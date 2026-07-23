@@ -1,0 +1,30 @@
+body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+html[lang="ar"] body {
+  font-family: var(--font-arabic);
+}
+
+h1,
+h2 {
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+html[lang="ar"] h1,
+html[lang="ar"] h2 {
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.metadata-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}

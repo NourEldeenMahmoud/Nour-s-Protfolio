@@ -1,0 +1,32 @@
+# Project-local tooling node modules
+.opencode/node_modules/
+
+# Transient browser artifacts
+.opencode/browser-data/
+.opencode/browser-profiles/
+
+# Project-local browser binaries (if downloaded via PLAYWRIGHT_BROWSERS_PATH)
+.opencode/browsers/
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+
+# Application dependencies and build output
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+.playwright-mcp/
+.lighthouseci/
+*.tsbuildinfo
+
+# Blender autosave backups
+*.blend1
+*.blend2
+
+# Local environment files
+.env*
+!.env.example

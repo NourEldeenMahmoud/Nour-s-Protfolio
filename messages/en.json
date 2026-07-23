@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "title": "Nour Eldeen Mahmoud | Software Engineer",
+    "description": ".NET-centered software engineer building dependable systems across backend, full-stack, cross-platform, and interactive work."
+  },
+  "entry": {
+    "eyebrow": "ENGINEERING CORE / 001",
+    "name": "Nour Eldeen Mahmoud",
+    "role": ".NET-centered software engineer",
+    "statement": "I turn complex problems into systems that can be understood, built, and validated.",
+    "selectorTitle": "Choose your path",
+    "selectorHint": "One engineering core. Four ways to examine the work.",
+    "skip": "Skip intro",
+    "replay": "Replay intro",
+    "language": "العربية",
+    "languageLabel": "View in Arabic",
+    "statusPlaying": "Introduction playing. Use Skip intro to continue immediately.",
+    "statusReady": "The path selector is ready.",
+    "signals": [
+      "Booking",
+      "Payments",
+      "Hardware",
+      "Healthcare",
+      "Cross-platform",
+      "Interactive"
+    ],
+    "process": ["Understand", "Design", "Build", "Validate"],
+    "paths": {
+      "hire": {
+        "label": "Hire",
+        "description": "I am evaluating Nour for a role, internship, or engineering opportunity."
+      },
+      "watch": {
+        "label": "Watch",
+        "description": "I came to watch Nour's work, projects, interactions, and visual product stories."
+      },
+      "learn": {
+        "label": "Learn",
+        "description": "I want to understand Nour's architecture, decisions, experiments, knowledge, and working process."
+      },
+      "general": {
+        "label": "Continue to the general portfolio",
+        "description": "A balanced overview of work, process, knowledge, About, CV, and contact."
+      }
+    }
+  },
+  "room": {
+    "eyebrow": "NOUR / ENGINEERING ROOM",
+    "name": "Nour Eldeen Mahmoud",
+    "role": ".NET-centered software engineer building dependable, thoughtful systems.",
+    "introStatus": "Room introduction playing. Use Skip intro to continue immediately.",
+    "readyStatus": "The engineering room is ready.",
+    "loading": "Preparing the room",
+    "skip": "Skip intro",
+    "replay": "Replay room intro",
+    "language": "العربية",
+    "languageLabel": "View in Arabic",
+    "instruction": "Explore by room area. Use Tab to move between destinations.",
+    "areas": {
+      "projects": {
+        "label": "Are you here to hire me?",
+        "description": "For HR teams, recruiters, and clients.",
+        "path": "hire"
+      },
+      "exploration": {
+        "label": "Are you here to explore my work?",
+        "description": "For clients, developers, and product teams.",
+        "path": "watch"
+      },
+      "lab": {
+        "label": "Are you here to learn?",
+        "description": "For developers, peers, and fellow builders.",
+        "path": "learn"
+      }
+    }
+  },
+  "placeholder": {
+    "eyebrow": "PHASE 1 ROUTE CONTRACT",
+    "title": "The {path} path starts here.",
+    "description": "This destination is intentionally semantic and minimal. Its complete experience belongs to a later implementation phase.",
+    "back": "Return to path selector"
+  }
+}

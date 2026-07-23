@@ -1,0 +1,55 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "node",
+        ".opencode/node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js",
+        "--isolated",
+        "--no-usage-statistics",
+        "--headless"
+      ],
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "node",
+        ".opencode/node_modules/@playwright/mcp/cli.js",
+        "--browser",
+        "chrome",
+        "--headless",
+        "--isolated"
+      ],
+      "enabled": true
+    },
+    "tsparticles": {
+      "type": "local",
+      "command": [
+        "node",
+        ".opencode/node_modules/@tsparticles/mcp-server/dist/index.js"
+      ],
+      "enabled": true
+    },
+    "blender": {
+      "type": "local",
+      "command": [
+        "C:\\Users\\nabde\\AppData\\Local\\hermes\\bin\\uvx.exe",
+        "--python",
+        "3.11",
+        "blender-mcp"
+      ],
+      "enabled": true,
+      "env": {
+        "BLENDER_HOST": "localhost",
+        "BLENDER_PORT": "9876",
+        "DISABLE_TELEMETRY": "true",
+        "UV_PYTHON_PREFERENCE": "only-managed"
+      }
+    }
+  }
+}

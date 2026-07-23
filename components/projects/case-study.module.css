@@ -1,0 +1,225 @@
+.caseStudy {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #ece6d8;
+  color: #151a1f;
+  animation: case-enter 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes case-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.2rem clamp(1rem, 4vw, 4rem);
+  border-block-end: 1px solid rgb(21 26 31 / 18%);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(20rem, 0.82fr) minmax(0, 1.18fr);
+  min-height: min(86svh, 60rem);
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 6vw, 6rem);
+}
+
+.heroCopy > p:first-child,
+.narrative article > p:first-child,
+.narrative aside > p:first-child {
+  color: #8a5d2d;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heroCopy h1 {
+  max-width: 10ch;
+  margin-block: 1rem 1.5rem;
+  font-size: clamp(3rem, 7vw, 7.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.heroCopy > p:nth-child(3) {
+  max-width: 36rem;
+  color: rgb(21 26 31 / 70%);
+  font-size: clamp(1rem, 1.7vw, 1.3rem);
+  line-height: 1.6;
+}
+
+.heroCopy ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-block-start: 2rem;
+}
+
+.heroCopy li {
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgb(21 26 31 / 24%);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  text-transform: uppercase;
+}
+
+.hero figure {
+  position: relative;
+  min-height: 34rem;
+  background: #111920;
+}
+
+.hero figure img {
+  object-fit: cover;
+}
+
+.factGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-block: 1px solid rgb(21 26 31 / 18%);
+}
+
+.factGrid article {
+  min-height: 24rem;
+  padding: clamp(2rem, 6vw, 6rem);
+  border-inline-end: 1px solid rgb(21 26 31 / 18%);
+}
+
+.factGrid span {
+  color: #8a5d2d;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.factGrid h2,
+.narrative h2 {
+  margin-block: 2rem 1rem;
+  font-size: clamp(2rem, 4vw, 4.4rem);
+  letter-spacing: -0.05em;
+}
+
+.factGrid p,
+.narrative article > p:last-child,
+.narrative aside > p:last-child {
+  max-width: 42rem;
+  color: rgb(21 26 31 / 70%);
+  line-height: 1.75;
+}
+
+.narrative {
+  display: grid;
+  gap: 1px;
+  padding: clamp(4rem, 10vw, 10rem) clamp(1.25rem, 9vw, 9rem);
+  background: rgb(21 26 31 / 16%);
+}
+
+.narrative article,
+.narrative aside {
+  padding: clamp(2rem, 6vw, 6rem);
+  background: #ece6d8;
+}
+
+.narrative article:nth-child(even) {
+  margin-inline-start: 14%;
+}
+
+.narrative aside {
+  margin-inline-start: 28%;
+  background: #20282e;
+  color: #f0eadf;
+}
+
+.narrative aside > p:last-child {
+  color: rgb(240 234 223 / 68%);
+}
+
+.narrative aside > p:first-child {
+  color: #d6a96f;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  padding: clamp(4rem, 8vw, 7rem) 1.25rem;
+}
+
+.actions a {
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(21 26 31 / 30%);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.nextProject {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: clamp(3rem, 8vw, 7rem) clamp(1.25rem, 8vw, 8rem);
+  background: #121920;
+  color: #eee8db;
+}
+
+.nextProject > span:first-child {
+  grid-column: 1 / -1;
+  color: #c99b5a;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.nextProject strong {
+  font-size: clamp(2.2rem, 6vw, 6rem);
+  letter-spacing: -0.05em;
+}
+
+.nextProject > span:last-child {
+  align-self: center;
+  color: #c99b5a;
+  font-size: 2rem;
+}
+
+@media (max-width: 850px) {
+  .hero,
+  .factGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero figure {
+    min-height: 50svh;
+    grid-row: 1;
+  }
+
+  .factGrid article {
+    min-height: auto;
+    border-block-end: 1px solid rgb(21 26 31 / 18%);
+  }
+
+  .narrative article:nth-child(even),
+  .narrative aside {
+    margin-inline-start: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caseStudy {
+    animation: none;
+  }
+}
