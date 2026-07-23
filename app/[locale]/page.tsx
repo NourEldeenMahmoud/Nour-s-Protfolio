@@ -26,6 +26,7 @@ export default async function EntryPage({
         loading: t("loading"),
         skip: t("skip"),
         replay: t("replay"),
+        returnToRoom: t("returnToRoom"),
         language: t("language"),
         languageLabel: t("languageLabel"),
         instruction: t("instruction"),

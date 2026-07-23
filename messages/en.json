@@ -53,6 +53,7 @@
     "loading": "Preparing the room",
     "skip": "Skip intro",
     "replay": "Replay room intro",
+    "returnToRoom": "Return to room",
     "language": "العربية",
     "languageLabel": "View in Arabic",
     "instruction": "Explore by room area. Use Tab to move between destinations.",

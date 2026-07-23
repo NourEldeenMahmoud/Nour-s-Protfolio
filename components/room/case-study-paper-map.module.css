@@ -11,7 +11,6 @@
 
 .active {
   opacity: 1;
-  pointer-events: auto;
 }
 
 .paper {
@@ -19,17 +18,25 @@
   outline: none;
 }
 
+.map:not(.active) .paper {
+  pointer-events: none;
+}
+
+.paperPreview {
+  opacity: 0;
+  transform-box: view-box;
+  transition:
+    opacity 180ms ease,
+    filter 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  will-change: opacity, transform, filter;
+}
+
 .paperSurface {
   fill: rgb(218 168 95 / 0%);
-  stroke: rgb(241 202 140 / 0%);
+  stroke: transparent;
   stroke-width: 7;
-  transform-box: fill-box;
-  transform-origin: center;
-  transition:
-    fill 220ms ease,
-    stroke 220ms ease,
-    filter 260ms ease,
-    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
   vector-effect: non-scaling-stroke;
 }
 
@@ -59,10 +66,14 @@
 
 .paper:hover .paperSurface,
 .paper:focus-visible .paperSurface {
-  fill: rgb(218 168 95 / 12%);
-  stroke: #efc781;
-  filter: drop-shadow(0 22px 22px rgb(0 0 0 / 50%));
-  transform: translateY(-10px) scale(1.018);
+  fill: transparent;
+}
+
+.paper:hover .paperPreview,
+.paper:focus-visible .paperPreview {
+  opacity: 1;
+  filter: drop-shadow(0 28px 24px rgb(0 0 0 / 48%));
+  transform: translateY(-18px) scale(1.08);
 }
 
 .paper:hover .paperLabel,
@@ -79,6 +90,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .map,
+  .paperPreview,
   .paperSurface,
   .paperLabel {
     transition: none;

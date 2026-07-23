@@ -32,6 +32,7 @@ type RoomCopy = {
   loading: string;
   skip: string;
   replay: string;
+  returnToRoom: string;
   language: string;
   languageLabel: string;
   instruction: string;
@@ -261,14 +262,12 @@ export function RoomExperience({
     setRun((value) => value + 1);
   }
 
-  function focusArea(
-    event: MouseEvent<HTMLAnchorElement>,
-    area: RoomArea,
-  ) {
-    event.preventDefault();
-    const nextArea = focusedArea === area ? null : area;
+  function transitionToArea(nextArea: RoomArea | null) {
     setFocusedArea(nextArea);
-    setStatus(nextArea ? `${copy.areas[area].label}.` : copy.readyStatus);
+    setHoveredArea(null);
+    setStatus(
+      nextArea ? `${copy.areas[nextArea].label}.` : copy.readyStatus,
+    );
     if (rootRef.current) {
       rootRef.current.dataset.roomState = nextArea ? "focused" : "idle";
       const focusStills = rootRef.current.querySelectorAll<HTMLElement>(
@@ -291,6 +290,15 @@ export function RoomExperience({
         };
       });
     }
+  }
+
+  function focusArea(
+    event: MouseEvent<HTMLAnchorElement>,
+    area: RoomArea,
+  ) {
+    event.preventDefault();
+    if (!isIdle || (focusedArea !== null && focusedArea !== area)) return;
+    transitionToArea(focusedArea === area ? null : area);
   }
 
   const alternateLocale = locale === "en" ? "ar" : "en";
@@ -384,6 +392,8 @@ export function RoomExperience({
           <nav className={styles.hotspots} aria-label={copy.instruction}>
             {roomAreas.map((area, index) => {
               const areaCopy = copy.areas[area];
+              const areaDisabled =
+                !isIdle || (focusedArea !== null && focusedArea !== area);
               return (
                 <Link
                   key={area}
@@ -392,16 +402,18 @@ export function RoomExperience({
                   data-area={area}
                   aria-label={`${areaCopy.label}. ${areaCopy.description}`}
                   aria-current={focusedArea === area ? "true" : undefined}
-                  aria-disabled={!isIdle}
-                  tabIndex={isIdle ? 0 : -1}
+                  aria-disabled={areaDisabled}
+                  tabIndex={areaDisabled ? -1 : 0}
                   onMouseEnter={() => {
-                    if (isIdle) {
+                    if (!areaDisabled) {
                       setHoveredArea(area);
                     }
                   }}
                   onMouseLeave={() => setHoveredArea(null)}
                   onFocus={() => {
-                    setHoveredArea(area);
+                    if (!areaDisabled) {
+                      setHoveredArea(area);
+                    }
                   }}
                   onBlur={() => setHoveredArea(null)}
                   onClick={(event) => focusArea(event, area)}
@@ -417,6 +429,16 @@ export function RoomExperience({
               );
             })}
           </nav>
+
+          {focusedArea && (
+            <button
+              className={styles.returnToRoom}
+              type="button"
+              onClick={() => transitionToArea(null)}
+            >
+              {copy.returnToRoom}
+            </button>
+          )}
 
           <button
             className={styles.replay}
