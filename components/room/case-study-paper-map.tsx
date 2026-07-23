@@ -16,7 +16,7 @@ const papers: Array<{
     y: 430,
     width: 620,
     height: 730,
-    clipPoints: "1280,430 1860,430 1850,1135 1265,1115",
+    clipPoints: "1295,448 1845,448 1835,1115 1280,1095",
   },
   {
     slug: "bookify",
@@ -24,7 +24,7 @@ const papers: Array<{
     y: 420,
     width: 450,
     height: 600,
-    clipPoints: "2045,420 2470,425 2460,1015 2040,1000",
+    clipPoints: "2060,438 2455,443 2445,995 2055,980",
   },
   {
     slug: "blood-bank-mobile",
@@ -32,7 +32,7 @@ const papers: Array<{
     y: 430,
     width: 430,
     height: 610,
-    clipPoints: "2515,430 2925,425 2920,1035 2510,1020",
+    clipPoints: "2530,448 2910,443 2905,1015 2525,1000",
   },
   {
     slug: "dvld",
@@ -40,7 +40,7 @@ const papers: Array<{
     y: 1150,
     width: 390,
     height: 490,
-    clipPoints: "1240,1150 1610,1160 1605,1640 1235,1625",
+    clipPoints: "1255,1168 1595,1178 1590,1620 1250,1605",
   },
   {
     slug: "blood-bank-desktop",
@@ -48,7 +48,7 @@ const papers: Array<{
     y: 1200,
     width: 390,
     height: 500,
-    clipPoints: "1830,1200 2200,1205 2195,1690 1825,1680",
+    clipPoints: "1845,1218 2185,1223 2180,1670 1840,1660",
   },
   {
     slug: "cinemaverse",
@@ -56,7 +56,7 @@ const papers: Array<{
     y: 1170,
     width: 390,
     height: 500,
-    clipPoints: "2440,1170 2810,1180 2805,1675 2435,1660",
+    clipPoints: "2455,1188 2795,1198 2790,1655 2450,1640",
   },
 ];
 

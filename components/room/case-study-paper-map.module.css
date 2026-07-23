@@ -7,6 +7,13 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 260ms ease;
+
+  /* Align SVG with the focus still's object-position: 50% 18%.
+     The SVG uses xMidYMid slice (centered at 50%) — more top crop.
+     object-position 18% has LESS top crop, so the image content is
+     lower. Shift the SVG DOWN by (50%-18%) = 32% of excess height.
+     excess = scaledImgHeight − viewport = vw × 9/14 − vh           */
+  transform: translateY(calc(max(0px, 100vw * 9 / 14 - 100vh) * 0.32));
 }
 
 .active {
