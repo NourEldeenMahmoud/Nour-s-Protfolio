@@ -177,7 +177,7 @@
 
 .veil {
   position: absolute;
-  z-index: 20;
+  z-index: 6;
   inset: 0;
   background: #070b10;
   opacity: 0;
@@ -186,6 +186,10 @@
 
 .room[data-room-state="loading"] .veil {
   opacity: 1;
+}
+
+.room[data-room-state="loading"] .controls {
+  opacity: 0;
 }
 
 .topbar {
@@ -216,6 +220,11 @@
   z-index: 7;
   inset: 0;
   will-change: transform, opacity;
+}
+
+.pathUi {
+  position: absolute;
+  inset: 0;
 }
 
 .identity {

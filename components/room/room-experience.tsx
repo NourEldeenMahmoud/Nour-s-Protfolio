@@ -10,11 +10,6 @@ import {
   type MouseEvent,
 } from "react";
 import type { Locale } from "@/i18n/routing";
-import {
-  getIntroEligibility,
-  persistIntroSeen,
-  readIntroSeen,
-} from "@/components/entry/entry-state";
 import styles from "./room.module.css";
 
 const roomAreas = ["projects", "exploration", "lab"] as const;
@@ -56,6 +51,9 @@ export function RoomExperience({
   const veilRef = useRef<HTMLDivElement>(null);
   const sweepRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
+  const identityRef = useRef<HTMLDivElement>(null);
+  const pathUiRef = useRef<HTMLDivElement>(null);
+  const topbarRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const contextRef = useRef<gsap.Context | null>(null);
@@ -76,7 +74,6 @@ export function RoomExperience({
 
   function completeIntro({ focus = true }: { focus?: boolean } = {}) {
     clearAnimation();
-    persistIntroSeen(window.localStorage);
     if (rootRef.current) rootRef.current.dataset.roomState = "idle";
     setIsIdle(true);
     setStatus(copy.readyStatus);
@@ -94,6 +91,9 @@ export function RoomExperience({
     const veil = veilRef.current;
     const sweep = sweepRef.current;
     const controls = controlsRef.current;
+    const identity = identityRef.current;
+    const pathUi = pathUiRef.current;
+    const topbar = topbarRef.current;
     if (
       !root ||
       !frame ||
@@ -101,40 +101,29 @@ export function RoomExperience({
       !introLightsContainer ||
       !veil ||
       !sweep ||
-      !controls
+      !controls ||
+      !identity ||
+      !pathUi ||
+      !topbar
     )
       return;
     const introLights = Array.from(introLightsContainer.children);
     const [projectsLight, explorationLight, labLight] = introLights;
     if (!projectsLight || !explorationLight || !labLight) return;
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const replayRequested =
-      run > 0 || new URLSearchParams(window.location.search).has("replay");
-    const seen = readIntroSeen(window.localStorage);
-    const eligibility = getIntroEligibility({
-      isEntryRoute: true,
-      reducedMotion,
-      replayRequested,
-      seen,
-    });
     let cancelled = false;
     void import("gsap")
       .then(({ gsap }) => {
         if (cancelled) return;
         contextRef.current = gsap.context(() => {
-          if (eligibility === "static") {
-            root.dataset.roomState = "idle";
-            gsap.set(controls, { autoAlpha: 1, y: 0 });
-            gsap.set([veil, sweep], { autoAlpha: 0 });
-            completeIntroAfterEffect({ focus: false });
-            return;
-          }
-
           root.dataset.roomState = "intro";
           setStatus(copy.introStatus);
+          const identityOffset = Math.max(
+            0,
+            window.innerHeight / 2 -
+              identity.getBoundingClientRect().top -
+              identity.offsetHeight / 2,
+          );
           gsap.set(frame, { xPercent: 0, yPercent: 0, scale: 1 });
           gsap.set(roomImage, {
             filter: "brightness(0.12) saturate(0.3) contrast(1.16)",
@@ -142,22 +131,51 @@ export function RoomExperience({
           gsap.set(introLights, { autoAlpha: 0 });
           gsap.set(veil, { autoAlpha: 1 });
           gsap.set(sweep, { autoAlpha: 0, xPercent: -55 });
-          gsap.set(controls, { autoAlpha: 0, y: 18 });
+          gsap.set(controls, { autoAlpha: 1, y: 0 });
+          gsap.set(identity, {
+            autoAlpha: 0,
+            y: identityOffset,
+            scale: 0.82,
+            transformOrigin: "50% 50%",
+          });
+          gsap.set(pathUi, { autoAlpha: 0, y: 14 });
+          gsap.set(topbar, { autoAlpha: 0, y: -8 });
 
           timelineRef.current = gsap
             .timeline({
               defaults: { ease: "power2.inOut" },
               onComplete: () => completeIntroAfterEffect({ focus: true }),
             })
-            .addLabel("powerDown", 0)
-            .to(veil, { autoAlpha: 0, duration: 0.8 }, "powerDown+=0.15")
+            .addLabel("identity", 0)
+            .to(
+              identity,
+              {
+                autoAlpha: 1,
+                scale: 1.22,
+                duration: 1,
+                ease: "expo.out",
+              },
+              "identity+=0.2",
+            )
+            .to(
+              identity,
+              {
+                y: 0,
+                scale: 1,
+                duration: 1.2,
+                ease: "power3.inOut",
+              },
+              "identity+=1.45",
+            )
+            .addLabel("powerUp", 2.35)
+            .to(veil, { autoAlpha: 0, duration: 0.85 }, "powerUp")
             .to(
               roomImage,
               {
                 filter: "brightness(0.2) saturate(0.42) contrast(1.12)",
                 duration: 0.9,
               },
-              "powerDown+=0.2",
+              "powerUp",
             )
             .to(
               projectsLight,
@@ -170,7 +188,7 @@ export function RoomExperience({
                   { autoAlpha: 1, duration: 0.5, ease: "power2.out" },
                 ],
               },
-              0.9,
+              2.85,
             )
             .to(
               explorationLight,
@@ -183,7 +201,7 @@ export function RoomExperience({
                   { autoAlpha: 1, duration: 0.52, ease: "power2.out" },
                 ],
               },
-              1.55,
+              3.45,
             )
             .to(
               labLight,
@@ -196,16 +214,20 @@ export function RoomExperience({
                   { autoAlpha: 1, duration: 0.5, ease: "power2.out" },
                 ],
               },
-              2.2,
+              4.05,
             )
             .to(
               sweep,
               { autoAlpha: 0.38, xPercent: 60, duration: 1.25 },
-              2.25,
+              4.1,
             )
-            .to(sweep, { autoAlpha: 0, duration: 0.55 }, 3.15)
-            .to(controls, { autoAlpha: 1, y: 0, duration: 0.8 }, 3.05)
-            .to({}, { duration: 0.35 });
+            .to(sweep, { autoAlpha: 0, duration: 0.55 }, 5)
+            .to(
+              [topbar, pathUi],
+              { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.12 },
+              4.8,
+            )
+            .to({}, { duration: 0.2 });
         }, root);
       })
       .catch(() => completeIntroAfterEffect({ focus: false }));
@@ -282,7 +304,7 @@ export function RoomExperience({
       <div ref={sweepRef} className={styles.lightSweep} aria-hidden="true" />
       <div ref={veilRef} className={styles.veil} aria-hidden="true" />
 
-      <header className={styles.topbar}>
+      <header ref={topbarRef} className={styles.topbar}>
         <p>{copy.eyebrow}</p>
         <Link
           href={`/${alternateLocale}`}
@@ -299,63 +321,65 @@ export function RoomExperience({
         className={styles.controls}
         aria-labelledby="room-heading"
       >
-        <div className={styles.identity}>
+        <div ref={identityRef} className={styles.identity}>
           <h1>{copy.name}</h1>
           <p>{copy.role}</p>
         </div>
 
-        <div className={styles.roomHeading}>
-          <p>{copy.instruction}</p>
-          <h2 id="room-heading" ref={headingRef} tabIndex={-1}>
-            {copy.readyStatus}
-          </h2>
-        </div>
+        <div ref={pathUiRef} className={styles.pathUi}>
+          <div className={styles.roomHeading}>
+            <p>{copy.instruction}</p>
+            <h2 id="room-heading" ref={headingRef} tabIndex={-1}>
+              {copy.readyStatus}
+            </h2>
+          </div>
 
-        <nav className={styles.hotspots} aria-label={copy.instruction}>
-          {roomAreas.map((area, index) => {
-            const areaCopy = copy.areas[area];
-            return (
-              <Link
-                key={area}
-                href={`/${locale}/${areaCopy.path}`}
-                className={styles.hotspot}
-                data-area={area}
-                aria-label={`${areaCopy.label}. ${areaCopy.description}`}
-                aria-current={focusedArea === area ? "true" : undefined}
-                aria-disabled={!isIdle}
-                tabIndex={isIdle ? 0 : -1}
-                onMouseEnter={() => {
-                  if (isIdle) {
+          <nav className={styles.hotspots} aria-label={copy.instruction}>
+            {roomAreas.map((area, index) => {
+              const areaCopy = copy.areas[area];
+              return (
+                <Link
+                  key={area}
+                  href={`/${locale}/${areaCopy.path}`}
+                  className={styles.hotspot}
+                  data-area={area}
+                  aria-label={`${areaCopy.label}. ${areaCopy.description}`}
+                  aria-current={focusedArea === area ? "true" : undefined}
+                  aria-disabled={!isIdle}
+                  tabIndex={isIdle ? 0 : -1}
+                  onMouseEnter={() => {
+                    if (isIdle) {
+                      setHoveredArea(area);
+                    }
+                  }}
+                  onMouseLeave={() => setHoveredArea(null)}
+                  onFocus={() => {
                     setHoveredArea(area);
-                  }
-                }}
-                onMouseLeave={() => setHoveredArea(null)}
-                onFocus={() => {
-                  setHoveredArea(area);
-                }}
-                onBlur={() => setHoveredArea(null)}
-                onClick={(event) => focusArea(event, area)}
-              >
-                <span className={styles.hotspotMarker}>
-                  <span className={styles.hotspotIndex}>0{index + 1}</span>
-                  <span className={styles.hotspotCopy}>
-                    <strong>{areaCopy.label}</strong>
-                    <span>{areaCopy.description}</span>
+                  }}
+                  onBlur={() => setHoveredArea(null)}
+                  onClick={(event) => focusArea(event, area)}
+                >
+                  <span className={styles.hotspotMarker}>
+                    <span className={styles.hotspotIndex}>0{index + 1}</span>
+                    <span className={styles.hotspotCopy}>
+                      <strong>{areaCopy.label}</strong>
+                      <span>{areaCopy.description}</span>
+                    </span>
                   </span>
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+                </Link>
+              );
+            })}
+          </nav>
 
-        <button
-          className={styles.replay}
-          type="button"
-          onClick={replayIntro}
-          disabled={!isIdle}
-        >
-          {copy.replay}
-        </button>
+          <button
+            className={styles.replay}
+            type="button"
+            onClick={replayIntro}
+            disabled={!isIdle}
+          >
+            {copy.replay}
+          </button>
+        </div>
       </section>
 
       <button

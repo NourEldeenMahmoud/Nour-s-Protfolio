@@ -17,9 +17,7 @@ test.afterEach(({ page }) => {
   expect(browserErrors.get(page)).toEqual([]);
 });
 
-test("first visit can skip, persists state, and moves focus", async ({
-  page,
-}) => {
+test("intro can skip and moves focus", async ({ page }) => {
   await page.goto("/en");
   await page.getByRole("button", { name: "Skip intro" }).click();
 
@@ -35,15 +33,8 @@ test("first visit can skip, persists state, and moves focus", async ({
   await expect(
     page.getByRole("link", { name: /Are you here to explore my work/ }),
   ).toHaveAttribute("href", "/en/watch");
-  expect(
-    await page.evaluate(() => localStorage.getItem("portfolio.intro.seen.v3")),
-  ).toBe("true");
-
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: "Replay room intro" }),
-  ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Skip intro" })).toBeHidden();
+  await expect(page.getByRole("button", { name: "Skip intro" })).toBeVisible();
 });
 
 test("Replay remains skippable and does not navigate", async ({ page }) => {
@@ -59,7 +50,7 @@ test("Replay remains skippable and does not navigate", async ({ page }) => {
   ).toBeFocused();
 });
 
-test("natural completion persists state, keeps the URL, and focuses the selector", async ({
+test("natural completion keeps the URL and focuses the selector", async ({
   page,
 }) => {
   await page.goto("/en");
@@ -68,9 +59,6 @@ test("natural completion persists state, keeps the URL, and focuses the selector
     page.getByRole("heading", { name: "The engineering room is ready." }),
   ).toBeFocused({ timeout: 7_000 });
   await expect(page).toHaveURL(/\/en$/);
-  expect(
-    await page.evaluate(() => localStorage.getItem("portfolio.intro.seen.v3")),
-  ).toBe("true");
 });
 
 test("JavaScript-disabled fallback keeps all room routes", async ({
@@ -113,11 +101,10 @@ test("Arabic entry has RTL direction and equivalent route links", async ({
   ).toHaveAttribute("href", "/ar/watch");
 });
 
-test("reduced motion bypasses the timeline", async ({ page }) => {
+test("light-only intro remains available with reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/en");
-  await expect(page.getByRole("button", { name: "Skip intro" })).toBeHidden();
-  await expect(page.getByRole("navigation")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Skip intro" })).toBeVisible();
 });
 
 const routeHeadings = {
