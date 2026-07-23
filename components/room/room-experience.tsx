@@ -10,9 +10,17 @@ import {
   type MouseEvent,
 } from "react";
 import type { Locale } from "@/i18n/routing";
+import type { Project } from "@/content/portfolio";
+import { CaseStudyModal } from "./case-study-modal";
+import { CaseStudyPaperMap } from "./case-study-paper-map";
 import styles from "./room.module.css";
 
 const roomAreas = ["projects", "exploration", "lab"] as const;
+const focusStills = {
+  projects: "/engineering-room-hire-straight.webp",
+  exploration: "/engineering-room-watch-straight.webp",
+  lab: "/engineering-room-learn-straight.webp",
+} as const;
 type RoomArea = (typeof roomAreas)[number];
 
 type RoomCopy = {
@@ -61,6 +69,7 @@ export function RoomExperience({
   const [run, setRun] = useState(0);
   const [hoveredArea, setHoveredArea] = useState<RoomArea | null>(null);
   const [focusedArea, setFocusedArea] = useState<RoomArea | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isIdle, setIsIdle] = useState(false);
   const [status, setStatus] = useState(copy.loading);
   const activeArea = hoveredArea ?? focusedArea;
@@ -240,6 +249,12 @@ export function RoomExperience({
 
   function replayIntro() {
     clearAnimation();
+    rootRef.current
+      ?.querySelectorAll<HTMLElement>(`.${styles.focusStill}`)
+      .forEach((still) => {
+        still.getAnimations().forEach((animation) => animation.cancel());
+        still.style.opacity = "0";
+      });
     setIsIdle(false);
     setHoveredArea(null);
     setFocusedArea(null);
@@ -256,6 +271,25 @@ export function RoomExperience({
     setStatus(nextArea ? `${copy.areas[area].label}.` : copy.readyStatus);
     if (rootRef.current) {
       rootRef.current.dataset.roomState = nextArea ? "focused" : "idle";
+      const focusStills = rootRef.current.querySelectorAll<HTMLElement>(
+        `.${styles.focusStill}`,
+      );
+      focusStills.forEach((still) => {
+        const currentOpacity = getComputedStyle(still).opacity;
+        const targetOpacity = still.dataset.focusStill === nextArea ? 1 : 0;
+        still.getAnimations().forEach((animation) => animation.cancel());
+        still.style.opacity = currentOpacity;
+        const animation = still.animate(
+          [{ opacity: currentOpacity }, { opacity: targetOpacity }],
+          {
+            duration: 1100,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          },
+        );
+        animation.onfinish = () => {
+          still.style.opacity = String(targetOpacity);
+        };
+      });
     }
   }
 
@@ -294,6 +328,19 @@ export function RoomExperience({
             unoptimized
             sizes="100vw"
           />
+          {Object.entries(focusStills).map(([area, src]) => (
+            <Image
+              key={area}
+              className={styles.focusStill}
+              data-focus-still={area}
+              src={src}
+              alt=""
+              fill
+              priority
+              unoptimized
+              sizes="100vw"
+            />
+          ))}
           <div ref={introLightsRef} className={styles.introLights}>
             {roomAreas.map((area) => (
               <span key={area} data-intro-light={area} />
@@ -381,6 +428,20 @@ export function RoomExperience({
           </button>
         </div>
       </section>
+
+      <CaseStudyPaperMap
+        active={isIdle && focusedArea === "projects"}
+        locale={locale}
+        onOpen={setSelectedProject}
+      />
+
+      {selectedProject && (
+        <CaseStudyModal
+          locale={locale}
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
+      )}
 
       <button
         className={styles.skip}

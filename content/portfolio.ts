@@ -19,6 +19,7 @@ export type Project = {
   shortTitle: string;
   image: string;
   imageAlt: LocalizedText;
+  gallery?: Array<{ src: string; alt: LocalizedText }>;
   summary: LocalizedText;
   context: LocalizedText;
   contribution: LocalizedText;
@@ -26,6 +27,7 @@ export type Project = {
   evidence: LocalizedText;
   limitation: LocalizedText;
   stack: string[];
+  highlights?: string[];
   repository: string;
   demo?: string;
   featured?: boolean;
@@ -41,6 +43,15 @@ export const projects: Project[] = [
       en: "BuildSense hardware discovery home page",
       ar: "الصفحة الرئيسية لمنصة BuildSense لاكتشاف مكونات الحاسوب",
     },
+    gallery: [
+      {
+        src: "/projects/buildsense-catalog.webp",
+        alt: {
+          en: "BuildSense component catalog with filters and product cards",
+          ar: "كتالوج مكونات BuildSense مع المرشحات وبطاقات المنتجات",
+        },
+      },
+    ],
     summary: {
       en: "PC hardware discovery and compatibility for the Egyptian market.",
       ar: "منصة لاكتشاف مكونات الحاسوب والتحقق من توافقها للسوق المصري.",
@@ -66,6 +77,12 @@ export const projects: Project[] = [
       ar: "يظل التوافق مرتبطاً بجودة الأدلة؛ تظهر الحقائق الناقصة كغير معروفة، ولا توجد مقاييس استخدام منشورة تم التحقق منها.",
     },
     stack: ["Angular 19", "TypeScript", "Node.js", "Express", "MongoDB", "Nx"],
+    highlights: [
+      "Search, filters, sorting, pagination, product offers, and source-store links.",
+      "Persistent eight-slot PC builder with compatibility states: compatible, warning, incompatible, and unknown.",
+      "Multi-store worker pipeline with immutable snapshots, identity matching, offer publishing, and fact extraction.",
+      "Admin console for scrape runs, match reviews, data quality, compatibility coverage, and reprocessing jobs.",
+    ],
     repository: "https://github.com/NourEldeenMahmoud/BuildSense",
     demo: "https://buildsense.pages.dev/",
     featured: true,
@@ -79,6 +96,15 @@ export const projects: Project[] = [
       en: "Bookify hotel reservation home page",
       ar: "الصفحة الرئيسية لنظام حجز الفنادق Bookify",
     },
+    gallery: [
+      {
+        src: "/projects/bookify-rooms.png",
+        alt: {
+          en: "Bookify hotel room browsing screen",
+          ar: "شاشة استعراض غرف الفنادق في Bookify",
+        },
+      },
+    ],
     summary: {
       en: "A hotel reservation application covering availability, booking, payment, identity, and administration.",
       ar: "تطبيق لحجز الفنادق يغطي التوفر والحجز والدفع والهوية والإدارة.",
@@ -111,6 +137,12 @@ export const projects: Project[] = [
       "Stripe",
       "Identity",
     ],
+    highlights: [
+      "Date-range room search, availability checks, room details, booking history, and customer profiles.",
+      "Admin dashboard for rooms, room types, bookings, refunds, users, occupancy, and revenue views.",
+      "Stripe Payment Intents, SendGrid transactional email, ASP.NET Identity, RBAC, lockout, and CSRF protection.",
+      "N-tier structure with Repository, Unit of Work, ViewModel, service layer, migrations, and health checks.",
+    ],
     repository: "https://github.com/NourEldeenMahmoud/Bookify",
   },
   {
@@ -122,6 +154,15 @@ export const projects: Project[] = [
       en: "Blood Bank desktop operations dashboard",
       ar: "لوحة عمليات نظام بنك الدم المكتبي",
     },
+    gallery: [
+      {
+        src: "/projects/bbms-dashboard.png",
+        alt: {
+          en: "Blood Bank desktop dashboard",
+          ar: "لوحة تحكم نظام بنك الدم المكتبي",
+        },
+      },
+    ],
     summary: {
       en: "A Windows desktop system for donations, inventory, transfusions, patients, and employee access.",
       ar: "نظام مكتبي لويندوز لإدارة التبرعات والمخزون ونقل الدم والمرضى وصلاحيات الموظفين.",
@@ -147,6 +188,12 @@ export const projects: Project[] = [
       ar: "ما زال توثيق مساهمات أعضاء الفريق وتغطية الاختبارات ومخطط البنية متعدد المنصات المتحقق منه من الكود غير مكتمل.",
     },
     stack: [".NET Framework", "WinForms", "C#", "SQL Server", "Guna UI2"],
+    highlights: [
+      "Donor, patient, employee, blood unit, donation, transfusion, and reporting workflows.",
+      "Blood compatibility checks, expiration detection, test results, low-stock alerts, and unit traceability.",
+      "Three-tier Windows Forms architecture with Guna UI2 cards, navigation, charts, search, and validation.",
+      "Role-based access, authentication, data sanitization, and audit logging for critical operations.",
+    ],
     repository: "https://github.com/NourEldeenMahmoud/BBMS-Project",
   },
   {
@@ -158,6 +205,15 @@ export const projects: Project[] = [
       en: "Blood Bank donor mobile application home screen",
       ar: "الشاشة الرئيسية لتطبيق المتبرعين في منصة بنك الدم",
     },
+    gallery: [
+      {
+        src: "/projects/bbms-mobile-home.jpg",
+        alt: {
+          en: "Blood Bank donor mobile home screen",
+          ar: "الشاشة الرئيسية لتطبيق المتبرعين في بنك الدم",
+        },
+      },
+    ],
     summary: {
       en: "A Flutter donor experience connected to a .NET API and the wider blood-bank platform.",
       ar: "تجربة للمتبرعين مبنية بـFlutter ومتصلة بواجهة .NET وبمنصة بنك الدم الأوسع.",
@@ -190,6 +246,12 @@ export const projects: Project[] = [
       "Provider",
       "SQL Server",
     ],
+    highlights: [
+      "Flutter donor app with phone authentication, profiles, blood details, appointments, history, and notifications.",
+      "REST API with Swagger documentation, JWT authentication, CORS, and structured error handling.",
+      "Integrated mobile, desktop, API, and SQL Server workflow from appointment booking to donation processing.",
+      "Provider state management with organized models, services, routes, screens, and reusable widgets.",
+    ],
     repository: "https://github.com/NourEldeenMahmoud/Blood-Bank-mobile-App",
   },
   {
@@ -201,6 +263,15 @@ export const projects: Project[] = [
       en: "DVLD local driving license applications screen",
       ar: "شاشة طلبات رخص القيادة المحلية في نظام DVLD",
     },
+    gallery: [
+      {
+        src: "/projects/dvld-people.png",
+        alt: {
+          en: "DVLD people records management screen",
+          ar: "شاشة إدارة سجلات الأشخاص في DVLD",
+        },
+      },
+    ],
     summary: {
       en: "A Windows Forms application for driving licenses, applications, tests, people, and users.",
       ar: "تطبيق Windows Forms لإدارة رخص القيادة والطلبات والاختبارات والأشخاص والمستخدمين.",
@@ -226,6 +297,12 @@ export const projects: Project[] = [
       ar: "هذا عمل داعم؛ لا تُعرض نتائج تحقق أو نشر أو أدلة ملكية تفصيلية على أنها حقائق مؤكدة.",
     },
     stack: ["C#", ".NET Framework", "Windows Forms", "ADO.NET", "SQL Server"],
+    highlights: [
+      "People and user records with permissions, credentials, account freezing, and personal history.",
+      "License classes, staged vision/theory/practical tests, appointments, fees, issuance, and renewals.",
+      "International permits, detainment and release, lost or damaged replacements, and driver history.",
+      "Three-tier architecture with ADO.NET data access and Crystal Reports for reporting.",
+    ],
     repository: "https://github.com/NourEldeenMahmoud/DVLD",
   },
   {
@@ -237,6 +314,15 @@ export const projects: Project[] = [
       en: "CinemaVerse movie booking home page",
       ar: "الصفحة الرئيسية لمنصة حجز السينما CinemaVerse",
     },
+    gallery: [
+      {
+        src: "/projects/cinemaverse-movies.png",
+        alt: {
+          en: "CinemaVerse movie listing and discovery screen",
+          ar: "شاشة استعراض واكتشاف الأفلام في CinemaVerse",
+        },
+      },
+    ],
     summary: {
       en: "A cinema ticket platform covering discovery, seats, bookings, payments, tickets, and administration.",
       ar: "منصة لتذاكر السينما تشمل الاستكشاف والمقاعد والحجوزات والمدفوعات والتذاكر والإدارة.",
@@ -269,6 +355,12 @@ export const projects: Project[] = [
       "JWT",
       "Stripe",
       "Hangfire",
+    ],
+    highlights: [
+      "Movie discovery with search, genre and language filters, cast, images, and showtimes.",
+      "Interactive seat selection, real-time availability, Stripe payments, QR tickets, and check-in management.",
+      "Admin surfaces for movies, media, branches, halls, seat layouts, genres, showtimes, users, and bookings.",
+      "JWT access and refresh tokens, rate-limited auth, Hangfire expiry/reminder jobs, MailKit, and Serilog.",
     ],
     repository: "https://github.com/NourEldeenMahmoud/CinemaVerse",
   },
