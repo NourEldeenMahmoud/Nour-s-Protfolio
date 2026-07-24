@@ -68,7 +68,7 @@
 }
 
 .focusStill[data-focus-still="exploration"] {
-  object-position: 50% 22%;
+  object-position: 50% 8%;
 }
 
 .introLights {
@@ -233,7 +233,7 @@
 .identity {
   position: absolute;
   inset-block-start: clamp(1.25rem, 2.8vh, 2.25rem);
-  inset-inline-start: 50%;
+  left: 50%;
   width: min(62rem, 72vw);
   text-align: center;
   text-shadow: 0 3px 28px #000;
@@ -285,6 +285,32 @@
   letter-spacing: -0.03em;
 }
 
+[dir="rtl"] .identity p {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.95rem, 1.25vw, 1.25rem);
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+
+[dir="rtl"] .hotspotCopy strong {
+  font-family: var(--font-arabic);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+[dir="rtl"] .hotspotCopy > span {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.95rem, 1.2vw, 1.18rem);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .returnToRoom {
+  font-family: var(--font-arabic);
+  font-size: 0.92rem;
+  letter-spacing: 0;
+}
+
 .roomHeading {
   position: absolute;
   width: 1px;
@@ -315,21 +341,22 @@
 }
 
 .hotspot[data-area="projects"] {
-  inset-inline-start: 0;
+  left: 0;
 }
 
 .hotspot[data-area="exploration"] {
-  inset-inline-start: 33.333%;
+  left: 33.333%;
 }
 
 .hotspot[data-area="lab"] {
-  inset-inline-end: 0;
+  right: 0;
+  left: auto;
 }
 
 .hotspotMarker {
   position: absolute;
   inset-block-end: 10%;
-  inset-inline-start: 50%;
+  left: 50%;
   width: min(92%, 30rem);
   color: rgb(246 240 229 / 72%);
   text-align: center;
@@ -395,13 +422,15 @@
 }
 
 .room[data-focused-area] .hotspot[aria-current="true"] {
-  inset-inline: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   z-index: 8;
 }
 
 .room[data-focused-area] .hotspot[aria-current="true"] .hotspotMarker {
   inset-block: auto 11%;
+  left: 50%;
   transform: translateX(-50%);
 }
 
@@ -418,7 +447,7 @@
   position: absolute;
   z-index: 10;
   inset-block-end: clamp(1.4rem, 4vh, 2.75rem);
-  inset-inline-start: 50%;
+  left: 50%;
   padding: 0.6rem 1.4rem;
   border: 1px solid rgb(216 167 92 / 50%);
   background: rgb(6 11 16 / 45%);
@@ -496,7 +525,7 @@
   position: absolute;
   z-index: 12;
   inset-block-end: 2rem;
-  inset-inline-start: 50%;
+  left: 50%;
   translate: -50% 0;
   font-family: var(--font-mono);
   font-size: 0.7rem;
