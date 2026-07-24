@@ -1,0 +1,36 @@
+"use client";
+
+import type { Locale } from "@/i18n/routing";
+import { LearnExperience } from "./learn-experience";
+
+interface LearnExperiencePageProps {
+  locale: Locale;
+  copy: {
+    returnToRoom: string;
+    openComputer: string;
+    start: string;
+    search: string;
+    searchPlaceholder: string;
+    fileExplorer: string;
+    desktop: string;
+    emptyFolder: string;
+    itemCountPattern: string;
+    thisPC: string;
+    copyLink: string;
+    copied: string;
+    openProject: string;
+    relatedFiles: string;
+    relatedProjects: string;
+    limitations: string;
+    startMenuTitle: string;
+    noResults: string;
+    languageLabel: string;
+    usedFor: string;
+    workflowUses: string;
+    relatedSkills: string;
+  };
+}
+
+export function LearnExperiencePage({ locale, copy }: LearnExperiencePageProps) {
+  return <LearnExperience locale={locale} copy={copy} />;
+}

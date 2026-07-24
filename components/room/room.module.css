@@ -331,6 +331,7 @@
 }
 
 [dir="rtl"] .returnToRoom,
+[dir="rtl"] .openComputer,
 [dir="rtl"] .replay,
 [dir="rtl"] .skip {
   font-family: var(--font-arabic);
@@ -508,6 +509,38 @@
 .returnToRoom:hover,
 .returnToRoom:focus-visible {
   border-color: #d8a75c;
+  background: rgb(6 11 16 / 65%);
+  color: #fff;
+  transform: translate(-50%, -0.25rem);
+}
+
+.openComputer {
+  position: absolute;
+  z-index: 10;
+  inset-block-end: clamp(4rem, 9vh, 6.5rem);
+  left: 50%;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid rgb(102 167 170 / 50%);
+  background: rgb(6 11 16 / 45%);
+  color: rgb(166 220 226 / 82%);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-shadow: 0 2px 16px #000;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transform: translateX(-50%);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.openComputer:hover,
+.openComputer:focus-visible {
+  border-color: #66a7aa;
   background: rgb(6 11 16 / 65%);
   color: #fff;
   transform: translate(-50%, -0.25rem);

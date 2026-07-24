@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="ssms-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a7bd5"/>
+      <stop offset="100%" stop-color="#1a4f8a"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="16" fill="url(#ssms-bg)"/>
+  <ellipse cx="64" cy="88" rx="32" ry="10" fill="#1a4f8a"/>
+  <rect x="32" y="40" width="64" height="48" fill="#2a6bc5"/>
+  <ellipse cx="64" cy="40" rx="32" ry="10" fill="#4a90e0"/>
+  <ellipse cx="64" cy="40" rx="32" ry="10" fill="rgba(255,255,255,0.15)"/>
+  <ellipse cx="64" cy="64" rx="32" ry="7" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+</svg>

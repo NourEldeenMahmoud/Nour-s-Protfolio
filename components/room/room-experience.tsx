@@ -33,6 +33,7 @@ type RoomCopy = {
   skip: string;
   replay: string;
   returnToRoom: string;
+  openComputer: string;
   language: string;
   languageLabel: string;
   instruction: string;
@@ -94,6 +95,19 @@ export function RoomExperience({
 
   useLayoutEffect(() => {
     if (!imageReady) return;
+
+    const returning =
+      sessionStorage.getItem("learn-returning") === "true" ||
+      new URLSearchParams(window.location.search).get("from") === "room";
+    if (returning) {
+      sessionStorage.removeItem("learn-returning");
+      window.history.replaceState(null, "", window.location.pathname);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: useLayoutEffect runs before paint
+      setIsIdle(true);
+      setStatus(copy.readyStatus);
+      return;
+    }
+
     const root = rootRef.current;
     const frame = frameRef.current;
     const roomImage = roomImageRef.current;
@@ -246,7 +260,7 @@ export function RoomExperience({
       cancelled = true;
       clearAnimation();
     };
-  }, [copy.introStatus, imageReady, run]);
+  }, [copy.introStatus, copy.readyStatus, imageReady, run]);
 
   function replayIntro() {
     clearAnimation();
@@ -438,6 +452,15 @@ export function RoomExperience({
             >
               {copy.returnToRoom}
             </button>
+          )}
+
+          {focusedArea === "lab" && (
+            <Link
+              href={`/${locale}/learn?from=room`}
+              className={styles.openComputer}
+            >
+              {copy.openComputer}
+            </Link>
           )}
 
           <button

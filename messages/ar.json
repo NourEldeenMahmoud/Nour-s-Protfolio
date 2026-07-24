@@ -54,6 +54,7 @@
     "skip": "تخطي المقدمة",
     "replay": "إعادة مقدمة الغرفة",
     "returnToRoom": "العودة إلى الغرفة",
+    "openComputer": "افتح جهاز نور",
     "language": "English",
     "languageLabel": "عرض باللغة الإنجليزية",
     "instruction": "استكشف مساحات الغرفة. استخدم Tab للتنقل بين الوجهات.",
@@ -80,5 +81,29 @@
     "title": "يبدأ مسار {path} من هنا.",
     "description": "هذه الوجهة دلالية ومختصرة عن قصد. تجربتها الكاملة تنتمي إلى مرحلة تنفيذ لاحقة.",
     "back": "العودة إلى اختيار المسار"
+  },
+  "learnDesktop": {
+    "returnToRoom": "العودة إلى الغرفة",
+    "openComputer": "افتح جهاز نور",
+    "start": "ابدأ",
+    "search": "بحث",
+    "searchPlaceholder": "ابحث عن مجلدات وملفات ووسوم...",
+    "fileExplorer": "مستكشف الملفات",
+    "desktop": "سطح المكتب",
+    "emptyFolder": "هذا المجلد فارغ.",
+    "itemCount": "{count, plural, =0 {لا عناصر} one {عنصر واحد} other {# عناصر}}",
+    "thisPC": "هذا الكمبيوتر",
+    "copyLink": "نسخ الرابط",
+    "copied": "تم النسخ!",
+    "openProject": "افتح المشروع",
+    "relatedFiles": "ملفات ذات صلة",
+    "relatedProjects": "مشاريع ذات صلة",
+    "limitations": "قيود",
+    "startMenuTitle": "المجلدات",
+    "noResults": "لم يتم العثور على نتائج.",
+    "languageLabel": "تغيير اللغة",
+    "usedFor": "يُستخدم لـ",
+    "workflowUses": "استخدامات في سير العمل",
+    "relatedSkills": "مهارات ذات صلة"
   }
 }
