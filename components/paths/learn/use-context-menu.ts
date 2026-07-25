@@ -1,13 +1,33 @@
 "use client";
 
+import type { RefObject } from "react";
 import { useCallback, useEffect, useState } from "react";
 
 export type ContextMenuTarget =
   | { type: "desktop" }
-  | { type: "folder"; id: string; explorerWindowId?: string; sourceFolderId?: string }
-  | { type: "file"; id: string; explorerWindowId: string; sourceFolderId: string }
+  | {
+      type: "folder";
+      id: string;
+      explorerWindowId?: string;
+      sourceFolderId?: string;
+    }
+  | {
+      type: "file";
+      id: string;
+      explorerWindowId: string;
+      sourceFolderId: string;
+    }
   | { type: "app"; id: string }
-  | { type: "content"; windowId: string; contentId: string; contentKind: "document" | "app" | "about"; selectedText: string; fallbackText: string; x?: number; y?: number };
+  | {
+      type: "content";
+      windowId: string;
+      contentId: string;
+      contentKind: "document" | "app" | "about";
+      selectedText: string;
+      fallbackText: string;
+      x?: number;
+      y?: number;
+    };
 
 export interface ContextMenuState {
   open: boolean;
@@ -23,14 +43,18 @@ const initialState: ContextMenuState = {
   target: { type: "desktop" },
 };
 
-export function useContextMenu() {
+export function useContextMenu(childOpenRef?: RefObject<boolean>) {
   const [menu, setMenu] = useState<ContextMenuState>(initialState);
 
-  const openContextMenu = useCallback((x: number, y: number, target: ContextMenuTarget) => {
-    setMenu({ open: true, x, y, target });
-  }, []);
+  const openContextMenu = useCallback(
+    (x: number, y: number, target: ContextMenuTarget) => {
+      setMenu({ open: true, x, y, target });
+    },
+    [],
+  );
 
-  const closeContextMenu = useCallback(() => {
+  const closeContextMenu = useCallback((childOpen?: boolean) => {
+    if (childOpen) return;
     setMenu((prev) => (prev.open ? { ...prev, open: false } : prev));
   }, []);
 
@@ -39,6 +63,7 @@ export function useContextMenu() {
 
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
+        if (childOpenRef?.current) return;
         closeContextMenu();
       }
     }
@@ -57,7 +82,7 @@ export function useContextMenu() {
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("scroll", handleScroll, true);
     };
-  }, [menu.open, closeContextMenu]);
+  }, [menu.open, closeContextMenu, childOpenRef]);
 
   return { menu, openContextMenu, closeContextMenu };
 }

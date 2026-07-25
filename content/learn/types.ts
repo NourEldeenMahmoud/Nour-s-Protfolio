@@ -118,3 +118,39 @@ export interface Widget {
   stepCount?: number;
   focusItems?: string[];
 }
+
+export interface WidgetBase {
+  id: string;
+  title: string;
+  content: string;
+  openFolderId?: string;
+  openFileId?: string;
+}
+
+export interface HeroWidget extends WidgetBase {
+  kind: "hero";
+  subtitle: string;
+  avatarSrc?: string;
+  avatarFallback: string;
+  accentColor?: string;
+  capsules: Array<{ label: string; value: string }>;
+  featureItems: Array<{ label: string; icon?: string }>;
+  footer: string;
+}
+
+export interface FeaturedItem {
+  id: string;
+  title: string;
+  description: string;
+  variant: "note" | "workflow" | "learning";
+  openFolderId?: string;
+  openFileId?: string;
+  stepCount?: number;
+}
+
+export interface FeaturedWidget extends WidgetBase {
+  kind: "featured";
+  items: FeaturedItem[];
+}
+
+export type WidgetV2 = HeroWidget | FeaturedWidget;

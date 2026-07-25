@@ -2,10 +2,11 @@ import type { Locale } from "@/i18n/routing";
 import { learnNodes } from "./tree";
 import type { LearnNode } from "./types";
 
-export type { LearnNode, Breadcrumb, FileKind, LearnNodeType, LearnSection, LearnApplication, Widget } from "./types";
+export type { LearnNode, Breadcrumb, FileKind, LearnNodeType, LearnSection, LearnApplication, Widget, WidgetBase, HeroWidget, FeaturedItem, FeaturedWidget, WidgetV2 } from "./types";
 export { getNodePath, getChildNodes, searchNodes } from "./types";
 export { applications, applicationMap, searchApplications } from "./applications";
 export { widgets } from "./widgets";
+export { widgetsV2 } from "./widgets-v2";
 
 export const learnNodeMap = new Map<string, LearnNode>(
   learnNodes.map((node) => [node.id, node]),

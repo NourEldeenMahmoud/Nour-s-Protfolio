@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { Locale } from "@/i18n/routing";
-import { widgets } from "@/content/learn";
-import { LearnWidget } from "./learn-widget";
+import { widgetsV2 } from "@/content/learn";
+import { WidgetHero } from "./widget-hero";
+import { WidgetFeatured } from "./widget-featured";
 import styles from "./learn.module.css";
 
 interface LearnWidgetsProps {
@@ -19,39 +20,59 @@ export function LearnWidgets({
   onOpenFile,
   learnNodeMap,
 }: LearnWidgetsProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const handleOpen = useCallback(
     (folderId?: string, fileId?: string) => {
       if (fileId) {
         const node = learnNodeMap.get(fileId);
-        if (node) {
-          onOpenFile(fileId, node.name[locale]);
-        }
+        if (node) onOpenFile(fileId, node.name[locale]);
       } else if (folderId) {
         const node = learnNodeMap.get(folderId);
-        if (node) {
-          onOpenFolder(folderId, node.name[locale]);
-        }
+        if (node) onOpenFolder(folderId, node.name[locale]);
       }
     },
     [locale, onOpenFolder, onOpenFile, learnNodeMap],
   );
 
-  const largeWidget = widgets.find((w) => w.layout === "large");
-  const smallWidgets = widgets.filter((w) => w.layout === "small");
-  const wideWidget = widgets.find((w) => w.layout === "wide");
+  // GSAP entry animation
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    let cleanup: (() => void) | undefined;
+    void import("gsap").then(({ gsap }) => {
+      const ctx = gsap.context(() => {
+        const cards = containerRef.current?.querySelectorAll(`.${styles.widgetCard}`);
+        if (!cards?.length) return;
+        gsap.set(cards, { y: 20, opacity: 0 });
+        gsap.to(cards, {
+          y: 0,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power3.out",
+          stagger: 0.12,
+          delay: 0.15,
+        });
+      }, containerRef);
+      cleanup = () => ctx.revert();
+    });
+
+    return () => {
+      cleanup?.();
+    };
+  }, []);
+
+  const heroWidget = widgetsV2.find((w) => w.kind === "hero");
+  const featuredWidget = widgetsV2.find((w) => w.kind === "featured");
 
   return (
-    <div className={styles.learnWidgets} aria-label="Widgets">
-      {largeWidget && (
-        <LearnWidget widget={largeWidget} onOpen={handleOpen} />
+    <div ref={containerRef} className={styles.learnWidgets} aria-label="Widgets">
+      {heroWidget?.kind === "hero" && (
+        <WidgetHero widget={heroWidget} onOpen={handleOpen} />
       )}
-      <div className={styles.learnWidgetsRow}>
-        {smallWidgets.map((widget) => (
-          <LearnWidget key={widget.id} widget={widget} onOpen={handleOpen} />
-        ))}
-      </div>
-      {wideWidget && (
-        <LearnWidget widget={wideWidget} onOpen={handleOpen} />
+      {featuredWidget?.kind === "featured" && (
+        <WidgetFeatured widget={featuredWidget} onOpen={handleOpen} />
       )}
     </div>
   );

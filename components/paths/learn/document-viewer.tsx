@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import { learnNodeMap, getNodePath } from "@/content/learn";
 import { getProject } from "@/content/portfolio";
-import { copyTextToSystemClipboard } from "./copy-text";
+import { copyTextToSystemClipboard, buildDocumentPlainText } from "./copy-text";
 import styles from "./learn.module.css";
 
 interface DocumentViewerProps {
@@ -12,10 +12,13 @@ interface DocumentViewerProps {
   fileId: string;
   windowId?: string;
   onOpenFile: (fileId: string, title: string) => void;
-  onContextMenuRequest?: (target: import("./use-context-menu").ContextMenuTarget) => void;
+  onContextMenuRequest?: (
+    target: import("./use-context-menu").ContextMenuTarget,
+  ) => void;
   copy: {
     copyLink: string;
     copied: string;
+    copyFailed: string;
     openProject: string;
     relatedFiles: string;
     relatedProjects: string;
@@ -31,15 +34,17 @@ export function DocumentViewer({
   onContextMenuRequest,
   copy,
 }: DocumentViewerProps) {
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "success" | "failed">(
+    "idle",
+  );
   const node = learnNodeMap.get(fileId);
 
   const handleCopyLink = useCallback(() => {
     const url = new URL(window.location.href);
     url.searchParams.set("file", fileId);
     copyTextToSystemClipboard(url.toString()).then((ok) => {
-      if (ok) setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopyState(ok ? "success" : "failed");
+      setTimeout(() => setCopyState("idle"), 2000);
     });
   }, [fileId]);
 
@@ -47,8 +52,7 @@ export function DocumentViewer({
     (e: React.MouseEvent) => {
       e.preventDefault();
       const selection = window.getSelection()?.toString().trim() ?? "";
-      const container = e.currentTarget.querySelector("[data-copy-content]");
-      const fallback = container?.textContent?.trim().slice(0, 500) ?? "";
+      const fallback = node ? buildDocumentPlainText(node, locale) : "";
       onContextMenuRequest?.({
         type: "content",
         windowId: windowId ?? "",
@@ -60,7 +64,7 @@ export function DocumentViewer({
         y: e.clientY,
       });
     },
-    [windowId, fileId, onContextMenuRequest],
+    [windowId, fileId, locale, node, onContextMenuRequest],
   );
 
   if (!node) {
@@ -182,7 +186,11 @@ export function DocumentViewer({
             type="button"
             onClick={handleCopyLink}
           >
-            {copied ? copy.copied : copy.copyLink}
+            {copyState === "success"
+              ? copy.copied
+              : copyState === "failed"
+                ? copy.copyFailed
+                : copy.copyLink}
           </button>
         </div>
       </div>

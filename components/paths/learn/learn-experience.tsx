@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type { Locale } from "@/i18n/routing";
 import {
   learnNodeMap,
@@ -150,12 +156,28 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const [workspaceRect, setWorkspaceRect] = useState<DOMRect | null>(null);
   const [toast, setToast] = useState<{ message: string } | null>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
-  const { menu: contextMenu, openContextMenu, closeContextMenu } = useContextMenu();
+  const childMenuRef = useRef<HTMLDivElement | null>(null);
+  const childMenuOpenRef = useRef(false);
+  const childHoverRef = useRef(false);
+  const {
+    menu: contextMenu,
+    openContextMenu,
+    closeContextMenu,
+  } = useContextMenu(childMenuOpenRef);
   const { copyFile } = useFileClipboard();
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const explorerSelectionsRef = useRef<Record<string, { nodeId: string; nodeType: string; folderId: string } | null>>({});
+  const explorerSelectionsRef = useRef<
+    Record<
+      string,
+      { nodeId: string; nodeType: string; folderId: string } | null
+    >
+  >({});
   const isApplyingPopStateRef = useRef(false);
-  const { positions: customPositions, sortMode, replacePositions } = useDesktopIconGridPositions();
+  const {
+    positions: customPositions,
+    sortMode,
+    replacePositions,
+  } = useDesktopIconGridPositions();
 
   const alternateLocale = locale === "en" ? "ar" : "en";
 
@@ -208,7 +230,10 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   }, [locale]);
 
   const handleRefresh = useCallback(() => {
-    const allIds = [...desktopFolders.map((f) => f.id), ...applications.map((a) => a.id)];
+    const allIds = [
+      ...desktopFolders.map((f) => f.id),
+      ...applications.map((a) => a.id),
+    ];
     const validIds = new Set(allIds);
     const cleaned: Record<string, { column: number; row: number }> = {};
     for (const [id, pos] of Object.entries(customPositions)) {
@@ -217,7 +242,14 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     replacePositions(cleaned, sortMode);
     closeContextMenu();
     showToast(copy.toastDesktopRefreshed);
-  }, [customPositions, replacePositions, sortMode, closeContextMenu, showToast, copy.toastDesktopRefreshed]);
+  }, [
+    customPositions,
+    replacePositions,
+    sortMode,
+    closeContextMenu,
+    showToast,
+    copy.toastDesktopRefreshed,
+  ]);
 
   const handleOpenAbout = useCallback(() => {
     openDocument("__about__", "About Nour\u2019s Desktop");
@@ -248,24 +280,37 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const handleSortChange = useCallback(
     (mode: DesktopSortMode) => {
-      const allIds = [...desktopFolders.map((f) => f.id), ...applications.map((a) => a.id)];
+      const allIds = [
+        ...desktopFolders.map((f) => f.id),
+        ...applications.map((a) => a.id),
+      ];
       const getLabel = (id: string) => {
         const folder = desktopFolders.find((f) => f.id === id);
         if (folder) return folder.name[locale] ?? id;
         const app = applications.find((a) => a.id === id);
         return app?.name ?? id;
       };
-      const isFolderFn = (id: string) => desktopFolders.some((f) => f.id === id);
+      const isFolderFn = (id: string) =>
+        desktopFolders.some((f) => f.id === id);
 
       const el = workspaceRef.current;
       if (!el) return;
-      const { maxCols, maxRows } = getMaxGridDimensions(el.clientWidth, el.clientHeight);
+      const { maxCols, maxRows } = getMaxGridDimensions(
+        el.clientWidth,
+        el.clientHeight,
+      );
 
       if (mode === "name") {
         const positions = sortItemsByName(allIds, maxCols, maxRows, getLabel);
         replacePositions(positions, mode);
       } else if (mode === "item-type") {
-        const positions = sortItemsByType(allIds, maxCols, maxRows, getLabel, isFolderFn);
+        const positions = sortItemsByType(
+          allIds,
+          maxCols,
+          maxRows,
+          getLabel,
+          isFolderFn,
+        );
         replacePositions(positions, mode);
       } else if (mode === "default") {
         replacePositions({}, mode);
@@ -281,7 +326,10 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   }, [alternateLocale]);
 
   const handleSelectionChange = useCallback(
-    (_windowId: string | undefined, selection: { nodeId: string; nodeType: string; folderId: string } | null) => {
+    (
+      _windowId: string | undefined,
+      selection: { nodeId: string; nodeType: string; folderId: string } | null,
+    ) => {
       const wid = _windowId ?? "default";
       explorerSelectionsRef.current[wid] = selection;
     },
@@ -306,12 +354,95 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const handleContentContextMenuRequest = useCallback(
     (target: ContextMenuTarget) => {
-      const x = ("x" in target && target.x != null) ? target.x : Math.min(window.innerWidth - 160, Math.max(10, window.innerWidth / 2));
-      const y = ("y" in target && target.y != null) ? target.y : Math.min(window.innerHeight - 100, Math.max(10, window.innerHeight / 2));
+      const x =
+        "x" in target && target.x != null
+          ? target.x
+          : Math.min(
+              window.innerWidth - 160,
+              Math.max(10, window.innerWidth / 2),
+            );
+      const y =
+        "y" in target && target.y != null
+          ? target.y
+          : Math.min(
+              window.innerHeight - 100,
+              Math.max(10, window.innerHeight / 2),
+            );
       openContextMenu(x, y, target);
     },
     [openContextMenu],
   );
+
+  const [childMenu, setChildMenu] = useState<{
+    open: boolean;
+    x: number;
+    y: number;
+    items: ContextMenuItem[];
+  }>({ open: false, x: 0, y: 0, items: [] });
+
+  // Sync ref with state for the escape-handler closure
+  useEffect(() => {
+    childMenuOpenRef.current = childMenu.open;
+  });
+
+  const handleOpenChildMenu = useCallback(
+    (_parentId: string, childX: number, childY: number) => {
+      const isRtl =
+        document.dir === "rtl" || document.documentElement.dir === "rtl";
+      const childWidth = 180;
+      const px = isRtl ? childX - childWidth : childX;
+      setChildMenu({
+        open: true,
+        x: px,
+        y: childY,
+        items: [
+          {
+            id: "sort-name",
+            label: copy.sortName,
+            checked: sortMode === "name",
+          },
+          {
+            id: "sort-item-type",
+            label: copy.sortItemType,
+            checked: sortMode === "item-type",
+          },
+          {
+            id: "sort-default",
+            label: copy.sortDefault,
+            checked: sortMode === "default",
+          },
+        ],
+      });
+    },
+    [copy.sortName, copy.sortItemType, copy.sortDefault, sortMode],
+  );
+
+  const handleCloseChildMenu = useCallback(() => {
+    setChildMenu((prev) => (prev.open ? { ...prev, open: false } : prev));
+    // Restore focus to Sort by parent item
+    requestAnimationFrame(() => {
+      const el = document.querySelector<HTMLElement>("[data-submenu-parent]");
+      if (el) el.focus();
+    });
+  }, []);
+
+  const handleCloseAll = useCallback(() => {
+    closeContextMenu();
+    setChildMenu((prev) => (prev.open ? { ...prev, open: false } : prev));
+    childHoverRef.current = false;
+  }, [closeContextMenu]);
+
+  const handleChildMouseEnter = useCallback(() => {
+    childHoverRef.current = true;
+  }, []);
+
+  const handleChildMouseLeave = useCallback(() => {
+    childHoverRef.current = false;
+  }, []);
+
+  const handleChildHoverBridgeMouseEnter = useCallback(() => {
+    childHoverRef.current = true;
+  }, []);
 
   const getContextMenuItems = useCallback(
     (target: ContextMenuTarget): ContextMenuItem[] => {
@@ -324,14 +455,28 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
               id: "sort-by",
               label: copy.menuSortBy,
               submenu: [
-                { id: "sort-name", label: copy.sortName, checked: sortMode === "name" },
-                { id: "sort-item-type", label: copy.sortItemType, checked: sortMode === "item-type" },
-                { id: "sort-default", label: copy.sortDefault, checked: sortMode === "default" },
+                {
+                  id: "sort-name",
+                  label: copy.sortName,
+                  checked: sortMode === "name",
+                },
+                {
+                  id: "sort-item-type",
+                  label: copy.sortItemType,
+                  checked: sortMode === "item-type",
+                },
+                {
+                  id: "sort-default",
+                  label: copy.sortDefault,
+                  checked: sortMode === "default",
+                },
               ],
             },
             {
               id: "toggle-widgets",
-              label: widgetsVisible ? copy.menuHideWidgets : copy.menuShowWidgets,
+              label: widgetsVisible
+                ? copy.menuHideWidgets
+                : copy.menuShowWidgets,
             },
             { id: "about", label: copy.menuAbout },
             { id: "sep-2", label: "", separator: true },
@@ -351,11 +496,12 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           ];
         case "app":
           return [];
-        case "content":
-          if (target.selectedText) {
-            return [{ id: "copy-text", label: copy.menuCopy }];
-          }
-          return [{ id: "copy-text", label: copy.menuCopy, disabled: true }];
+        case "content": {
+          const hasText = !!(target.selectedText || target.fallbackText);
+          return [
+            { id: "copy-text", label: copy.menuCopy, disabled: !hasText },
+          ];
+        }
         default:
           return [];
       }
@@ -372,12 +518,15 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           handleRefresh();
           break;
         case "sort-name":
+          setChildMenu((prev) => (prev.open ? { ...prev, open: false } : prev));
           handleSortChange("name");
           break;
         case "sort-item-type":
+          setChildMenu((prev) => (prev.open ? { ...prev, open: false } : prev));
           handleSortChange("item-type");
           break;
         case "sort-default":
+          setChildMenu((prev) => (prev.open ? { ...prev, open: false } : prev));
           handleSortChange("default");
           break;
         case "toggle-widgets":
@@ -415,7 +564,11 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         case "open": {
           if (target.type === "folder") {
             if (target.explorerWindowId) {
-              navigateWindow(target.explorerWindowId, target.id, learnNodeMap.get(target.id)?.name[locale] ?? target.id);
+              navigateWindow(
+                target.explorerWindowId,
+                target.id,
+                learnNodeMap.get(target.id)?.name[locale] ?? target.id,
+              );
             } else {
               const node = learnNodeMap.get(target.id);
               if (node) handleOpenFolder(target.id, node.name[locale]);
@@ -431,15 +584,40 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         }
       }
     },
-    [contextMenu.target, closeContextMenu, handleRefresh, handleSortChange, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow, copyFile, showToast, copy],
+    [
+      contextMenu.target,
+      closeContextMenu,
+      handleRefresh,
+      handleSortChange,
+      toggleWidgets,
+      handleOpenAbout,
+      handleReturnToRoom,
+      handleOpenFolder,
+      handleOpenFile,
+      handleOpenApp,
+      locale,
+      navigateWindow,
+      copyFile,
+      showToast,
+      copy,
+    ],
   );
 
   // Close context menu when target window is minimized or closed
   useEffect(() => {
     if (!contextMenu.open) return;
     const target = contextMenu.target;
-    if (target.type === "content" || target.type === "file" || target.type === "folder") {
-      const targetWindowId = "windowId" in target ? target.windowId : ("explorerWindowId" in target ? target.explorerWindowId : undefined);
+    if (
+      target.type === "content" ||
+      target.type === "file" ||
+      target.type === "folder"
+    ) {
+      const targetWindowId =
+        "windowId" in target
+          ? target.windowId
+          : "explorerWindowId" in target
+            ? target.explorerWindowId
+            : undefined;
       if (targetWindowId && !windows.some((w) => w.id === targetWindowId)) {
         closeContextMenu();
       }
@@ -561,13 +739,27 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         if (contextMenu.open) {
-          closeContextMenu();
+          if (childMenuOpenRef.current) {
+            handleCloseChildMenu();
+          } else {
+            handleCloseAll();
+          }
           return;
         }
         if (searchOpen) {
           setSearchOpen(false);
         } else if (startOpen) {
           setStartOpen(false);
+        }
+      }
+      if (e.key === "ArrowDown") {
+        if (contextMenu.open && childMenuOpenRef.current) {
+          handleCloseChildMenu();
+        }
+      }
+      if (e.key === "ArrowUp") {
+        if (contextMenu.open && childMenuOpenRef.current) {
+          handleCloseChildMenu();
         }
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "f") {
@@ -579,7 +771,11 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
         // Priority 1: Native input/textarea — let browser handle it
         const el = document.activeElement;
-        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || (el instanceof HTMLElement && el.isContentEditable)) {
+        if (
+          el instanceof HTMLInputElement ||
+          el instanceof HTMLTextAreaElement ||
+          (el instanceof HTMLElement && el.isContentEditable)
+        ) {
           return;
         }
 
@@ -594,8 +790,12 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         }
 
         // Priority 3: Explorer file selection — active visible explorer first, then highest z-index
-        const visibleExplorers = windows.filter((w) => !w.minimized && w.type === "explorer");
-        const activeExplorer = visibleExplorers.find((w) => w.id === activeWindowId);
+        const visibleExplorers = windows.filter(
+          (w) => !w.minimized && w.type === "explorer",
+        );
+        const activeExplorer = visibleExplorers.find(
+          (w) => w.id === activeWindowId,
+        );
         if (activeExplorer) {
           const sel = explorerSelectionsRef.current[activeExplorer.id];
           if (sel && sel.nodeType === "file") {
@@ -605,7 +805,9 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
             return;
           }
         }
-        const highestZExplorer = [...visibleExplorers].sort((a, b) => b.zIndex - a.zIndex)[0];
+        const highestZExplorer = [...visibleExplorers].sort(
+          (a, b) => b.zIndex - a.zIndex,
+        )[0];
         if (highestZExplorer && highestZExplorer.id !== activeExplorer?.id) {
           const sel = explorerSelectionsRef.current[highestZExplorer.id];
           if (sel && sel.nodeType === "file") {
@@ -621,7 +823,18 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [contextMenu.open, closeContextMenu, searchOpen, startOpen, windows, activeWindowId, copyFile, showToast, copy]);
+  }, [
+    contextMenu.open,
+    handleCloseChildMenu,
+    handleCloseAll,
+    searchOpen,
+    startOpen,
+    windows,
+    activeWindowId,
+    copyFile,
+    showToast,
+    copy,
+  ]);
 
   // Clean up stale explorer selections when windows close
   useEffect(() => {
@@ -632,6 +845,14 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
       }
     }
   }, [windows]);
+
+  useEffect(() => {
+    if (!contextMenu.open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: clears child menu when parent closes
+      setChildMenu((prev) => (prev.open ? { ...prev, open: false } : prev));
+      childHoverRef.current = false;
+    }
+  }, [contextMenu.open]);
 
   useLayoutEffect(() => {
     closeContextMenu();
@@ -651,7 +872,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     [restoreWindow],
   );
 
-  const contextMenuItems = getContextMenuItems(contextMenu.target);
+  const baseContextMenuItems = getContextMenuItems(contextMenu.target);
+  const contextMenuItems = baseContextMenuItems;
 
   const contextMenuItemLabel =
     contextMenu.target.type !== "desktop"
@@ -739,23 +961,26 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
                 onContextMenuRequest={handleContentContextMenuRequest}
               />
             )}
-            {win.type === "document" && win.fileId && win.fileId !== "__about__" && (
-              <DocumentViewer
-                locale={locale}
-                fileId={win.fileId}
-                windowId={win.id}
-                onOpenFile={handleOpenFile}
-                onContextMenuRequest={handleContentContextMenuRequest}
-                copy={{
-                  copyLink: copy.copyLink,
-                  copied: copy.copied,
-                  openProject: copy.openProject,
-                  relatedFiles: copy.relatedFiles,
-                  relatedProjects: copy.relatedProjects,
-                  limitations: copy.limitations,
-                }}
-              />
-            )}
+            {win.type === "document" &&
+              win.fileId &&
+              win.fileId !== "__about__" && (
+                <DocumentViewer
+                  locale={locale}
+                  fileId={win.fileId}
+                  windowId={win.id}
+                  onOpenFile={handleOpenFile}
+                  onContextMenuRequest={handleContentContextMenuRequest}
+                  copy={{
+                    copyLink: copy.copyLink,
+                    copied: copy.copied,
+                    copyFailed: copy.toastCopyFailed,
+                    openProject: copy.openProject,
+                    relatedFiles: copy.relatedFiles,
+                    relatedProjects: copy.relatedProjects,
+                    limitations: copy.limitations,
+                  }}
+                />
+              )}
             {win.type === "app" && win.appId && (
               <AppProfileViewer
                 locale={locale}
@@ -793,7 +1018,10 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           onOpenFolder={handleOpenFolder}
           onOpenApp={handleOpenApp}
           onClose={() => setSearchOpen(false)}
-          copy={{ placeholder: copy.searchPlaceholder, noResults: copy.noResults }}
+          copy={{
+            placeholder: copy.searchPlaceholder,
+            noResults: copy.noResults,
+          }}
         />
       )}
 
@@ -803,13 +1031,36 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           y={contextMenu.y}
           items={contextMenuItems}
           onSelect={handleContextMenuAction}
-          onClose={closeContextMenu}
+          onClose={handleCloseAll}
           itemLabel={contextMenuItemLabel}
+          expandedId={childMenu.open ? "sort-by" : undefined}
+          onSubmenuOpen={handleOpenChildMenu}
+          childMenuRef={childMenuRef}
+        />
+      )}
+
+      {contextMenu.open && childMenu.open && (
+        <DesktopContextMenu
+          x={childMenu.x}
+          y={childMenu.y}
+          items={childMenu.items}
+          onSelect={handleContextMenuAction}
+          onClose={handleCloseChildMenu}
+          itemLabel="Sort"
+          childMenuRef={childMenuRef}
+          onChildMouseEnter={handleChildMouseEnter}
+          onChildMouseLeave={handleChildMouseLeave}
+          onChildHoverBridgeMouseEnter={handleChildHoverBridgeMouseEnter}
         />
       )}
 
       {toast && (
-        <div className={styles.globalToast} role="status" aria-live="polite" data-testid="global-toast">
+        <div
+          className={styles.globalToast}
+          role="status"
+          aria-live="polite"
+          data-testid="global-toast"
+        >
           {toast.message}
         </div>
       )}

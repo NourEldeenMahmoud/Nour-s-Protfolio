@@ -102,6 +102,8 @@ export function RoomExperience({
     if (returning) {
       sessionStorage.removeItem("learn-returning");
       window.history.replaceState(null, "", window.location.pathname);
+      clearAnimation();
+      if (rootRef.current) rootRef.current.dataset.roomState = "idle";
       // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: useLayoutEffect runs before paint
       setIsIdle(true);
       setStatus(copy.readyStatus);
@@ -240,11 +242,7 @@ export function RoomExperience({
               },
               4.05,
             )
-            .to(
-              sweep,
-              { autoAlpha: 0.38, xPercent: 60, duration: 1.25 },
-              4.1,
-            )
+            .to(sweep, { autoAlpha: 0.38, xPercent: 60, duration: 1.25 }, 4.1)
             .to(sweep, { autoAlpha: 0, duration: 0.55 }, 5)
             .to(
               [topbar, pathUi],
@@ -279,9 +277,7 @@ export function RoomExperience({
   function transitionToArea(nextArea: RoomArea | null) {
     setFocusedArea(nextArea);
     setHoveredArea(null);
-    setStatus(
-      nextArea ? `${copy.areas[nextArea].label}.` : copy.readyStatus,
-    );
+    setStatus(nextArea ? `${copy.areas[nextArea].label}.` : copy.readyStatus);
     if (rootRef.current) {
       rootRef.current.dataset.roomState = nextArea ? "focused" : "idle";
       const focusStills = rootRef.current.querySelectorAll<HTMLElement>(
@@ -306,10 +302,7 @@ export function RoomExperience({
     }
   }
 
-  function focusArea(
-    event: MouseEvent<HTMLAnchorElement>,
-    area: RoomArea,
-  ) {
+  function focusArea(event: MouseEvent<HTMLAnchorElement>, area: RoomArea) {
     event.preventDefault();
     if (!isIdle || (focusedArea !== null && focusedArea !== area)) return;
     transitionToArea(focusedArea === area ? null : area);

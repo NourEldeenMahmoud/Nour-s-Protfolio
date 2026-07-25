@@ -4,8 +4,8 @@ import { useCallback, useLayoutEffect, useState } from "react";
 
 const STORAGE_KEY = "learn-desktop-icon-grid-positions";
 
-export const ICON_CELL_WIDTH = 96;
-export const ICON_CELL_HEIGHT = 108;
+export const ICON_CELL_WIDTH = 112;
+export const ICON_CELL_HEIGHT = 124;
 export const ICON_GAP_X = 12;
 export const ICON_GAP_Y = 12;
 export const DESKTOP_PADDING_X = 16;

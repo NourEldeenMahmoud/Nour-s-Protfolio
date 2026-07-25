@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { MutableRefObject } from "react";
 import styles from "./learn.module.css";
 
 export interface ContextMenuItem {
@@ -20,7 +21,15 @@ interface DesktopContextMenuProps {
   onSelect: (id: string) => void;
   onClose: () => void;
   itemLabel?: string;
+  /** When set, the matching submenu parent item is visually marked expanded. */
+  expandedId?: string;
   onSubmenuOpen?: (parentId: string, x: number, y: number) => void;
+  /** Ref to the child panel DOM node — used by the parent to avoid click-outside close. */
+  childMenuRef?: MutableRefObject<HTMLDivElement | null>;
+  /** Hover bridge callbacks — for child panel only, to bridge the gap to the parent. */
+  onChildMouseEnter?: () => void;
+  onChildMouseLeave?: () => void;
+  onChildHoverBridgeMouseEnter?: () => void;
 }
 
 export function DesktopContextMenu({
@@ -30,12 +39,22 @@ export function DesktopContextMenu({
   onSelect,
   onClose,
   itemLabel,
+  expandedId,
   onSubmenuOpen,
+  childMenuRef,
+  onChildMouseEnter,
+  onChildMouseLeave,
+  onChildHoverBridgeMouseEnter,
 }: DesktopContextMenuProps) {
-  const menuRef = useRef<HTMLDivElement>(null);
+  const selfRef = useRef<HTMLDivElement>(null);
   const invokerRef = useRef<HTMLElement | null>(null);
   const [focusIndex, setFocusIndex] = useState(-1);
   const [pos, setPos] = useState({ x, y });
+
+  // For the child panel, sync position from props (it can change after open)
+  useEffect(() => {
+    if (childMenuRef) setPos({ x, y });
+  }, [childMenuRef, x, y]);
 
   const nonSepItems = items.filter((i) => !i.separator);
 
@@ -44,43 +63,59 @@ export function DesktopContextMenu({
     invokerRef.current = document.activeElement as HTMLElement;
   }, []);
 
-  // Restore focus to invoker on close
+  // Restore focus to invoker on close — unless childMenuRef (child panel)
   useEffect(() => {
     return () => {
-      if (invokerRef.current && typeof invokerRef.current.focus === "function") {
+      if (childMenuRef) return;
+      if (
+        invokerRef.current &&
+        typeof invokerRef.current.focus === "function"
+      ) {
         invokerRef.current.focus();
       }
     };
-  }, []);
+  }, [childMenuRef]);
 
-  // Clamp focusIndex to valid range — avoids setState in effect for item changes
+  // Clamp focusIndex to valid range
   const clampedFocusIndex = Math.min(
     Math.max(focusIndex, nonSepItems.length > 0 ? 0 : -1),
     nonSepItems.length - 1,
   );
 
   const clampToViewport = useCallback(() => {
-    const el = menuRef.current;
+    const el = selfRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    let nx = x;
-    let ny = y;
+    let nx = pos.x;
+    let ny = pos.y;
     if (nx + rect.width > vw - 4) nx = Math.max(4, vw - rect.width - 4);
     if (ny + rect.height > vh - 4) ny = Math.max(4, vh - rect.height - 4);
     if (nx < 4) nx = 4;
+    if (ny + 4 > vh) ny = Math.max(4, vh - rect.height - 4);
     if (ny < 4) ny = 4;
-    setPos({ x: nx, y: ny });
-  }, [x, y]);
+    if (nx !== pos.x || ny !== pos.y) setPos({ x: nx, y: ny });
+  }, [pos.x, pos.y]);
 
   useEffect(() => {
     clampToViewport();
   }, [clampToViewport]);
 
+  // Expose selfRef via childMenuRef for the child panel
+  useEffect(() => {
+    if (childMenuRef) {
+      childMenuRef.current = selfRef.current;
+      return () => {
+        childMenuRef.current = null;
+      };
+    }
+  });
+
+  // Click-outside and keyboard
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (selfRef.current && !selfRef.current.contains(e.target as Node)) {
         onClose();
       }
     }
@@ -93,7 +128,8 @@ export function DesktopContextMenu({
         e.preventDefault();
         setFocusIndex((prev) => {
           let next = prev + 1;
-          while (next < nonSepItems.length && nonSepItems[next]?.disabled) next++;
+          while (next < nonSepItems.length && nonSepItems[next]?.disabled)
+            next++;
           return next < nonSepItems.length ? next : prev;
         });
       }
@@ -122,7 +158,30 @@ export function DesktopContextMenu({
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         const item = nonSepItems[clampedFocusIndex];
-        if (item && !item.disabled) onSelect(item.id);
+        if (item && !item.disabled) {
+          if (item.submenu && onSubmenuOpen) {
+            const el =
+              selfRef.current?.querySelectorAll<HTMLElement>(
+                "[role='menuitem']",
+              )[clampedFocusIndex];
+            const rect = el?.getBoundingClientRect();
+            onSubmenuOpen(item.id, rect?.right ?? x, rect?.top ?? y);
+          } else {
+            onSelect(item.id);
+          }
+        }
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const item = nonSepItems[clampedFocusIndex];
+        if (item?.submenu && onSubmenuOpen) {
+          const el =
+            selfRef.current?.querySelectorAll<HTMLElement>("[role='menuitem']")[
+              clampedFocusIndex
+            ];
+          const rect = el?.getBoundingClientRect();
+          onSubmenuOpen(item.id, rect?.right ?? x, rect?.top ?? y);
+        }
       }
     }
     function handleResize() {
@@ -136,51 +195,74 @@ export function DesktopContextMenu({
       document.removeEventListener("keydown", handleKey);
       window.removeEventListener("resize", handleResize);
     };
-  }, [onClose, onSelect, clampedFocusIndex, nonSepItems]);
+  }, [onClose, onSelect, onSubmenuOpen, clampedFocusIndex, nonSepItems, x, y]);
 
   useEffect(() => {
-    menuRef.current?.focus();
+    selfRef.current?.focus();
   }, []);
 
   // Move DOM focus to the active menuitem when focusIndex changes (roving tabindex)
   useEffect(() => {
-    const el = menuRef.current;
+    const el = selfRef.current;
     if (!el) return;
     const items = el.querySelectorAll<HTMLElement>("[role='menuitem']");
     const active = items[clampedFocusIndex];
     if (active) active.focus();
   }, [clampedFocusIndex]);
 
+  const isChild = !!childMenuRef;
+
   return (
     <div
-      ref={menuRef}
+      ref={selfRef}
       className={styles.contextMenu}
       style={{ left: pos.x, top: pos.y }}
       role="menu"
-      aria-label={itemLabel ? `${itemLabel} context menu` : "Desktop context menu"}
+      aria-label={
+        itemLabel ? `${itemLabel} context menu` : "Desktop context menu"
+      }
       tabIndex={-1}
       onMouseDown={(e) => e.stopPropagation()}
+      onMouseEnter={onChildMouseEnter}
+      onMouseLeave={onChildMouseLeave}
     >
       {items.map((item) =>
         item.separator ? (
-          <div key={`sep-${item.id}`} className={styles.contextMenuSep} role="separator" />
+          <div
+            key={`sep-${item.id}`}
+            className={styles.contextMenuSep}
+            role="separator"
+          />
         ) : (
           <button
             key={item.id}
-            className={styles.contextMenuItem}
+            className={`${styles.contextMenuItem}${expandedId === item.id ? ` ${styles.contextMenuActiveParent}` : ""}`}
             type="button"
             role="menuitem"
             aria-disabled={item.disabled || undefined}
+            aria-haspopup={item.submenu ? "menu" : undefined}
+            aria-expanded={item.submenu ? expandedId === item.id : undefined}
             data-has-submenu={item.submenu ? "" : undefined}
+            data-submenu-parent={item.submenu ? "" : undefined}
             tabIndex={clampedFocusIndex === nonSepItems.indexOf(item) ? 0 : -1}
-            onMouseEnter={() => {
-              if (!item.disabled) setFocusIndex(nonSepItems.indexOf(item));
+            onMouseEnter={(e) => {
+              if (!item.disabled) {
+                setFocusIndex(nonSepItems.indexOf(item));
+                if (item.submenu && onSubmenuOpen) {
+                  const rect = (
+                    e.currentTarget as HTMLElement
+                  ).getBoundingClientRect();
+                  onSubmenuOpen(item.id, rect.right, rect.top);
+                }
+              }
             }}
             onClick={(e) => {
               e.stopPropagation();
               if (!item.disabled) {
                 if (item.submenu && onSubmenuOpen) {
-                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                  const rect = (
+                    e.currentTarget as HTMLElement
+                  ).getBoundingClientRect();
                   onSubmenuOpen(item.id, rect.right, rect.top);
                 } else {
                   onSelect(item.id);
@@ -189,11 +271,21 @@ export function DesktopContextMenu({
             }}
           >
             {item.checked && <span className={styles.contextMenuCheck}>✓</span>}
-            {item.icon && <span className={styles.contextMenuIcon}>{item.icon}</span>}
+            {item.icon && (
+              <span className={styles.contextMenuIcon}>{item.icon}</span>
+            )}
             {item.label}
-            {item.submenu && <span className={styles.contextMenuChevron}>▸</span>}
+            {item.submenu && (
+              <span className={styles.contextMenuChevron}>▸</span>
+            )}
           </button>
         ),
+      )}
+      {isChild && (
+        <div
+          className={styles.contextMenuHoverBridge}
+          onMouseEnter={onChildHoverBridgeMouseEnter}
+        />
       )}
     </div>
   );

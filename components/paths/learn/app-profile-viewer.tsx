@@ -4,13 +4,16 @@ import { useCallback } from "react";
 import type { Locale } from "@/i18n/routing";
 import { applicationMap, learnNodeMap } from "@/content/learn";
 import { getProject } from "@/content/portfolio";
+import { buildAppPlainText } from "./copy-text";
 import styles from "./learn.module.css";
 
 interface AppProfileViewerProps {
   locale: Locale;
   appId: string;
   windowId?: string;
-  onContextMenuRequest?: (target: import("./use-context-menu").ContextMenuTarget) => void;
+  onContextMenuRequest?: (
+    target: import("./use-context-menu").ContextMenuTarget,
+  ) => void;
   copy: {
     usedFor: string;
     workflowUses: string;
@@ -34,8 +37,7 @@ export function AppProfileViewer({
     (e: React.MouseEvent) => {
       e.preventDefault();
       const selection = window.getSelection()?.toString().trim() ?? "";
-      const container = e.currentTarget.querySelector("[data-copy-content]");
-      const fallback = container?.textContent?.trim().slice(0, 500) ?? "";
+      const fallback = app ? buildAppPlainText(app) : "";
       onContextMenuRequest?.({
         type: "content",
         windowId: windowId ?? "",
@@ -47,7 +49,7 @@ export function AppProfileViewer({
         y: e.clientY,
       });
     },
-    [windowId, appId, onContextMenuRequest],
+    [windowId, appId, app, onContextMenuRequest],
   );
 
   if (!app) {
