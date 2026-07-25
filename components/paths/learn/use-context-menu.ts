@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export type ContextMenuTarget =
   | { type: "desktop" }
-  | { type: "folder"; id: string }
+  | { type: "folder"; id: string; explorerWindowId?: string }
   | { type: "file"; id: string }
   | { type: "app"; id: string };
 

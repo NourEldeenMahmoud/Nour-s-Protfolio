@@ -143,26 +143,31 @@ export function findNearestAvailableCell(
   maxCols: number,
   maxRows: number,
   occupancy: Map<string, string>,
-): DesktopIconGridPosition {
-  if (!isOccupied(col, row, occupancy)) {
-    return clampGridPosition(col, row, maxCols, maxRows);
+): DesktopIconGridPosition | null {
+  const clamped = clampGridPosition(col, row, maxCols, maxRows);
+
+  if (!isOccupied(clamped.column, clamped.row, occupancy)) {
+    return clamped;
   }
 
-  for (let radius = 1; radius < Math.max(maxCols, maxRows) * 2; radius++) {
-    for (let dy = -radius; dy <= radius; dy++) {
-      for (let dx = -radius; dx <= radius; dx++) {
-        if (Math.abs(dx) !== radius && Math.abs(dy) !== radius) continue;
-        const nx = col + dx;
-        const ny = row + dy;
-        if (nx < 0 || nx >= maxCols || ny < 0 || ny >= maxRows) continue;
-        if (!isOccupied(nx, ny, occupancy)) {
-          return { column: nx, row: ny };
-        }
-      }
+  // Deterministic spiral search: sorted by Euclidean distance, then column, then row
+  const candidates: Array<{ column: number; row: number; dist: number }> = [];
+  for (let r = 0; r < maxRows; r++) {
+    for (let c = 0; c < maxCols; c++) {
+      if (c === clamped.column && r === clamped.row) continue;
+      if (isOccupied(c, r, occupancy)) continue;
+      const dist = Math.sqrt(
+        (c - clamped.column) ** 2 + (r - clamped.row) ** 2,
+      );
+      candidates.push({ column: c, row: r, dist });
     }
   }
 
-  return clampGridPosition(col, row, maxCols, maxRows);
+  if (candidates.length === 0) return null;
+
+  candidates.sort((a, b) => a.dist - b.dist || a.column - b.column || a.row - b.row);
+  const best = candidates[0];
+  return best ? { column: best.column, row: best.row } : null;
 }
 
 export function computeDefaultPositions(
@@ -214,6 +219,8 @@ export function resolveDesktopLayout(
       maxRows,
       occupancy,
     );
+
+    if (!final) continue;
 
     occupancy.set(`${final.column},${final.row}`, id);
 

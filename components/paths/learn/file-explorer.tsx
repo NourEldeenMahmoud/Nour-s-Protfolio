@@ -15,6 +15,7 @@ import styles from "./learn.module.css";
 interface FileExplorerProps {
   locale: Locale;
   folderId: string;
+  windowId?: string;
   onOpenFile: (fileId: string, title: string) => void;
   onOpenFolder: (folderId: string, title: string) => void;
   onReturnToRoom: () => void;
@@ -32,6 +33,7 @@ interface FileExplorerProps {
 export function FileExplorer({
   locale,
   folderId,
+  windowId,
   onOpenFile,
   onOpenFolder,
   onReturnToRoom,
@@ -285,6 +287,7 @@ export function FileExplorer({
                       onItemContextMenu?.(e, {
                         type: node.type === "folder" ? "folder" : "file",
                         id: node.id,
+                        explorerWindowId: node.type === "folder" ? windowId : undefined,
                       });
                     }}
                   >
@@ -318,6 +321,7 @@ export function FileExplorer({
                     onItemContextMenu?.(e, {
                       type: node.type === "folder" ? "folder" : "file",
                       id: node.id,
+                      explorerWindowId: node.type === "folder" ? windowId : undefined,
                     });
                   }}
                 >

@@ -205,8 +205,12 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           break;
         case "open": {
           if (target.type === "folder") {
-            const node = learnNodeMap.get(target.id);
-            if (node) handleOpenFolder(target.id, node.name[locale]);
+            if (target.explorerWindowId) {
+              navigateWindow(target.explorerWindowId, target.id, learnNodeMap.get(target.id)?.name[locale] ?? target.id);
+            } else {
+              const node = learnNodeMap.get(target.id);
+              if (node) handleOpenFolder(target.id, node.name[locale]);
+            }
           } else if (target.type === "file") {
             const node = learnNodeMap.get(target.id);
             if (node) handleOpenFile(target.id, node.name[locale]);
@@ -218,7 +222,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         }
       }
     },
-    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale],
+    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow],
   );
 
   // Sync URL → state on mount
@@ -239,9 +243,9 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         openDocument(file, node.name[locale]);
       }
     } else if (app) {
-      const node = learnNodeMap.get(app);
-      if (node) {
-        openDocument(app, node.name[locale]);
+      const appEntry = applicationMap.get(app);
+      if (appEntry) {
+        openApp(app, appEntry.name);
       }
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -314,15 +318,19 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           openDocument(file, node.name[locale]);
         }
       } else if (appParam) {
-        const node = learnNodeMap.get(appParam);
-        if (node) {
-          openApp(appParam, node.name[locale]);
+        const appEntry = applicationMap.get(appParam);
+        if (appEntry) {
+          openApp(appParam, appEntry.name);
+        }
+      } else {
+        for (const w of windows) {
+          closeWindow(w.id);
         }
       }
     }
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [locale, openExplorer, openDocument, openApp]);
+  }, [locale, openExplorer, openDocument, openApp, windows, closeWindow]);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -435,6 +443,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
               <FileExplorer
                 locale={locale}
                 folderId={win.folderId}
+                windowId={win.id}
                 onOpenFile={handleOpenFile}
                 onOpenFolder={(id, name) => {
                   navigateWindow(win.id, id, name);

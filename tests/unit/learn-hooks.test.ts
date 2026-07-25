@@ -244,25 +244,30 @@ describe("grid utilities", () => {
   });
 
   describe("findNearestAvailableCell", () => {
-    it("returns same cell if unoccupied", () => {
+    it("returns clamped cell if unoccupied", () => {
       const occ = new Map<string, string>();
-      expect(findNearestAvailableCell(2, 3, 8, 10, occ)).toEqual({
-        column: 2,
-        row: 3,
-      });
+      const result = findNearestAvailableCell(2, 3, 8, 10, occ);
+      expect(result).toEqual({ column: 2, row: 3 });
+    });
+
+    it("clamps out-of-bounds before checking occupancy", () => {
+      const occ = new Map<string, string>();
+      const result = findNearestAvailableCell(100, 100, 8, 10, occ);
+      expect(result).toEqual({ column: 7, row: 9 });
     });
 
     it("finds neighbor when target is occupied", () => {
       const occ = new Map([["2,3", "a"]]);
       const result = findNearestAvailableCell(2, 3, 8, 10, occ);
-      expect(result.column).toBeGreaterThanOrEqual(0);
-      expect(result.column).toBeLessThan(8);
-      expect(result.row).toBeGreaterThanOrEqual(0);
-      expect(result.row).toBeLessThan(10);
-      expect(isOccupied(result.column, result.row, occ)).toBe(false);
+      expect(result).not.toBeNull();
+      expect(result!.column).toBeGreaterThanOrEqual(0);
+      expect(result!.column).toBeLessThan(8);
+      expect(result!.row).toBeGreaterThanOrEqual(0);
+      expect(result!.row).toBeLessThan(10);
+      expect(isOccupied(result!.column, result!.row, occ)).toBe(false);
     });
 
-    it("finds the nearest unoccupied cell", () => {
+    it("finds the nearest unoccupied cell by distance", () => {
       const occ = new Map([
         ["2,3", "a"],
         ["3,3", "b"],
@@ -271,30 +276,44 @@ describe("grid utilities", () => {
         ["2,2", "e"],
       ]);
       const result = findNearestAvailableCell(2, 3, 8, 10, occ);
-      expect(isOccupied(result.column, result.row, occ)).toBe(false);
+      expect(result).not.toBeNull();
+      expect(isOccupied(result!.column, result!.row, occ)).toBe(false);
       const dist =
-        Math.abs(result.column - 2) + Math.abs(result.row - 3);
+        Math.abs(result!.column - 2) + Math.abs(result!.row - 3);
       expect(dist).toBe(2);
     });
 
-    it("expands rings to find available cell", () => {
+    it("returns null when all cells are occupied", () => {
       const occ = new Map<string, string>();
-      for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 3; c++) {
+      for (let r = 0; r < 2; r++) {
+        for (let c = 0; c < 2; c++) {
           occ.set(`${c},${r}`, "x");
         }
       }
-      const result = findNearestAvailableCell(1, 1, 8, 10, occ);
-      expect(isOccupied(result.column, result.row, occ)).toBe(false);
+      const result = findNearestAvailableCell(0, 0, 2, 2, occ);
+      expect(result).toBeNull();
     });
 
     it("stays within bounds", () => {
       const occ = new Map([["0,0", "a"]]);
       const result = findNearestAvailableCell(0, 0, 2, 2, occ);
-      expect(result.column).toBeGreaterThanOrEqual(0);
-      expect(result.column).toBeLessThan(2);
-      expect(result.row).toBeGreaterThanOrEqual(0);
-      expect(result.row).toBeLessThan(2);
+      expect(result).not.toBeNull();
+      expect(result!.column).toBeGreaterThanOrEqual(0);
+      expect(result!.column).toBeLessThan(2);
+      expect(result!.row).toBeGreaterThanOrEqual(0);
+      expect(result!.row).toBeLessThan(2);
+    });
+
+    it("deterministic: same input always produces same output", () => {
+      const occ = new Map([["0,0", "a"]]);
+      const results = Array.from({ length: 10 }, () =>
+        findNearestAvailableCell(0, 0, 8, 10, occ),
+      );
+      const first = results[0];
+      expect(first).not.toBeNull();
+      for (const r of results) {
+        expect(r).toEqual(first);
+      }
     });
   });
 
@@ -381,7 +400,9 @@ describe("grid utilities", () => {
       const b = layout.items.get("b");
       expect(a).toBeDefined();
       expect(b).toBeDefined();
-      expect(a!.col).not.toBe(b!.col);
+      const posA = `${a!.col},${a!.row}`;
+      const posB = `${b!.col},${b!.row}`;
+      expect(posA).not.toBe(posB);
     });
 
     it("skips dragging item", () => {
@@ -421,6 +442,40 @@ describe("grid utilities", () => {
       expect(b!.row).toBe(0);
       expect(c!.col).toBe(2);
       expect(c!.row).toBe(0);
+    });
+
+    it("no item rectangles overlap", () => {
+      const defaults = new Map<string, { column: number; row: number }>();
+      const ids = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      for (let i = 0; i < ids.length; i++) {
+        defaults.set(ids[i]!, { column: i % 4, row: Math.floor(i / 4) });
+      }
+      const layout = resolveDesktopLayout(ids, {}, defaults, 8, 10);
+      const items = Array.from(layout.items.values());
+      for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+          const a = items[i]!;
+          const b = items[j]!;
+          expect(
+            a.col !== b.col || a.row !== b.row,
+          ).toBe(true);
+        }
+      }
+    });
+
+    it("source cell is free when dragging item is excluded", () => {
+      const defaults = new Map([
+        ["a", { column: 2, row: 3 }],
+        ["b", { column: 1, row: 0 }],
+      ]);
+      const layoutWithA = resolveDesktopLayout(["a", "b"], {}, defaults, 8, 10, null);
+      const layoutWithoutA = resolveDesktopLayout(["a", "b"], {}, defaults, 8, 10, "a");
+      const aPos = layoutWithA.items.get("a");
+      expect(aPos).toBeDefined();
+      const bPos = layoutWithoutA.items.get("b");
+      expect(bPos).toBeDefined();
+      expect(bPos!.col).toBe(1);
+      expect(bPos!.row).toBe(0);
     });
   });
 });

@@ -257,23 +257,28 @@ test.describe("Learn desktop grid system", () => {
     expect(cellSize!.h).toBe(108);
   });
 
-  test("right-click on desktop shows context menu", async ({ page }) => {
+  test("right-click on desktop shows context menu", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    await page.evaluate(() => {
-      const desktop = document.querySelector("[data-desktop-surface]");
-      if (!desktop) return;
-      const rect = desktop.getBoundingClientRect();
-      const event = new MouseEvent("contextmenu", {
-        bubbles: true,
-        cancelable: true,
-        clientX: rect.left + rect.width / 2,
-        clientY: rect.top + rect.height / 2,
-        button: 2,
-      });
-      desktop.dispatchEvent(event);
-    });
+    const desktop = page.locator("[data-desktop-surface]");
+    const desktopBox = await desktop.boundingBox();
+    expect(desktopBox).not.toBeNull();
+
+    const targetX = desktopBox!.x + desktopBox!.width / 2;
+    const targetY = desktopBox!.y + desktopBox!.height / 2;
+
+    const icons = page.locator("[data-desktop-item]");
+    const count = await icons.count();
+    for (let i = 0; i < count; i++) {
+      const box = await icons.nth(i).boundingBox();
+      if (box && targetX >= box.x && targetX <= box.x + box.width && targetY >= box.y && targetY <= box.y + box.height) {
+        return;
+      }
+    }
+
+    await page.mouse.click(targetX, targetY, { button: "right" });
 
     const menu = page.locator("[role='menu']");
     await expect(menu).toBeVisible({ timeout: 2000 });
@@ -299,19 +304,8 @@ test.describe("Learn desktop grid system", () => {
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    await page.evaluate(() => {
-      const desktop = document.querySelector("[data-desktop-surface]");
-      if (!desktop) return;
-      const rect = desktop.getBoundingClientRect();
-      const event = new MouseEvent("contextmenu", {
-        bubbles: true,
-        cancelable: true,
-        clientX: rect.left + rect.width / 2,
-        clientY: rect.top + rect.height / 2,
-        button: 2,
-      });
-      desktop.dispatchEvent(event);
-    });
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    await icon.click({ button: "right" });
 
     const menu = page.locator("[role='menu']");
     await expect(menu).toBeVisible({ timeout: 2000 });
@@ -325,19 +319,8 @@ test.describe("Learn desktop grid system", () => {
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    await page.evaluate(() => {
-      const desktop = document.querySelector("[data-desktop-surface]");
-      if (!desktop) return;
-      const rect = desktop.getBoundingClientRect();
-      const event = new MouseEvent("contextmenu", {
-        bubbles: true,
-        cancelable: true,
-        clientX: rect.left + rect.width / 2,
-        clientY: rect.top + rect.height / 2,
-        button: 2,
-      });
-      desktop.dispatchEvent(event);
-    });
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    await icon.click({ button: "right" });
 
     const menu = page.locator("[role='menu']");
     await expect(menu).toBeVisible({ timeout: 2000 });
@@ -394,6 +377,105 @@ test.describe("Learn desktop grid system", () => {
   });
 });
 
+test.describe("Native drag regression", () => {
+  test("desktop icon button has draggable=false and blocks native dragstart", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='app-vscode']");
+    await expect(icon).toBeVisible();
+
+    const hasFalse = await icon.evaluate(
+      (el) => (el as HTMLButtonElement).draggable === false,
+    );
+    expect(hasFalse).toBe(true);
+
+    const cssBlock = await icon.evaluate((el) => {
+      const img = el.querySelector("img");
+      if (!img) return { pointerEvents: "none" };
+      const s = window.getComputedStyle(img);
+      return { pointerEvents: s.pointerEvents };
+    });
+    expect(cssBlock.pointerEvents).toBe("none");
+  });
+
+  test("app icon image has pointer-events none so button is the pointer target", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='app-vscode']");
+    const imgPointerEvents = await icon.locator("img").evaluate(
+      (el) => window.getComputedStyle(el).pointerEvents,
+    );
+    expect(imgPointerEvents).toBe("none");
+  });
+
+  test("app icon visibly follows the pointer during drag", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='app-vscode']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 80, startY + 120, { steps: 5 });
+
+    await page.waitForTimeout(50);
+    const midBox = await icon.boundingBox();
+    expect(midBox).not.toBeNull();
+    expect(midBox!.x).toBeGreaterThan(box!.x + 30);
+    expect(midBox!.y).toBeGreaterThan(box!.y + 30);
+
+    await page.mouse.up();
+    await page.waitForTimeout(200);
+  });
+
+  test("dragging a folder from its SVG child works correctly", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='knowledge']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const imgEl = icon.locator("span").first();
+    const imgBox = await imgEl.boundingBox();
+    expect(imgBox).not.toBeNull();
+
+    const startX = imgBox!.x + imgBox!.width / 2;
+    const startY = imgBox!.y + imgBox!.height / 2;
+    const originalY = box!.y;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX, startY + 150, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox = await icon.boundingBox();
+    expect(newBox).not.toBeNull();
+    expect(newBox!.y).toBeGreaterThan(originalY);
+  });
+});
+
 test.describe("Icon drag", () => {
   test("dragging an icon moves it to a new grid position", async ({
     page,
@@ -408,7 +490,6 @@ test.describe("Icon drag", () => {
 
     const startX = box!.x + box!.width / 2;
     const startY = box!.y + box!.height / 2;
-
     const originalY = box!.y;
 
     await page.mouse.move(startX, startY);
@@ -510,6 +591,297 @@ test.describe("Icon drag", () => {
     await page.mouse.up();
     await page.waitForTimeout(100);
   });
+
+  test("tiny drag within source cell does not move the icon", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 30, startY + 20, { steps: 5 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox = await icon.boundingBox();
+    expect(newBox).not.toBeNull();
+    const cellW = 96;
+    const cellH = 108;
+    const gapX = 12;
+    const gapY = 12;
+    const padX = 16;
+    const padTop = 12;
+
+    const origCol = Math.round((box!.x - padX) / (cellW + gapX));
+    const origRow = Math.round((box!.y - padTop) / (cellH + gapY));
+    const newCol = Math.round((newBox!.x - padX) / (cellW + gapX));
+    const newRow = Math.round((newBox!.y - padTop) / (cellH + gapY));
+
+    expect(newCol).toBe(origCol);
+    expect(newRow).toBe(origRow);
+  });
+
+  test("drag to left edge keeps icon inside workspace", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(2, startY, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox = await icon.boundingBox();
+    expect(newBox).not.toBeNull();
+    expect(newBox!.x).toBeGreaterThanOrEqual(0);
+    expect(newBox!.x + newBox!.width).toBeLessThanOrEqual(
+      page.viewportSize()!.width,
+    );
+  });
+
+  test("drag to bottom edge keeps icon inside workspace", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+    const viewport = page.viewportSize()!;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX, viewport.height - 5, { steps: 15 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox = await icon.boundingBox();
+    expect(newBox).not.toBeNull();
+    expect(newBox!.y).toBeGreaterThanOrEqual(0);
+    expect(newBox!.y + newBox!.height).toBeLessThanOrEqual(viewport.height);
+  });
+});
+
+test.describe("Activation suppression", () => {
+  test("drag does not select the item through trailing click", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX, startY + 150, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const isSelected = await icon.evaluate(
+      (el) => el.getAttribute("data-selected") === "true",
+    );
+    expect(isSelected).toBe(false);
+  });
+
+  test("drag does not open the item", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX, startY + 150, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(300);
+
+    const windows = await page.locator("[role='dialog']").count();
+    expect(windows).toBe(0);
+  });
+
+  test("normal click still selects the item", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    await icon.click();
+
+    const isSelected = await icon.evaluate(
+      (el) => el.getAttribute("data-selected") === "true",
+    );
+    expect(isSelected).toBe(true);
+  });
+
+  test("normal double-click still opens the item", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    await icon.dblclick();
+
+    const window = page.locator("[role='dialog']");
+    await expect(window).toBeVisible({ timeout: 3000 });
+  });
+});
+
+test.describe("Occupancy", () => {
+  test("moving a neighboring icon does not change whether another icon is draggable", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon1 = page.locator("[data-desktop-item-id='this-pc']");
+    const icon2 = page.locator("[data-desktop-item-id='knowledge']");
+
+    const box1 = await icon1.boundingBox();
+    const box2 = await icon2.boundingBox();
+    expect(box1).not.toBeNull();
+    expect(box2).not.toBeNull();
+
+    const startX2 = box2!.x + box2!.width / 2;
+    const startY2 = box2!.y + box2!.height / 2;
+
+    await page.mouse.move(startX2, startY2);
+    await page.mouse.down();
+    await page.mouse.move(startX2 + 200, startY2 + 100, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(300);
+
+    const box1After = await icon1.boundingBox();
+    expect(box1After).not.toBeNull();
+
+    const startX1 = box1After!.x + box1After!.width / 2;
+    const startY1 = box1After!.y + box1After!.height / 2;
+    const originalY1 = box1After!.y;
+
+    await page.mouse.move(startX1, startY1);
+    await page.mouse.down();
+    await page.mouse.move(startX1, startY1 + 150, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox1 = await icon1.boundingBox();
+    expect(newBox1).not.toBeNull();
+    expect(newBox1!.y).toBeGreaterThan(originalY1);
+  });
+});
+
+test.describe("Swap on occupied target", () => {
+  test("dragging icon onto occupied cell swaps positions", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon1 = page.locator("[data-desktop-item-id='this-pc']");
+    const icon2 = page.locator("[data-desktop-item-id='knowledge']");
+
+    const box1 = await icon1.boundingBox();
+    const box2 = await icon2.boundingBox();
+    expect(box1).not.toBeNull();
+    expect(box2).not.toBeNull();
+
+    const startX1 = box1!.x + box1!.width / 2;
+    const startY1 = box1!.y + box1!.height / 2;
+
+    const targetX = box2!.x + box2!.width / 2;
+    const targetY = box2!.y + box2!.height / 2;
+
+    await page.mouse.move(startX1, startY1);
+    await page.mouse.down();
+    await page.mouse.move(targetX, targetY, { steps: 15 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(300);
+
+    const newBox1 = await icon1.boundingBox();
+    const newBox2 = await icon2.boundingBox();
+    expect(newBox1).not.toBeNull();
+    expect(newBox2).not.toBeNull();
+
+    const cellW = 96;
+    const cellH = 108;
+    const gapX = 12;
+    const gapY = 12;
+    const padX = 16;
+    const padTop = 12;
+
+    const col1 = Math.round((newBox1!.x - padX) / (cellW + gapX));
+    const row1 = Math.round((newBox1!.y - padTop) / (cellH + gapY));
+    const col2 = Math.round((newBox2!.x - padX) / (cellW + gapX));
+    const row2 = Math.round((newBox2!.y - padTop) / (cellH + gapY));
+
+    expect(col1 === col2 && row1 === row2).toBe(false);
+
+    const overlapX = Math.min(newBox1!.x + newBox1!.width, newBox2!.x + newBox2!.width) - Math.max(newBox1!.x, newBox2!.x);
+    const overlapY = Math.min(newBox1!.y + newBox1!.height, newBox2!.y + newBox2!.height) - Math.max(newBox1!.y, newBox2!.y);
+    const overlapArea = Math.max(0, overlapX) * Math.max(0, overlapY);
+    expect(overlapArea).toBe(0);
+  });
+});
+
+test.describe("Right-click selection", () => {
+  test("right-clicking a desktop icon selects it", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    await icon.click({ button: "right" });
+
+    const isSelected = await icon.evaluate(
+      (el) => el.getAttribute("data-selected") === "true",
+    );
+    expect(isSelected).toBe(true);
+  });
 });
 
 test.describe("Explorer context menus", () => {
@@ -535,6 +907,36 @@ test.describe("Explorer context menus", () => {
     const openOption = menu.getByRole("menuitem", { name: /open/i });
     await expect(openOption).toBeVisible();
   });
+
+  test("opening a nested folder navigates the same explorer window", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const thisPC = page.locator("[data-desktop-item-id='this-pc']");
+    await thisPC.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const windows0 = await page.locator("[role='dialog']").count();
+
+    const firstFolder = page
+      .locator("[role='listbox'][aria-label='Files']")
+      .locator("[role='option']")
+      .first();
+    await firstFolder.click({ button: "right" });
+
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible({ timeout: 2000 });
+    const openOption = menu.getByRole("menuitem", { name: /open/i });
+    await openOption.click();
+
+    await page.waitForTimeout(500);
+
+    const windows1 = await page.locator("[role='dialog']").count();
+    expect(windows1).toBe(windows0);
+  });
 });
 
 test.describe("App context menu resolves correctly", () => {
@@ -552,5 +954,32 @@ test.describe("App context menu resolves correctly", () => {
     await expect(menu).toBeVisible({ timeout: 2000 });
 
     await expect(menu).toHaveAttribute("aria-label", /Visual Studio Code/i);
+  });
+});
+
+test.describe("App URL restoration", () => {
+  test("direct ?app= URL opens the correct app window", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn?app=app-vscode");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const appWindow = page.locator("[role='dialog']");
+    await expect(appWindow).toBeVisible({ timeout: 3000 });
+    await expect(appWindow).toHaveAttribute("aria-label", /Visual Studio Code/i);
+  });
+
+  test("browser Back after opening app closes the app", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn?app=app-vscode");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const appWindow = page.locator("[role='dialog']");
+    await expect(appWindow).toBeVisible({ timeout: 3000 });
+
+    await page.goBack();
+    await page.waitForTimeout(500);
+
+    const windows = await page.locator("[role='dialog']").count();
+    expect(windows).toBe(0);
   });
 });

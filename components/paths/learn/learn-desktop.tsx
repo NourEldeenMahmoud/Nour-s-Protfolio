@@ -14,7 +14,7 @@ import {
   ICON_CELL_WIDTH,
   ICON_CELL_HEIGHT,
 } from "./use-desktop-icon-positions";
-import { useDesktopIconDrag } from "./use-desktop-icon-drag";
+import { useDesktopIconDrag, type DropUpdates } from "./use-desktop-icon-drag";
 import type { ContextMenuTarget } from "./use-context-menu";
 import styles from "./learn.module.css";
 
@@ -61,19 +61,17 @@ export function LearnDesktop({
     [allItemIds, maxCols],
   );
 
-  // Single authoritative layout computed from custom + default + bounds
   const layout = useMemo(
     () =>
       resolveDesktopLayout(allItemIds, customPositions, defaultPositions, maxCols, maxRows),
     [allItemIds, customPositions, defaultPositions, maxCols, maxRows],
   );
 
-  // Occupancy map for drag collision detection (excludes dragging item)
   const getOccupancy = useCallback(
-    (draggingId: string | null) =>
+    (excludeId: string | null) =>
       new Map(
         Array.from(layout.items.entries())
-          .filter(([id]) => id !== draggingId)
+          .filter(([id]) => id !== excludeId)
           .map(([, item]) => [`${item.col},${item.row}`, item.id]),
       ),
     [layout.items],
@@ -117,8 +115,10 @@ export function LearnDesktop({
   });
 
   const handleDrop = useCallback(
-    (id: string, col: number, row: number) => {
-      setGridPosition(id, col, row);
+    (updates: DropUpdates) => {
+      for (const [id, pos] of Object.entries(updates)) {
+        setGridPosition(id, pos.column, pos.row);
+      }
     },
     [setGridPosition],
   );
@@ -126,13 +126,15 @@ export function LearnDesktop({
   const {
     draggingId,
     previewCell,
+    swapPreview,
+    consumeSuppressedActivation,
     handlePointerDown: dragPointerDown,
     handlePointerMove: dragPointerMove,
     handlePointerUp: dragPointerUp,
     handlePointerCancel: dragPointerCancel,
     getIconStyle,
   } = useDesktopIconDrag({
-    occupancy: getOccupancy(null),
+    getOccupancy,
     maxCols,
     maxRows,
     onDrop: handleDrop,
@@ -183,7 +185,6 @@ export function LearnDesktop({
 
   const handleDesktopContextMenu = useCallback(
     (e: React.MouseEvent) => {
-      // Accept right-click anywhere on the desktop surface that isn't an icon
       if (e.target instanceof HTMLElement && e.target.closest("[data-desktop-item]")) return;
       if (!(e.target instanceof HTMLElement && e.target.closest("[data-desktop-surface]"))) return;
       e.preventDefault();
@@ -201,7 +202,6 @@ export function LearnDesktop({
     [onContextMenu],
   );
 
-  // Mutual exclusion: pointerdown on icon → drag only; pointerdown on empty → marquee only
   const handleIconPointerDown = useCallback(
     (e: React.PointerEvent, itemId: string) => {
       const layoutItem = layout.items.get(itemId);
@@ -250,6 +250,18 @@ export function LearnDesktop({
     return { left: x, top: y, width: ICON_CELL_WIDTH, height: ICON_CELL_HEIGHT };
   }, [previewCell]);
 
+  const swapPreviewStyle = useMemo(() => {
+    if (!swapPreview) return null;
+    const { x, y } = gridToPixel(swapPreview.cell.column, swapPreview.cell.row);
+    return {
+      left: x,
+      top: y,
+      width: ICON_CELL_WIDTH,
+      height: ICON_CELL_HEIGHT,
+      opacity: 0.5,
+    };
+  }, [swapPreview]);
+
   return (
     <div
       ref={desktopRef}
@@ -279,6 +291,19 @@ export function LearnDesktop({
             aria-hidden="true"
           />
         )}
+        {draggingId && swapPreviewStyle && (
+          <div
+            className={styles.gridPreview}
+            style={{
+              left: swapPreviewStyle.left,
+              top: swapPreviewStyle.top,
+              width: swapPreviewStyle.width,
+              height: swapPreviewStyle.height,
+              opacity: swapPreviewStyle.opacity,
+            }}
+            aria-hidden="true"
+          />
+        )}
 
         {allItemIds.map((id) => {
           const folder = desktopFolders.find((f) => f.id === id);
@@ -304,14 +329,25 @@ export function LearnDesktop({
               aria-selected={selectedIds.has(id)}
               aria-label={label}
               style={style}
+              draggable={false}
+              onDragStart={(e) => e.preventDefault()}
               onPointerDown={(e) => handleIconPointerDown(e, id)}
               onClick={(e) => {
-                e.stopPropagation();
+                if (consumeSuppressedActivation()) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return;
+                }
                 if (!draggingId) {
                   handleSelect(id, e.ctrlKey || e.metaKey);
                 }
               }}
-              onDoubleClick={() => {
+              onDoubleClick={(e) => {
+                if (consumeSuppressedActivation()) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return;
+                }
                 if (folder) handleOpenFolder(folder);
                 else if (app) handleOpenApp(app);
               }}
@@ -321,12 +357,13 @@ export function LearnDesktop({
                   else if (app) handleOpenApp(app);
                 })
               }
-              onContextMenu={(e) =>
+              onContextMenu={(e) => {
+                handleSelect(id, false);
                 handleItemContextMenu(e, {
                   type: folder ? "folder" : "app",
                   id,
-                })
-              }
+                });
+              }}
             >
               <span className={styles.desktopIconImage}>
                 {folder ? (

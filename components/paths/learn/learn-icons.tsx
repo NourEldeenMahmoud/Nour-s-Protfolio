@@ -225,6 +225,7 @@ export function AppIcon({ app, className, size = 48 }: { app: LearnApplication; 
         width={size}
         height={size}
         aria-hidden="true"
+        draggable={false}
         style={{ objectFit: "contain" }}
       />
     );
