@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useContextMenu } from "@/components/paths/learn/use-context-menu";
 import {
@@ -19,6 +19,12 @@ import {
   DESKTOP_PADDING_X,
   DESKTOP_PADDING_TOP,
 } from "@/components/paths/learn/use-desktop-icon-positions";
+import {
+  useFileClipboard,
+  copyFileToClipboard,
+  getCopiedFile,
+  clearClipboard,
+} from "@/components/paths/learn/use-file-clipboard";
 
 describe("useContextMenu", () => {
   beforeEach(() => {
@@ -605,5 +611,84 @@ describe("useDesktopIconGridPositions", () => {
     expect(result.current.getPosition("a")).toBeNull();
     expect(result.current.getPosition("b")).toBeNull();
     expect(result.current.getPosition("c")).toEqual({ column: 3, row: 4 });
+  });
+});
+
+describe("useFileClipboard", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("starts with copiedId null", () => {
+    const { result } = renderHook(() => useFileClipboard());
+    expect(result.current.copiedId).toBeNull();
+  });
+
+  it("copyFile writes to sessionStorage and sets copiedId", () => {
+    const { result } = renderHook(() => useFileClipboard());
+    act(() => {
+      result.current.copyFile("file-1", "folder-a");
+    });
+    expect(result.current.copiedId).toBe("file-1");
+    expect(getCopiedFile()).toEqual({ fileId: "file-1", folderId: "folder-a" });
+  });
+
+  it("copyFile overwrites previous clipboard data", () => {
+    const { result } = renderHook(() => useFileClipboard());
+    act(() => {
+      result.current.copyFile("file-1", "folder-a");
+    });
+    act(() => {
+      result.current.copyFile("file-2", "folder-b");
+    });
+    expect(result.current.copiedId).toBe("file-2");
+    expect(getCopiedFile()).toEqual({ fileId: "file-2", folderId: "folder-b" });
+  });
+
+  it("copiedId auto-clears after 2 seconds", () => {
+    const { result } = renderHook(() => useFileClipboard());
+    act(() => {
+      result.current.copyFile("file-1", "folder-a");
+    });
+    expect(result.current.copiedId).toBe("file-1");
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(result.current.copiedId).toBeNull();
+  });
+
+  it("copiedId clears on unmount", () => {
+    const { result, unmount } = renderHook(() => useFileClipboard());
+    act(() => {
+      result.current.copyFile("file-1", "folder-a");
+    });
+    unmount();
+    expect(result.current.copiedId).toBe("file-1");
+  });
+
+  it("clearClipboard removes from sessionStorage", () => {
+    copyFileToClipboard("file-1", "folder-a");
+    expect(getCopiedFile()).toEqual({ fileId: "file-1", folderId: "folder-a" });
+    clearClipboard();
+    expect(getCopiedFile()).toBeNull();
+  });
+
+  it("getCopiedFile returns null when sessionStorage is empty", () => {
+    expect(getCopiedFile()).toBeNull();
+  });
+
+  it("getCopiedFile returns null for malformed data", () => {
+    sessionStorage.setItem("learn-clipboard", "not-json");
+    expect(getCopiedFile()).toBeNull();
+  });
+
+  it("getCopiedFile returns null for missing fields", () => {
+    sessionStorage.setItem("learn-clipboard", JSON.stringify({ fileId: "x" }));
+    expect(getCopiedFile()).toBeNull();
   });
 });

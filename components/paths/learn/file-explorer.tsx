@@ -20,6 +20,8 @@ interface FileExplorerProps {
   onOpenFolder: (folderId: string, title: string) => void;
   onReturnToRoom: () => void;
   onItemContextMenu?: (e: React.MouseEvent, target: import("./use-context-menu").ContextMenuTarget) => void;
+  onSelectionChange?: (id: string | null) => void;
+  copiedFileId?: string | null;
   copy: {
     returnToRoom: string;
     searchPlaceholder: string;
@@ -38,6 +40,8 @@ export function FileExplorer({
   onOpenFolder,
   onReturnToRoom,
   onItemContextMenu,
+  onSelectionChange,
+  copiedFileId,
   copy,
 }: FileExplorerProps) {
   const [history, setHistory] = useState<string[]>([folderId]);
@@ -45,6 +49,10 @@ export function FileExplorer({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const isNavigatingRef = useRef(false);
+
+  useEffect(() => {
+    onSelectionChange?.(selectedId);
+  }, [selectedId, onSelectionChange]);
 
   const currentFolder = learnNodeMap.get(folderId);
   const children = currentFolder
@@ -277,6 +285,8 @@ export function FileExplorer({
                     className={styles.fileItem}
                     type="button"
                     role="option"
+                    data-node-id={node.id}
+                    data-node-type={node.type}
                     aria-selected={node.id === selectedId}
                     onClick={() => handleItemClick(node)}
                     onDoubleClick={() => handleItemOpen(node)}
@@ -311,6 +321,8 @@ export function FileExplorer({
                   className={styles.fileItem}
                   type="button"
                   role="option"
+                  data-node-id={node.id}
+                  data-node-type={node.type}
                   aria-selected={node.id === selectedId}
                   onClick={() => handleItemClick(node)}
                   onDoubleClick={() => handleItemOpen(node)}
@@ -338,9 +350,13 @@ export function FileExplorer({
         </div>
 
         <div className={styles.explorerStatus}>
-          {searchQuery.length >= 2
-            ? `${searchResults.length} result${searchResults.length !== 1 ? "s" : ""}`
-            : copy.itemCountPattern.replace("{{count}}", String(children.length))}
+          {copiedFileId ? (
+            <span className={styles.copiedToast} data-testid="copied-toast">Copied</span>
+          ) : searchQuery.length >= 2 ? (
+            `${searchResults.length} result${searchResults.length !== 1 ? "s" : ""}`
+          ) : (
+            copy.itemCountPattern.replace("{{count}}", String(children.length))
+          )}
         </div>
       </div>
     </div>

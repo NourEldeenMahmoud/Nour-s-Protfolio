@@ -1199,6 +1199,17 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+.copiedToast {
+  color: #4ade80;
+  font-weight: 500;
+  animation: copiedFade 2s ease forwards;
+}
+
+@keyframes copiedFade {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ─── Document Viewer ─── */
 .docViewer {
   height: 100%;

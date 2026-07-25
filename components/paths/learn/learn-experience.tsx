@@ -19,6 +19,7 @@ import { LearnWidgets } from "./learn-widgets";
 import { DesktopContextMenu } from "./desktop-context-menu";
 import type { ContextMenuItem } from "./desktop-context-menu";
 import { useContextMenu } from "./use-context-menu";
+import { useFileClipboard } from "./use-file-clipboard";
 import styles from "./learn.module.css";
 
 const WIDGETS_VISIBLE_KEY = "learn-widgets-visible";
@@ -94,6 +95,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const [workspaceRect, setWorkspaceRect] = useState<DOMRect | null>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const { menu: contextMenu, openContextMenu, closeContextMenu } = useContextMenu();
+  const { copiedId, copyFile } = useFileClipboard();
+  const selectedFileRef = useRef<string | null>(null);
 
   const alternateLocale = locale === "en" ? "ar" : "en";
 
@@ -182,6 +185,12 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const itemContextMenuItems: ContextMenuItem[] = [
     { id: "open", label: "Open" },
+    ...(contextMenu.target.type === "file"
+      ? [
+          { id: "sep-copy", label: "", separator: true },
+          { id: "copy", label: "Copy" },
+        ]
+      : []),
     { id: "sep-open", label: "", separator: true },
     { id: "refresh", label: "Refresh" },
   ];
@@ -203,6 +212,15 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         case "return":
           handleReturnToRoom();
           break;
+        case "copy": {
+          if (target.type === "file") {
+            const node = learnNodeMap.get(target.id);
+            if (node?.parentId) {
+              copyFile(target.id, node.parentId);
+            }
+          }
+          break;
+        }
         case "open": {
           if (target.type === "folder") {
             if (target.explorerWindowId) {
@@ -222,7 +240,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         }
       }
     },
-    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow],
+    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow, copyFile],
   );
 
   // Sync URL → state on mount
@@ -349,10 +367,20 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         e.preventDefault();
         setSearchOpen(true);
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === "c") {
+        const el = document.activeElement;
+        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return;
+        const fid = selectedFileRef.current;
+        if (!fid) return;
+        const node = learnNodeMap.get(fid);
+        if (node?.parentId) {
+          copyFile(fid, node.parentId);
+        }
+      }
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [searchOpen, startOpen, contextMenu.open, closeContextMenu]);
+  }, [searchOpen, startOpen, contextMenu.open, closeContextMenu, copyFile]);
 
   useLayoutEffect(() => {
     closeContextMenu();
@@ -450,6 +478,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
                 }}
                 onReturnToRoom={handleReturnToRoom}
                 onItemContextMenu={handleExplorerItemContextMenu}
+                onSelectionChange={(id) => { selectedFileRef.current = id; }}
+                copiedFileId={copiedId}
                 copy={{
                   returnToRoom: copy.returnToRoom,
                   searchPlaceholder: copy.searchPlaceholder,

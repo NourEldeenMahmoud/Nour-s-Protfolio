@@ -983,3 +983,169 @@ test.describe("App URL restoration", () => {
     expect(windows).toBe(0);
   });
 });
+
+test.describe("File copy", () => {
+  test("right-clicking a file in explorer shows Copy in context menu", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const aboutIcon = page.locator("[data-desktop-item-id='about']");
+    await aboutIcon.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const explorer = page.locator("[role='dialog'] [role='listbox']");
+    const firstItem = explorer.locator("[role='option']").first();
+    await expect(firstItem).toBeVisible();
+
+    const nodeType = await firstItem.getAttribute("data-node-type");
+    expect(nodeType).toBe("file");
+
+    await firstItem.click({ button: "right" });
+
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible();
+
+    const copyItem = menu.locator("[role='menuitem']", { hasText: "Copy" });
+    await expect(copyItem).toBeVisible();
+  });
+
+  test("right-clicking a folder in explorer does NOT show Copy", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const knowledgeIcon = page.locator("[data-desktop-item-id='knowledge']");
+    await knowledgeIcon.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const explorer = page.locator("[role='dialog'] [role='listbox']");
+    const firstItem = explorer.locator("[role='option']").first();
+    await expect(firstItem).toBeVisible();
+
+    const nodeType = await firstItem.getAttribute("data-node-type");
+    expect(nodeType).toBe("folder");
+
+    await firstItem.click({ button: "right" });
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible();
+    const copyItem = menu.locator("[role='menuitem']", { hasText: "Copy" });
+    await expect(copyItem).toHaveCount(0);
+  });
+
+  test("clicking Copy stores file ID in sessionStorage and shows toast", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const aboutIcon = page.locator("[data-desktop-item-id='about']");
+    await aboutIcon.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const explorer = page.locator("[role='dialog'] [role='listbox']");
+    const firstItem = explorer.locator("[role='option']").first();
+    await expect(firstItem).toBeVisible();
+
+    const fileId = await firstItem.getAttribute("data-node-id");
+    expect(fileId).toBeTruthy();
+
+    await firstItem.click({ button: "right" });
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible();
+    await menu.locator("[role='menuitem']", { hasText: "Copy" }).click();
+
+    const toast = page.locator("[data-testid='copied-toast']");
+    await expect(toast).toBeVisible({ timeout: 2000 });
+
+    const clipData = await page.evaluate(() => {
+      const raw = sessionStorage.getItem("learn-clipboard");
+      return raw ? JSON.parse(raw) : null;
+    });
+    expect(clipData).not.toBeNull();
+    expect(clipData.fileId).toBe(fileId);
+    expect(clipData.folderId).toBe("about");
+  });
+
+  test("file stays selected after Copy", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const aboutIcon = page.locator("[data-desktop-item-id='about']");
+    await aboutIcon.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const explorer = page.locator("[role='dialog'] [role='listbox']");
+    const firstItem = explorer.locator("[role='option']").first();
+    await expect(firstItem).toBeVisible();
+    await firstItem.click();
+
+    const isSelected = await firstItem.getAttribute("aria-selected");
+    expect(isSelected).toBe("true");
+
+    await firstItem.click({ button: "right" });
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible();
+    await menu.locator("[role='menuitem']", { hasText: "Copy" }).click();
+
+    const stillSelected = await firstItem.getAttribute("aria-selected");
+    expect(stillSelected).toBe("true");
+  });
+
+  test("Ctrl+C copies the selected file", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const aboutIcon = page.locator("[data-desktop-item-id='about']");
+    await aboutIcon.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const explorer = page.locator("[role='dialog'] [role='listbox']");
+    const firstItem = explorer.locator("[role='option']").first();
+    await expect(firstItem).toBeVisible();
+    await firstItem.click();
+
+    const fileId = await firstItem.getAttribute("data-node-id");
+    expect(fileId).toBeTruthy();
+
+    await page.keyboard.press("Control+c");
+
+    const toast = page.locator("[data-testid='copied-toast']");
+    await expect(toast).toBeVisible({ timeout: 2000 });
+
+    const clipData = await page.evaluate(() => {
+      const raw = sessionStorage.getItem("learn-clipboard");
+      return raw ? JSON.parse(raw) : null;
+    });
+    expect(clipData).not.toBeNull();
+    expect(clipData.fileId).toBe(fileId);
+  });
+
+  test("Ctrl+C with no selection does nothing", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const aboutIcon = page.locator("[data-desktop-item-id='about']");
+    await aboutIcon.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    await page.keyboard.press("Control+c");
+
+    const toast = page.locator("[data-testid='copied-toast']");
+    await expect(toast).toHaveCount(0, { timeout: 500 });
+
+    const clipData = await page.evaluate(() => {
+      const raw = sessionStorage.getItem("learn-clipboard");
+      return raw ? JSON.parse(raw) : null;
+    });
+    expect(clipData).toBeNull();
+  });
+});
