@@ -11,7 +11,7 @@ import {
   isOccupied,
   findNearestAvailableCell,
   computeDefaultPositions,
-  enforceBounds,
+  resolveDesktopLayout,
   ICON_CELL_WIDTH,
   ICON_CELL_HEIGHT,
   ICON_GAP_X,
@@ -328,59 +328,99 @@ describe("grid utilities", () => {
     });
   });
 
-  describe("enforceBounds", () => {
-    it("returns empty when no positions", () => {
-      const result = enforceBounds({}, new Map(), 8, 10);
-      expect(Object.keys(result).length).toBe(0);
+  describe("resolveDesktopLayout", () => {
+    it("returns empty layout for empty item list", () => {
+      const layout = resolveDesktopLayout([], {}, new Map(), 8, 10);
+      expect(layout.items.size).toBe(0);
+      expect(layout.maxCols).toBe(8);
+      expect(layout.maxRows).toBe(10);
     });
 
-    it("keeps valid custom positions", () => {
-      const custom = { a: { column: 0, row: 0 } };
-      const result = enforceBounds(custom, new Map(), 8, 10);
-      expect(result.a).toEqual({ column: 0, row: 0 });
+    it("places items using default positions when no custom", () => {
+      const defaults = new Map([
+        ["a", { column: 0, row: 0 }],
+        ["b", { column: 1, row: 0 }],
+      ]);
+      const layout = resolveDesktopLayout(["a", "b"], {}, defaults, 8, 10);
+      const a = layout.items.get("a");
+      const b = layout.items.get("b");
+      expect(a).toBeDefined();
+      expect(b).toBeDefined();
+      expect(a!.col).toBe(0);
+      expect(a!.row).toBe(0);
+      expect(b!.col).toBe(1);
+      expect(b!.row).toBe(0);
     });
 
-    it("clamps out-of-bounds custom positions", () => {
+    it("custom positions take priority over defaults", () => {
+      const custom = { a: { column: 5, row: 3 } };
+      const defaults = new Map([["a", { column: 0, row: 0 }]]);
+      const layout = resolveDesktopLayout(["a"], custom, defaults, 8, 10);
+      const a = layout.items.get("a");
+      expect(a).toBeDefined();
+      expect(a!.col).toBe(5);
+      expect(a!.row).toBe(3);
+    });
+
+    it("clamps out-of-bounds positions", () => {
       const custom = { a: { column: 100, row: 100 } };
-      const result = enforceBounds(custom, new Map(), 8, 10);
-      const posA = result.a;
-      expect(posA).toBeDefined();
-      if (posA) {
-        expect(posA.column).toBeLessThan(8);
-        expect(posA.row).toBeLessThan(10);
-      }
+      const layout = resolveDesktopLayout(["a"], custom, new Map(), 8, 10);
+      const a = layout.items.get("a");
+      expect(a).toBeDefined();
+      expect(a!.col).toBeLessThan(8);
+      expect(a!.row).toBeLessThan(10);
     });
 
-    it("does not place two items in the same cell", () => {
+    it("avoids collisions with nearest available cell", () => {
       const custom = {
         a: { column: 0, row: 0 },
         b: { column: 0, row: 0 },
       };
-      const result = enforceBounds(custom, new Map(), 8, 10);
-      const posA = result.a;
-      const posB = result.b;
-      expect(posA).toBeDefined();
-      expect(posB).toBeDefined();
-      if (posA && posB) {
-        expect(posA).not.toEqual(posB);
-      }
+      const layout = resolveDesktopLayout(["a", "b"], custom, new Map(), 8, 10);
+      const a = layout.items.get("a");
+      const b = layout.items.get("b");
+      expect(a).toBeDefined();
+      expect(b).toBeDefined();
+      expect(a!.col).not.toBe(b!.col);
     });
 
-    it("custom position is placed within bounds when defaults exist", () => {
-      const custom = { a: { column: 0, row: 0 } };
+    it("skips dragging item", () => {
+      const custom = {
+        a: { column: 0, row: 0 },
+        b: { column: 1, row: 0 },
+      };
+      const layout = resolveDesktopLayout(["a", "b"], custom, new Map(), 8, 10, "a");
+      expect(layout.items.has("a")).toBe(false);
+      expect(layout.items.has("b")).toBe(true);
+    });
+
+    it("computes correct pixel positions", () => {
+      const custom = { a: { column: 2, row: 3 } };
+      const layout = resolveDesktopLayout(["a"], custom, new Map(), 8, 10);
+      const a = layout.items.get("a");
+      expect(a).toBeDefined();
+      const { x, y } = gridToPixel(2, 3);
+      expect(a!.x).toBe(x);
+      expect(a!.y).toBe(y);
+    });
+
+    it("handles mixed custom and default items", () => {
+      const custom = { a: { column: 3, row: 2 } };
       const defaults = new Map([
-        ["b", { column: 0, row: 0 }],
-        ["c", { column: 1, row: 0 }],
+        ["a", { column: 0, row: 0 }],
+        ["b", { column: 1, row: 0 }],
+        ["c", { column: 2, row: 0 }],
       ]);
-      const result = enforceBounds(custom, defaults, 8, 10);
-      const posA = result.a;
-      expect(posA).toBeDefined();
-      if (posA) {
-        expect(posA.column).toBeGreaterThanOrEqual(0);
-        expect(posA.column).toBeLessThan(8);
-        expect(posA.row).toBeGreaterThanOrEqual(0);
-        expect(posA.row).toBeLessThan(10);
-      }
+      const layout = resolveDesktopLayout(["a", "b", "c"], custom, defaults, 8, 10);
+      const a = layout.items.get("a");
+      const b = layout.items.get("b");
+      const c = layout.items.get("c");
+      expect(a!.col).toBe(3);
+      expect(a!.row).toBe(2);
+      expect(b!.col).toBe(1);
+      expect(b!.row).toBe(0);
+      expect(c!.col).toBe(2);
+      expect(c!.row).toBe(0);
     });
   });
 });

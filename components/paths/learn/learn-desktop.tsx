@@ -9,7 +9,7 @@ import {
   useDesktopIconGridPositions,
   computeDefaultPositions,
   getMaxGridDimensions,
-  enforceBounds,
+  resolveDesktopLayout,
   gridToPixel,
   ICON_CELL_WIDTH,
   ICON_CELL_HEIGHT,
@@ -61,26 +61,23 @@ export function LearnDesktop({
     [allItemIds, maxCols],
   );
 
-  useEffect(() => {
-    if (workspaceSize.w === 0) return;
-    const next = enforceBounds(customPositions, defaultPositions, maxCols, maxRows);
-    const changed = Object.keys(next).length !== Object.keys(customPositions).length;
-    if (!changed) {
-      for (const key of Object.keys(next)) {
-        const a = customPositions[key];
-        const b = next[key];
-        if (!a || !b || a.column !== b.column || a.row !== b.row) {
-          break;
-        }
-      }
-    }
-    for (const key of Object.keys(next)) {
-      const a = customPositions[key];
-      const b = next[key];
-      if (a && b && a.column === b.column && a.row === b.row) continue;
-      setGridPosition(key, b!.column, b!.row);
-    }
-  }, [workspaceSize.w, workspaceSize.h, customPositions, defaultPositions, maxCols, maxRows, setGridPosition]);
+  // Single authoritative layout computed from custom + default + bounds
+  const layout = useMemo(
+    () =>
+      resolveDesktopLayout(allItemIds, customPositions, defaultPositions, maxCols, maxRows),
+    [allItemIds, customPositions, defaultPositions, maxCols, maxRows],
+  );
+
+  // Occupancy map for drag collision detection (excludes dragging item)
+  const getOccupancy = useCallback(
+    (draggingId: string | null) =>
+      new Map(
+        Array.from(layout.items.entries())
+          .filter(([id]) => id !== draggingId)
+          .map(([, item]) => [`${item.col},${item.row}`, item.id]),
+      ),
+    [layout.items],
+  );
 
   useEffect(() => {
     const el = desktopRef.current;
@@ -119,6 +116,13 @@ export function LearnDesktop({
     onClearSelection: handleClearSelection,
   });
 
+  const handleDrop = useCallback(
+    (id: string, col: number, row: number) => {
+      setGridPosition(id, col, row);
+    },
+    [setGridPosition],
+  );
+
   const {
     draggingId,
     previewCell,
@@ -128,10 +132,10 @@ export function LearnDesktop({
     handlePointerCancel: dragPointerCancel,
     getIconStyle,
   } = useDesktopIconDrag({
-    customPositions,
-    defaultPositions,
-    allItemIds,
-    setGridPosition,
+    occupancy: getOccupancy(null),
+    maxCols,
+    maxRows,
+    onDrop: handleDrop,
   });
 
   const handleSelect = useCallback(
@@ -179,7 +183,9 @@ export function LearnDesktop({
 
   const handleDesktopContextMenu = useCallback(
     (e: React.MouseEvent) => {
-      if (e.target !== e.currentTarget) return;
+      // Accept right-click anywhere on the desktop surface that isn't an icon
+      if (e.target instanceof HTMLElement && e.target.closest("[data-desktop-item]")) return;
+      if (!(e.target instanceof HTMLElement && e.target.closest("[data-desktop-surface]"))) return;
       e.preventDefault();
       onContextMenu?.(e.clientX, e.clientY, { type: "desktop" });
     },
@@ -195,12 +201,23 @@ export function LearnDesktop({
     [onContextMenu],
   );
 
+  // Mutual exclusion: pointerdown on icon → drag only; pointerdown on empty → marquee only
   const handleIconPointerDown = useCallback(
     (e: React.PointerEvent, itemId: string) => {
-      dragPointerDown(e, itemId);
+      const layoutItem = layout.items.get(itemId);
+      if (!layoutItem) return;
+      dragPointerDown(e, itemId, layoutItem.x, layoutItem.y);
+    },
+    [layout.items, dragPointerDown],
+  );
+
+  const handleDesktopPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("[data-desktop-item]")) return;
       marqueePointerDown(e);
     },
-    [dragPointerDown, marqueePointerDown],
+    [marqueePointerDown],
   );
 
   const handleDesktopPointerMove = useCallback(
@@ -238,12 +255,7 @@ export function LearnDesktop({
       ref={desktopRef}
       className={styles.desktop}
       data-desktop-surface
-      onPointerDown={(e) => {
-        const target = e.target as HTMLElement;
-        if (!target.closest("[data-desktop-item]")) {
-          marqueePointerDown(e);
-        }
-      }}
+      onPointerDown={handleDesktopPointerDown}
       onPointerMove={handleDesktopPointerMove}
       onPointerUp={handleDesktopPointerUp}
       onPointerCancel={handleDesktopPointerCancel}
@@ -273,10 +285,10 @@ export function LearnDesktop({
           const app = !folder ? applications.find((a) => a.id === id) : null;
           if (!folder && !app) return null;
 
-          const defaultPos = defaultPositions.get(id);
-          const fallbackCol = defaultPos?.column ?? 0;
-          const fallbackRow = defaultPos?.row ?? 0;
-          const style = getIconStyle(id, fallbackCol, fallbackRow);
+          const layoutItem = layout.items.get(id);
+          const pixelX = layoutItem?.x ?? 0;
+          const pixelY = layoutItem?.y ?? 0;
+          const style = getIconStyle(id, pixelX, pixelY);
           const isDragging = draggingId === id;
           const label = folder ? folder.name[locale] : app?.name ?? "";
 

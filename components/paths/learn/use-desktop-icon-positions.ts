@@ -14,6 +14,20 @@ export const DESKTOP_PADDING_TOP = 12;
 export type DesktopIconGridPosition = { column: number; row: number };
 export type DesktopIconGridPositions = Record<string, DesktopIconGridPosition>;
 
+export interface DesktopLayoutItem {
+  id: string;
+  col: number;
+  row: number;
+  x: number;
+  y: number;
+}
+
+export interface DesktopLayout {
+  items: Map<string, DesktopLayoutItem>;
+  maxCols: number;
+  maxRows: number;
+}
+
 function readPositions(): DesktopIconGridPositions {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -167,32 +181,33 @@ export function computeDefaultPositions(
   return map;
 }
 
-export function enforceBounds(
+/**
+ * Pure function: computes the single authoritative layout for all desktop items.
+ * Custom positions take priority; defaults fill remaining slots with collision avoidance.
+ */
+export function resolveDesktopLayout(
+  allItemIds: string[],
   customPositions: DesktopIconGridPositions,
   defaultPositions: Map<string, DesktopIconGridPosition>,
   maxCols: number,
   maxRows: number,
-): DesktopIconGridPositions {
+  draggingId: string | null = null,
+): DesktopLayout {
+  const items = new Map<string, DesktopLayoutItem>();
   const occupancy = new Map<string, string>();
-  const result: DesktopIconGridPositions = {};
 
-  const customIds = Object.keys(customPositions);
-  const defaultIds = Array.from(defaultPositions.keys());
-  const allIdSet = new Set<string>([...customIds, ...defaultIds]);
-  const sortedIds = Array.from(allIdSet).sort((a, b) => {
-    const aCustom = customPositions[a];
-    const bCustom = customPositions[b];
-    if (aCustom && !bCustom) return -1;
-    if (!aCustom && bCustom) return 1;
-    return 0;
-  });
+  const customIds = allItemIds.filter((id) => customPositions[id]);
+  const defaultIds = allItemIds.filter((id) => !customPositions[id]);
+  const ordered = [...customIds, ...defaultIds];
 
-  for (const id of sortedIds) {
-    const pos = customPositions[id] ?? defaultPositions.get(id);
-    if (!pos) continue;
+  for (const id of ordered) {
+    if (id === draggingId) continue;
 
-    const clamped = clampGridPosition(pos.column, pos.row, maxCols, maxRows);
-    const finalPos = findNearestAvailableCell(
+    const raw = customPositions[id] ?? defaultPositions.get(id);
+    if (!raw) continue;
+
+    const clamped = clampGridPosition(raw.column, raw.row, maxCols, maxRows);
+    const final = findNearestAvailableCell(
       clamped.column,
       clamped.row,
       maxCols,
@@ -200,13 +215,13 @@ export function enforceBounds(
       occupancy,
     );
 
-    if (customPositions[id]) {
-      result[id] = finalPos;
-    }
-    occupancy.set(`${finalPos.column},${finalPos.row}`, id);
+    occupancy.set(`${final.column},${final.row}`, id);
+
+    const { x, y } = gridToPixel(final.column, final.row);
+    items.set(id, { id, col: final.column, row: final.row, x, y });
   }
 
-  return result;
+  return { items, maxCols, maxRows };
 }
 
 export function useDesktopIconGridPositions() {

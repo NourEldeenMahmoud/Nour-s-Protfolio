@@ -71,6 +71,14 @@ export function DesktopContextMenu({
         e.preventDefault();
         setFocusIndex((i) => (i - 1 + nonSepItems.length) % nonSepItems.length);
       }
+      if (e.key === "Home") {
+        e.preventDefault();
+        setFocusIndex(0);
+      }
+      if (e.key === "End") {
+        e.preventDefault();
+        setFocusIndex(nonSepItems.length - 1);
+      }
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         const item = nonSepItems[focusIndex];
@@ -93,6 +101,15 @@ export function DesktopContextMenu({
   useEffect(() => {
     menuRef.current?.focus();
   }, []);
+
+  // Move DOM focus to the active menuitem when focusIndex changes (roving tabindex)
+  useEffect(() => {
+    const el = menuRef.current;
+    if (!el) return;
+    const items = el.querySelectorAll<HTMLElement>("[role='menuitem']");
+    const active = items[focusIndex];
+    if (active) active.focus();
+  }, [focusIndex]);
 
   return (
     <div

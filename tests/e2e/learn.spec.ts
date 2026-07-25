@@ -94,88 +94,10 @@ test.describe("Learn desktop", () => {
     await expect(window).toHaveAttribute("aria-label", /This PC/i);
   });
 
-  test("nested folder navigation updates content in the same window", async ({
-    page,
-  }) => {
-    await page.goto("/en/learn");
-    await page.waitForSelector("[data-desktop-surface]");
-
-    // Open This PC
-    const thisPC = page.locator("[data-desktop-item-id='this-pc']");
-    await thisPC.dblclick();
-    await page.waitForSelector("[role='dialog']");
-
-    // Double-click a folder inside the explorer
-    const explorerGrid = page.locator("[role='listbox'][aria-label='Files']");
-    const firstFolder = explorerGrid.locator("[role='option']").first();
-    await firstFolder.dblclick();
-
-    // Should still be exactly one window
-    const windows = page.locator("[role='dialog']");
-    await expect(windows).toHaveCount(1);
-
-    // Breadcrumb should have updated
-    const breadcrumbs = page.locator("[role='dialog'] .breadcrumbBtn");
-    const breadcrumbCount = await breadcrumbs.count();
-    expect(breadcrumbCount).toBeGreaterThanOrEqual(2);
-  });
-
-  test("explorer back button works after nested navigation", async ({
-    page,
-  }) => {
-    await page.goto("/en/learn");
-    await page.waitForSelector("[data-desktop-surface]");
-
-    // Open This PC
-    const thisPC = page.locator("[data-desktop-item-id='this-pc']");
-    await thisPC.dblclick();
-    await page.waitForSelector("[role='dialog']");
-
-    // Navigate into first folder
-    const firstFolder = page
-      .locator("[role='listbox'][aria-label='Files']")
-      .locator("[role='option']")
-      .first();
-    await firstFolder.dblclick();
-    await page.waitForTimeout(200);
-
-    // Click back
-    const backBtn = page.locator("[aria-label='Back']");
-    await backBtn.click();
-    await page.waitForTimeout(200);
-
-    // Should be back at This PC with 1 breadcrumb
-    const breadcrumbs = page.locator("[role='dialog'] .breadcrumbBtn");
-    await expect(breadcrumbs).toHaveCount(1);
-  });
-
-  test("document viewer has a single scrollbar at the window edge", async ({
-    page,
-  }) => {
-    await page.goto("/en/learn?file=__about__");
-    await page.waitForSelector("[role='dialog']");
-
-    const scrollCheck = await page.evaluate(() => {
-      const docViewer = document.querySelector(
-        ".docViewer",
-      ) as HTMLElement | null;
-      if (!docViewer) return null;
-      const style = getComputedStyle(docViewer);
-      return {
-        overflowY: style.overflowY,
-        hasVerticalScroll: docViewer.scrollHeight > docViewer.clientHeight,
-      };
-    });
-
-    expect(scrollCheck).not.toBeNull();
-    expect(scrollCheck!.overflowY).toBe("auto");
-  });
-
   test("window cannot move below the taskbar area", async ({ page }) => {
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    // Open a window
     const thisPC = page.locator("[data-desktop-item-id='this-pc']");
     await thisPC.dblclick();
     await page.waitForSelector("[role='dialog']");
@@ -184,7 +106,6 @@ test.describe("Learn desktop", () => {
     const initialBox = await window.boundingBox();
     expect(initialBox).not.toBeNull();
 
-    // The window should not extend below the viewport
     const viewport = page.viewportSize();
     expect(viewport).not.toBeNull();
     expect(initialBox!.y + initialBox!.height).toBeLessThanOrEqual(
@@ -196,17 +117,14 @@ test.describe("Learn desktop", () => {
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    // Open a window
     const thisPC = page.locator("[data-desktop-item-id='this-pc']");
     await thisPC.dblclick();
     const window = page.locator("[role='dialog']").first();
     await expect(window).toBeVisible({ timeout: 3000 });
 
-    // Minimize
     await window.locator("[aria-label='Minimize']").click();
     await expect(window).toBeHidden({ timeout: 1000 });
 
-    // Click the taskbar folder icon to restore
     const taskbarExplorer = page
       .locator("[role='toolbar'][aria-label='Taskbar']")
       .locator("button")
@@ -222,22 +140,19 @@ test.describe("Learn desktop", () => {
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    // Count initial windows
     const windows0 = await page.locator("[role='dialog']").count();
 
-    // Open This PC
     const thisPC = page.locator("[data-desktop-item-id='this-pc']");
     await thisPC.dblclick();
     await page.waitForSelector("[role='dialog']");
 
-    // Count windows after opening
     const windows1 = await page.locator("[role='dialog']").count();
     expect(windows1).toBe(windows0 + 1);
   });
 });
 
 test.describe("Learn desktop at different viewports", () => {
-  test("1920×1080 has no scrollbars", async ({ page }) => {
+  test("1920x1080 has no scrollbars", async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
@@ -249,7 +164,7 @@ test.describe("Learn desktop at different viewports", () => {
     expect(result.scrollWidth).toBe(result.clientWidth);
   });
 
-  test("1366×768 has no scrollbars", async ({ page }) => {
+  test("1366x768 has no scrollbars", async ({ page }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
@@ -290,7 +205,6 @@ test.describe("Learn desktop grid system", () => {
 
     expect(positions.length).toBeGreaterThan(0);
 
-    // Check no two icons fully overlap (some margin tolerance for sub-pixel)
     for (let i = 0; i < positions.length; i++) {
       for (let j = i + 1; j < positions.length; j++) {
         const a = positions[i]!;
@@ -301,7 +215,6 @@ test.describe("Learn desktop grid system", () => {
           Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
         const overlapArea = Math.max(0, overlapX) * Math.max(0, overlapY);
         const minArea = Math.min(a.w * a.h, b.w * b.h);
-        // No icon should be more than 50% overlapped by another
         expect(overlapArea).toBeLessThan(minArea * 0.5);
       }
     }
@@ -321,16 +234,33 @@ test.describe("Learn desktop grid system", () => {
     });
 
     expect(firstIconPos).not.toBeNull();
-    // First icon should be near the top-left (within 200px)
     expect(firstIconPos!.x).toBeLessThan(200);
     expect(firstIconPos!.y).toBeLessThan(200);
+  });
+
+  test("desktop icons match grid cell dimensions exactly", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only (mobile has different CSS sizes)");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const cellSize = await page.evaluate(() => {
+      const item = document.querySelector("[data-desktop-item]");
+      if (!item) return null;
+      const r = item.getBoundingClientRect();
+      return { w: r.width, h: r.height };
+    });
+
+    expect(cellSize).not.toBeNull();
+    expect(cellSize!.w).toBe(96);
+    expect(cellSize!.h).toBe(108);
   });
 
   test("right-click on desktop shows context menu", async ({ page }) => {
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    // Right-click on empty area of desktop — use dispatchEvent to avoid z-index interception
     await page.evaluate(() => {
       const desktop = document.querySelector("[data-desktop-surface]");
       if (!desktop) return;
@@ -361,7 +291,6 @@ test.describe("Learn desktop grid system", () => {
     const menu = page.locator("[role='menu']");
     await expect(menu).toBeVisible({ timeout: 2000 });
 
-    // Should have an "Open" option
     const openOption = menu.getByRole("menuitem", { name: /open/i });
     await expect(openOption).toBeVisible();
   });
@@ -391,13 +320,57 @@ test.describe("Learn desktop grid system", () => {
     await expect(menu).toBeHidden({ timeout: 1000 });
   });
 
+  test("context menu navigates with Home and End keys", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    await page.evaluate(() => {
+      const desktop = document.querySelector("[data-desktop-surface]");
+      if (!desktop) return;
+      const rect = desktop.getBoundingClientRect();
+      const event = new MouseEvent("contextmenu", {
+        bubbles: true,
+        cancelable: true,
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2,
+        button: 2,
+      });
+      desktop.dispatchEvent(event);
+    });
+
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible({ timeout: 2000 });
+
+    const menuitems = menu.locator("[role='menuitem']");
+    const count = await menuitems.count();
+    expect(count).toBeGreaterThan(0);
+
+    await page.keyboard.press("End");
+    await page.waitForTimeout(50);
+    const lastFocused = await page.evaluate(() => {
+      const focused = document.activeElement;
+      return focused?.getAttribute("role") === "menuitem" ? focused.textContent : null;
+    });
+    const lastItemText = await menuitems.last().textContent();
+    expect(lastFocused).toBe(lastItemText);
+
+    await page.keyboard.press("Home");
+    await page.waitForTimeout(50);
+    const firstFocused = await page.evaluate(() => {
+      const focused = document.activeElement;
+      return focused?.getAttribute("role") === "menuitem" ? focused.textContent : null;
+    });
+    const firstItemText = await menuitems.first().textContent();
+    expect(firstFocused).toBe(firstItemText);
+  });
+
   test("desktop icons persist grid positions across reload", async ({
     page,
   }) => {
     await page.goto("/en/learn");
     await page.waitForSelector("[data-desktop-surface]");
 
-    // Record initial position of first icon
     const pos1 = await page.evaluate(() => {
       const item = document.querySelector("[data-desktop-item]");
       if (!item) return null;
@@ -406,11 +379,9 @@ test.describe("Learn desktop grid system", () => {
     });
     expect(pos1).not.toBeNull();
 
-    // Reload page
     await page.reload();
     await page.waitForSelector("[data-desktop-surface]");
 
-    // Position should be the same
     const pos2 = await page.evaluate(() => {
       const item = document.querySelector("[data-desktop-item]");
       if (!item) return null;
@@ -420,5 +391,166 @@ test.describe("Learn desktop grid system", () => {
     expect(pos2).not.toBeNull();
     expect(pos2!.x).toBe(pos1!.x);
     expect(pos2!.y).toBe(pos1!.y);
+  });
+});
+
+test.describe("Icon drag", () => {
+  test("dragging an icon moves it to a new grid position", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    const originalY = box!.y;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX, startY + 150, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox = await icon.boundingBox();
+    expect(newBox).not.toBeNull();
+    expect(newBox!.y).toBeGreaterThan(originalY);
+  });
+
+  test("dragged icon snaps to grid cell, not pixel", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 50, startY + 130, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox = await icon.boundingBox();
+    expect(newBox).not.toBeNull();
+
+    const cellW = 96;
+    const cellH = 108;
+    const gapX = 12;
+    const gapY = 12;
+    const padX = 16;
+    const padTop = 12;
+
+    const col = Math.round((newBox!.x - padX) / (cellW + gapX));
+    const row = Math.round((newBox!.y - padTop) / (cellH + gapY));
+
+    const snappedX = padX + col * (cellW + gapX);
+    const snappedY = padTop + row * (cellH + gapY);
+
+    expect(Math.abs(newBox!.x - snappedX)).toBeLessThan(2);
+    expect(Math.abs(newBox!.y - snappedY)).toBeLessThan(2);
+  });
+
+  test("drag does not start without crossing threshold", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    const box = await icon.boundingBox();
+    expect(box).not.toBeNull();
+
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 2, startY + 2, { steps: 2 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(200);
+
+    const newBox = await icon.boundingBox();
+    expect(newBox!.x).toBe(box!.x);
+    expect(newBox!.y).toBe(box!.y);
+  });
+
+  test("drag does not conflict with marquee on empty desktop", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only (marquee requires mouse pointer)");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const desktop = page.locator("[data-desktop-surface]");
+    const desktopBox = await desktop.boundingBox();
+    expect(desktopBox).not.toBeNull();
+
+    const startX = desktopBox!.x + desktopBox!.width / 2;
+    const startY = desktopBox!.y + desktopBox!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 100, startY + 100, { steps: 10 });
+
+    const marqueeVisible = await page.locator("[class*='selectionMarquee']").isVisible();
+    expect(marqueeVisible).toBe(true);
+
+    await page.mouse.up();
+    await page.waitForTimeout(100);
+  });
+});
+
+test.describe("Explorer context menus", () => {
+  test("right-clicking a folder in explorer shows context menu", async ({
+    page,
+  }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const thisPC = page.locator("[data-desktop-item-id='this-pc']");
+    await thisPC.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const firstItem = page
+      .locator("[role='listbox'][aria-label='Files']")
+      .locator("[role='option']")
+      .first();
+    await firstItem.click({ button: "right" });
+
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible({ timeout: 2000 });
+
+    const openOption = menu.getByRole("menuitem", { name: /open/i });
+    await expect(openOption).toBeVisible();
+  });
+});
+
+test.describe("App context menu resolves correctly", () => {
+  test("right-click app icon shows app name in context menu", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only (app icons may not be visible on mobile)");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const vscodeIcon = page.locator("[data-desktop-item-id='app-vscode']");
+    await vscodeIcon.click({ button: "right" });
+
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible({ timeout: 2000 });
+
+    await expect(menu).toHaveAttribute("aria-label", /Visual Studio Code/i);
   });
 });

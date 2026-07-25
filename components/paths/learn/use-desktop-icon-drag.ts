@@ -1,84 +1,74 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type {
-  DesktopIconGridPositions,
-  DesktopIconGridPosition,
-} from "./use-desktop-icon-positions";
+import type { DesktopIconGridPosition } from "./use-desktop-icon-positions";
 import {
   ICON_CELL_WIDTH,
   ICON_CELL_HEIGHT,
-  gridToPixel,
   pixelToGrid,
-  getMaxGridDimensions,
-  buildOccupancyMap,
   findNearestAvailableCell,
 } from "./use-desktop-icon-positions";
 
 const DRAG_THRESHOLD = 5;
 
 export interface UseDesktopIconDragOptions {
-  customPositions: DesktopIconGridPositions;
-  defaultPositions: Map<string, DesktopIconGridPosition>;
-  allItemIds: string[];
-  setGridPosition: (id: string, col: number, row: number) => void;
+  occupancy: Map<string, string>;
+  maxCols: number;
+  maxRows: number;
+  onDrop: (id: string, col: number, row: number) => void;
   onDragStart?: () => void;
   onDragEnd?: () => void;
 }
 
+interface DragState {
+  pointerId: number;
+  itemId: string;
+  startPointerX: number;
+  startPointerY: number;
+  startIconX: number;
+  startIconY: number;
+  prevGridPos: DesktopIconGridPosition | null;
+  hasPassedThreshold: boolean;
+  desktopRect: DOMRect;
+  /** Latest snap-to-grid candidate — read on pointerup, no stale state */
+  latestCandidate: DesktopIconGridPosition | null;
+}
+
 export function useDesktopIconDrag({
-  customPositions,
-  defaultPositions,
-  allItemIds,
-  setGridPosition,
+  occupancy,
+  maxCols,
+  maxRows,
+  onDrop,
   onDragStart,
   onDragEnd,
 }: UseDesktopIconDragOptions) {
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  /** pixel offset from the icon's layout position during drag */
+  const [dragOffset, setDragOffset] = useState<{ dx: number; dy: number } | null>(null);
   const [previewCell, setPreviewCell] = useState<DesktopIconGridPosition | null>(null);
 
-  const stateRef = useRef<{
-    pointerId: number;
-    itemId: string;
-    startPointerX: number;
-    startPointerY: number;
-    startIconX: number;
-    startIconY: number;
-    prevGridPos: DesktopIconGridPosition | null;
-    hasPassedThreshold: boolean;
-    desktopRect: DOMRect;
-    rafId: number;
-  } | null>(null);
+  const stateRef = useRef<DragState | null>(null);
 
   const finishDrag = useCallback(
     (save: boolean) => {
       const s = stateRef.current;
       if (!s) return;
-      if (s.rafId) cancelAnimationFrame(s.rafId);
 
-      if (save && previewCell) {
-        setGridPosition(s.itemId, previewCell.column, previewCell.row);
-      } else if (s.prevGridPos) {
-        const el = document.querySelector(
-          `[data-desktop-item-id="${s.itemId}"]`,
-        );
-        if (el) {
-          const { x, y } = gridToPixel(s.prevGridPos.column, s.prevGridPos.row);
-          (el as HTMLElement).style.left = `${x}px`;
-          (el as HTMLElement).style.top = `${y}px`;
-        }
+      if (save && s.latestCandidate) {
+        onDrop(s.itemId, s.latestCandidate.column, s.latestCandidate.row);
       }
 
       stateRef.current = null;
       setDraggingId(null);
+      setDragOffset(null);
       setPreviewCell(null);
       onDragEnd?.();
     },
-    [previewCell, setGridPosition, onDragEnd],
+    [onDrop, onDragEnd],
   );
 
   const handlePointerDown = useCallback(
-    (e: React.PointerEvent, itemId: string) => {
+    (e: React.PointerEvent, itemId: string, startPixelX: number, startPixelY: number) => {
       if (e.button !== 0) return;
       if (e.pointerType === "touch" || e.pointerType === "pen") return;
 
@@ -87,37 +77,21 @@ export function useDesktopIconDrag({
       if (!desktopEl) return;
 
       const desktopRect = desktopEl.getBoundingClientRect();
-      const pos = customPositions[itemId] ?? defaultPositions.get(itemId);
-
-      let startIconX: number;
-      let startIconY: number;
-
-      if (pos) {
-        const pixel = gridToPixel(pos.column, pos.row);
-        startIconX = pixel.x;
-        startIconY = pixel.y;
-      } else {
-        const iconEl = target.closest("[data-desktop-item]") as HTMLElement;
-        if (!iconEl) return;
-        const iconRect = iconEl.getBoundingClientRect();
-        startIconX = iconRect.left - desktopRect.left;
-        startIconY = iconRect.top - desktopRect.top;
-      }
 
       stateRef.current = {
         pointerId: e.pointerId,
         itemId,
         startPointerX: e.clientX,
         startPointerY: e.clientY,
-        startIconX,
-        startIconY,
-        prevGridPos: pos ?? null,
+        startIconX: startPixelX,
+        startIconY: startPixelY,
+        prevGridPos: null,
         hasPassedThreshold: false,
         desktopRect,
-        rafId: 0,
+        latestCandidate: null,
       };
     },
-    [customPositions, defaultPositions],
+    [],
   );
 
   const handlePointerMove = useCallback(
@@ -131,6 +105,7 @@ export function useDesktopIconDrag({
       if (!s.hasPassedThreshold) {
         if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
         s.hasPassedThreshold = true;
+        s.prevGridPos = pixelToGrid(s.startIconX, s.startIconY);
         const desktopEl = e.currentTarget as HTMLElement;
         if (desktopEl) desktopEl.setPointerCapture(e.pointerId);
         setDraggingId(s.itemId);
@@ -145,35 +120,21 @@ export function useDesktopIconDrag({
       const clampedX = Math.max(0, Math.min(newX, maxX));
       const clampedY = Math.max(0, Math.min(newY, maxY));
 
-      const { maxCols, maxRows } = getMaxGridDimensions(
-        s.desktopRect.width,
-        s.desktopRect.height,
-      );
-
       const hoverGrid = pixelToGrid(clampedX, clampedY);
-      const occ = buildOccupancyMap(allItemIds, customPositions, defaultPositions, s.itemId);
       const snapped = findNearestAvailableCell(
         hoverGrid.column,
         hoverGrid.row,
         maxCols,
         maxRows,
-        occ,
+        occupancy,
       );
 
-      if (s.rafId) cancelAnimationFrame(s.rafId);
-      s.rafId = requestAnimationFrame(() => {
-        const el = document.querySelector(
-          `[data-desktop-item-id="${s.itemId}"]`,
-        );
-        if (el) {
-          (el as HTMLElement).style.left = `${clampedX}px`;
-          (el as HTMLElement).style.top = `${clampedY}px`;
-        }
-      });
+      s.latestCandidate = snapped;
 
+      setDragOffset({ dx: clampedX - s.startIconX, dy: clampedY - s.startIconY });
       setPreviewCell(snapped);
     },
-    [allItemIds, customPositions, defaultPositions, onDragStart],
+    [maxCols, maxRows, occupancy, onDragStart],
   );
 
   const handlePointerUp = useCallback(
@@ -200,32 +161,33 @@ export function useDesktopIconDrag({
     [finishDrag],
   );
 
+  /**
+   * Returns the inline style for a desktop icon.
+   * During drag, the dragged item uses CSS transform (GPU composited, no layout thrash).
+   * All other items use their layout pixel position with no offset.
+   */
   const getIconStyle = useCallback(
-    (
-      id: string,
-      fallbackCol: number,
-      fallbackRow: number,
-    ): React.CSSProperties => {
-      const pos = customPositions[id] ?? defaultPositions.get(id);
-      const col = pos ? pos.column : fallbackCol;
-      const row = pos ? pos.row : fallbackRow;
-      const { x, y } = gridToPixel(col, row);
+    (id: string, pixelX: number, pixelY: number): React.CSSProperties => {
+      if (draggingId === id && dragOffset) {
+        return {
+          position: "absolute",
+          left: pixelX,
+          top: pixelY,
+          transform: `translate(${dragOffset.dx}px, ${dragOffset.dy}px)`,
+        };
+      }
       return {
         position: "absolute",
-        left: x,
-        top: y,
+        left: pixelX,
+        top: pixelY,
       };
     },
-    [customPositions, defaultPositions],
+    [draggingId, dragOffset],
   );
 
   useEffect(() => {
     return () => {
-      const s = stateRef.current;
-      if (s) {
-        if (s.rafId) cancelAnimationFrame(s.rafId);
-        stateRef.current = null;
-      }
+      stateRef.current = null;
     };
   }, []);
 

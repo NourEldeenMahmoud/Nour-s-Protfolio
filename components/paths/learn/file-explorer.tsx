@@ -18,6 +18,7 @@ interface FileExplorerProps {
   onOpenFile: (fileId: string, title: string) => void;
   onOpenFolder: (folderId: string, title: string) => void;
   onReturnToRoom: () => void;
+  onItemContextMenu?: (e: React.MouseEvent, target: import("./use-context-menu").ContextMenuTarget) => void;
   copy: {
     returnToRoom: string;
     searchPlaceholder: string;
@@ -34,6 +35,7 @@ export function FileExplorer({
   onOpenFile,
   onOpenFolder,
   onReturnToRoom,
+  onItemContextMenu,
   copy,
 }: FileExplorerProps) {
   const [history, setHistory] = useState<string[]>([folderId]);
@@ -277,6 +279,14 @@ export function FileExplorer({
                     onClick={() => handleItemClick(node)}
                     onDoubleClick={() => handleItemOpen(node)}
                     onKeyDown={(e) => handleItemKeyDown(e, node)}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onItemContextMenu?.(e, {
+                        type: node.type === "folder" ? "folder" : "file",
+                        id: node.id,
+                      });
+                    }}
                   >
                     <span className={styles.fileItemIcon}>
                       <FileIcon kind={node.kind} />
@@ -302,6 +312,14 @@ export function FileExplorer({
                   onClick={() => handleItemClick(node)}
                   onDoubleClick={() => handleItemOpen(node)}
                   onKeyDown={(e) => handleItemKeyDown(e, node)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onItemContextMenu?.(e, {
+                      type: node.type === "folder" ? "folder" : "file",
+                      id: node.id,
+                    });
+                  }}
                 >
                   <span className={styles.fileItemIcon}>
                     <FileIcon kind={node.kind} />

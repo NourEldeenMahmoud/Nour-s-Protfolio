@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import type { Locale } from "@/i18n/routing";
 import {
   learnNodeMap,
+  applicationMap,
 } from "@/content/learn";
 import { useLearnWindows } from "./use-learn-windows";
 import { LearnDesktop } from "./learn-desktop";
@@ -210,8 +211,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
             const node = learnNodeMap.get(target.id);
             if (node) handleOpenFile(target.id, node.name[locale]);
           } else if (target.type === "app") {
-            const node = learnNodeMap.get(target.id);
-            if (node) handleOpenApp(target.id, node.name[locale]);
+            const app = applicationMap.get(target.id);
+            if (app) handleOpenApp(target.id, app.name);
           }
           break;
         }
@@ -372,9 +373,20 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     [openContextMenu],
   );
 
+  const handleExplorerItemContextMenu = useCallback(
+    (e: React.MouseEvent, target: import("./use-context-menu").ContextMenuTarget) => {
+      handleContextMenuOpen(e.clientX, e.clientY, target);
+    },
+    [handleContextMenuOpen],
+  );
+
   const contextMenuItemLabel =
     contextMenu.target.type !== "desktop"
       ? (() => {
+          if (contextMenu.target.type === "app") {
+            const app = applicationMap.get(contextMenu.target.id);
+            return app?.name;
+          }
           const node = learnNodeMap.get(contextMenu.target.id);
           if (node) {
             const name = node.name[locale];
@@ -428,6 +440,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
                   navigateWindow(win.id, id, name);
                 }}
                 onReturnToRoom={handleReturnToRoom}
+                onItemContextMenu={handleExplorerItemContextMenu}
                 copy={{
                   returnToRoom: copy.returnToRoom,
                   searchPlaceholder: copy.searchPlaceholder,
