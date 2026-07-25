@@ -16,6 +16,7 @@ interface DesktopContextMenuProps {
   items: ContextMenuItem[];
   onSelect: (id: string) => void;
   onClose: () => void;
+  itemLabel?: string;
 }
 
 export function DesktopContextMenu({
@@ -24,6 +25,7 @@ export function DesktopContextMenu({
   items,
   onSelect,
   onClose,
+  itemLabel,
 }: DesktopContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [focusIndex, setFocusIndex] = useState(0);
@@ -98,7 +100,7 @@ export function DesktopContextMenu({
       className={styles.contextMenu}
       style={{ left: pos.x, top: pos.y }}
       role="menu"
-      aria-label="Desktop context menu"
+      aria-label={itemLabel ? `${itemLabel} context menu` : "Desktop context menu"}
       tabIndex={-1}
       onMouseDown={(e) => e.stopPropagation()}
     >

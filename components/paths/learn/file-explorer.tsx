@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import {
   type LearnNode,
@@ -14,7 +14,7 @@ import styles from "./learn.module.css";
 
 interface FileExplorerProps {
   locale: Locale;
-  initialFolderId: string;
+  folderId: string;
   onOpenFile: (fileId: string, title: string) => void;
   onOpenFolder: (folderId: string, title: string) => void;
   onReturnToRoom: () => void;
@@ -30,24 +30,24 @@ interface FileExplorerProps {
 
 export function FileExplorer({
   locale,
-  initialFolderId,
+  folderId,
   onOpenFile,
   onOpenFolder,
   onReturnToRoom,
   copy,
 }: FileExplorerProps) {
-  const [currentFolderId, setCurrentFolderId] = useState(initialFolderId);
-  const [history, setHistory] = useState<string[]>([initialFolderId]);
+  const [history, setHistory] = useState<string[]>([folderId]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const isNavigatingRef = useRef(false);
 
-  const currentFolder = learnNodeMap.get(currentFolderId);
+  const currentFolder = learnNodeMap.get(folderId);
   const children = currentFolder
-    ? getChildNodes(currentFolderId, learnNodeMap)
+    ? getChildNodes(folderId, learnNodeMap)
     : [];
   const breadcrumbPath = currentFolder
-    ? getNodePath(currentFolderId, learnNodeMap)
+    ? getNodePath(folderId, learnNodeMap)
     : [];
 
   const searchResults =
@@ -55,38 +55,61 @@ export function FileExplorer({
       ? searchNodes(searchQuery, learnNodeMap, locale)
       : [];
 
+  // Sync external folderId changes into history
+  useEffect(() => {
+    if (isNavigatingRef.current) {
+      isNavigatingRef.current = false;
+      return;
+    }
+    setHistory((prev) => {
+      const newHist = prev.slice(0, historyIndex + 1);
+      newHist.push(folderId);
+      return newHist;
+    });
+    setHistoryIndex((prev) => prev + 1);
+    setSelectedId(null);
+    setSearchQuery("");
+  }, [folderId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const navigateTo = useCallback(
-    (folderId: string) => {
-      setCurrentFolderId(folderId);
-      setSelectedId(null);
-      setSearchQuery("");
+    (targetFolderId: string) => {
+      isNavigatingRef.current = true;
       setHistory((prev) => {
         const newHist = prev.slice(0, historyIndex + 1);
-        newHist.push(folderId);
+        newHist.push(targetFolderId);
         return newHist;
       });
       setHistoryIndex((prev) => prev + 1);
+      setSelectedId(null);
+      setSearchQuery("");
+      onOpenFolder(targetFolderId, learnNodeMap.get(targetFolderId)?.name[locale] ?? targetFolderId);
     },
-    [historyIndex],
+    [historyIndex, locale, onOpenFolder],
   );
 
   const goBack = useCallback(() => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
+      const targetId = history[newIndex]!;
+      isNavigatingRef.current = true;
       setHistoryIndex(newIndex);
-      setCurrentFolderId(history[newIndex]!);
       setSelectedId(null);
+      setSearchQuery("");
+      onOpenFolder(targetId, learnNodeMap.get(targetId)?.name[locale] ?? targetId);
     }
-  }, [history, historyIndex]);
+  }, [history, historyIndex, locale, onOpenFolder]);
 
   const goForward = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
+      const targetId = history[newIndex]!;
+      isNavigatingRef.current = true;
       setHistoryIndex(newIndex);
-      setCurrentFolderId(history[newIndex]!);
       setSelectedId(null);
+      setSearchQuery("");
+      onOpenFolder(targetId, learnNodeMap.get(targetId)?.name[locale] ?? targetId);
     }
-  }, [history, historyIndex]);
+  }, [history, historyIndex, locale, onOpenFolder]);
 
   const goUp = useCallback(() => {
     if (currentFolder?.parentId) {
@@ -114,9 +137,17 @@ export function FileExplorer({
 
   const handleItemKeyDown = useCallback(
     (e: React.KeyboardEvent, node: LearnNode) => {
-      if (e.key === "Enter" || e.key === " ") {
+      if (e.key === "Enter") {
         e.preventDefault();
         handleItemOpen(node);
+      }
+      if (e.key === " " && node.type === "folder") {
+        e.preventDefault();
+        handleItemOpen(node);
+      }
+      if (e.key === " ") {
+        e.preventDefault();
+        setSelectedId(node.id);
       }
     },
     [handleItemOpen],
@@ -157,7 +188,7 @@ export function FileExplorer({
             className={styles.explorerNavItem}
             type="button"
             data-kind={item.id.startsWith("__") ? item.id : undefined}
-            aria-current={item.id === currentFolderId ? "page" : undefined}
+            aria-current={item.id === folderId ? "page" : undefined}
             onClick={() => handleNavClick(item.id)}
           >
             <NavIcon id={item.id} />

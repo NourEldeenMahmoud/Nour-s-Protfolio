@@ -11,6 +11,7 @@ interface LearnTaskbarProps {
   windows: WindowState[];
   activeWindowId: string | null;
   onFocusWindow: (id: string) => void;
+  onRestoreWindow: (id: string) => void;
   onOpenStart: () => void;
   onStartOpen: boolean;
   onOpenSearch: () => void;
@@ -30,6 +31,7 @@ export function LearnTaskbar({
   windows,
   activeWindowId,
   onFocusWindow,
+  onRestoreWindow,
   onOpenStart,
   onStartOpen,
   onOpenSearch,
@@ -38,6 +40,17 @@ export function LearnTaskbar({
   copy,
 }: LearnTaskbarProps) {
   const { hours, minutes, date, mounted } = useTime();
+
+  const handleAppClick = (win: WindowState) => {
+    if (win.minimized) {
+      onRestoreWindow(win.id);
+    } else if (win.id === activeWindowId) {
+      // minimize it
+      onFocusWindow(win.id);
+    } else {
+      onFocusWindow(win.id);
+    }
+  };
 
   return (
     <div className={styles.taskbar} role="toolbar" aria-label="Taskbar">
@@ -68,7 +81,7 @@ export function LearnTaskbar({
         aria-current={windows.some((w) => w.type === "explorer") ? "true" : undefined}
         onClick={() => {
           const explorer = windows.find((w) => w.type === "explorer");
-          if (explorer) onFocusWindow(explorer.id);
+          if (explorer) handleAppClick(explorer);
         }}
       >
         <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true">
@@ -79,21 +92,32 @@ export function LearnTaskbar({
 
       <div className={styles.taskbarApps}>
         {windows
-          .filter((w) => w.type === "document")
+          .filter((w) => w.type === "document" || w.type === "app")
           .map((w) => (
             <button
               key={w.id}
               className={styles.taskbarApp}
               type="button"
               aria-current={w.id === activeWindowId ? "true" : undefined}
-              onClick={() => onFocusWindow(w.id)}
+              onClick={() => handleAppClick(w)}
+              data-minimized={w.minimized || undefined}
             >
-              <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true">
-                <path d="M10 6H28L34 12H38C40.21 12 42 13.79 42 16V38C42 40.21 40.21 42 38 42H10C7.79 42 6 40.21 6 38V10C6 7.79 7.79 6 10 6Z" fill="#4A90D9" />
-                <path d="M6 16H42V38C42 40.21 40.21 42 38 42H10C7.79 42 6 40.21 6 38V16Z" fill="#4A90D9" />
-                <rect x="14" y="24" width="20" height="2" rx="1" fill="white" opacity="0.4" />
-                <rect x="14" y="29" width="14" height="2" rx="1" fill="white" opacity="0.4" />
-              </svg>
+              {w.type === "document" ? (
+                <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M10 6H28L34 12H38C40.21 12 42 13.79 42 16V38C42 40.21 40.21 42 38 42H10C7.79 42 6 40.21 6 38V10C6 7.79 7.79 6 10 6Z" fill="#4A90D9" />
+                  <path d="M6 16H42V38C42 40.21 40.21 42 38 42H10C7.79 42 6 40.21 6 38V16Z" fill="#4A90D9" />
+                  <rect x="14" y="24" width="20" height="2" rx="1" fill="white" opacity="0.4" />
+                  <rect x="14" y="29" width="14" height="2" rx="1" fill="white" opacity="0.4" />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true">
+                  <circle cx="24" cy="24" r="16" fill="#8B5CF6" />
+                  <circle cx="24" cy="24" r="8" fill="white" opacity="0.2" />
+                </svg>
+              )}
+              <span className={styles.taskbarAppLabel} style={{ fontSize: "0.6rem", opacity: 0.7, marginTop: 2 }}>
+                {w.title.length > 12 ? w.title.slice(0, 12) + "\u2026" : w.title}
+              </span>
             </button>
           ))}
       </div>

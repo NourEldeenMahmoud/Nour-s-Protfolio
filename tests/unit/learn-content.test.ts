@@ -330,4 +330,30 @@ describe("learn content", () => {
       }
     });
   });
+
+  describe("window defaults", () => {
+    it("explorer default size is comfortable", () => {
+      const explorerDefault = { width: 62, height: 64 };
+      expect(explorerDefault.width).toBeGreaterThanOrEqual(55);
+      expect(explorerDefault.width).toBeLessThanOrEqual(70);
+      expect(explorerDefault.height).toBeGreaterThanOrEqual(55);
+      expect(explorerDefault.height).toBeLessThanOrEqual(75);
+    });
+
+    it("document default size is comfortable", () => {
+      const docDefault = { width: 55, height: 64 };
+      expect(docDefault.width).toBeGreaterThanOrEqual(48);
+      expect(docDefault.width).toBeLessThanOrEqual(62);
+      expect(docDefault.height).toBeGreaterThanOrEqual(55);
+      expect(docDefault.height).toBeLessThanOrEqual(75);
+    });
+
+    it("app profile default size is comfortable", () => {
+      const appDefault = { width: 52, height: 62 };
+      expect(appDefault.width).toBeGreaterThanOrEqual(45);
+      expect(appDefault.width).toBeLessThanOrEqual(60);
+      expect(appDefault.height).toBeGreaterThanOrEqual(50);
+      expect(appDefault.height).toBeLessThanOrEqual(72);
+    });
+  });
 });

@@ -15,6 +15,7 @@ interface WindowShellProps {
   onFocus: () => void;
   onMove?: (x: number, y: number) => void;
   onResize?: (w: number, h: number) => void;
+  workspaceRect?: DOMRect | null;
   children: ReactNode;
 }
 
@@ -27,10 +28,17 @@ export function WindowShell({
   onFocus,
   onMove,
   onResize,
+  workspaceRect,
   children,
 }: WindowShellProps) {
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
+
+  const getWorkspaceRect = useCallback(() => {
+    if (workspaceRect) return workspaceRect;
+    const area = document.querySelector("[data-workspace]") as HTMLElement | null;
+    return area ? area.getBoundingClientRect() : null;
+  }, [workspaceRect]);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -41,13 +49,19 @@ export function WindowShell({
 
       function onMouseMove(ev: MouseEvent) {
         if (!dragRef.current) return;
-        const dx = ev.clientX - dragRef.current.startX;
-        const dy = ev.clientY - dragRef.current.startY;
-        const vw = window.innerWidth / 100;
-        const vh = window.innerHeight / 100;
+        const wr = getWorkspaceRect();
+        if (!wr) return;
+        const vw = wr.width / 100;
+        const vh = wr.height / 100;
+        const minX = 0;
+        const minY = 0;
+        const maxX = 100 - win.size.width;
+        const maxY = 100 - (win.size.height - 3);
+        const rawX = dragRef.current.origX + (ev.clientX - dragRef.current.startX) / vw;
+        const rawY = dragRef.current.origY + (ev.clientY - dragRef.current.startY) / vh;
         onMove!(
-          Math.max(0, dragRef.current.origX + dx / vw),
-          Math.max(0, dragRef.current.origY + dy / vh),
+          Math.max(minX, Math.min(maxX, rawX)),
+          Math.max(minY, Math.min(maxY, rawY)),
         );
       }
       function onMouseUp() {
@@ -58,7 +72,7 @@ export function WindowShell({
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [win.maximized, win.position.x, win.position.y, onFocus, onMove],
+    [win.maximized, win.position.x, win.position.y, win.size.width, win.size.height, onFocus, onMove, getWorkspaceRect],
   );
 
   const handleResizeMouseDown = useCallback(
@@ -70,10 +84,14 @@ export function WindowShell({
 
       function onMouseMove(ev: MouseEvent) {
         if (!resizeRef.current) return;
-        const vw = window.innerWidth / 100;
-        const vh = window.innerHeight / 100;
-        const newW = Math.max(30, resizeRef.current.origW + (ev.clientX - resizeRef.current.startX) / vw);
-        const newH = Math.max(15, resizeRef.current.origH + (ev.clientY - resizeRef.current.startY) / vh);
+        const wr = getWorkspaceRect();
+        if (!wr) return;
+        const vw = wr.width / 100;
+        const vh = wr.height / 100;
+        const maxW = 100 - win.position.x;
+        const maxH = 100 - win.position.y;
+        const newW = Math.max(30, Math.min(maxW, resizeRef.current.origW + (ev.clientX - resizeRef.current.startX) / vw));
+        const newH = Math.max(15, Math.min(maxH, resizeRef.current.origH + (ev.clientY - resizeRef.current.startY) / vh));
         onResize!(newW, newH);
       }
       function onMouseUp() {
@@ -84,7 +102,7 @@ export function WindowShell({
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [win.maximized, win.size.width, win.size.height, onResize],
+    [win.maximized, win.position.x, win.position.y, win.size.width, win.size.height, onResize, getWorkspaceRect],
   );
 
   return (
@@ -94,6 +112,7 @@ export function WindowShell({
       aria-label={win.title}
       aria-modal={win.maximized}
       data-maximized={win.maximized}
+      data-minimized={win.minimized}
       data-active={active}
       tabIndex={-1}
       onFocus={onFocus}

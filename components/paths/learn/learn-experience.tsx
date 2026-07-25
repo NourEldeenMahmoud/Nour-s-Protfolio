@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import {
   learnNodeMap,
@@ -17,6 +17,7 @@ import { SearchPanel } from "./search-panel";
 import { LearnWidgets } from "./learn-widgets";
 import { DesktopContextMenu } from "./desktop-context-menu";
 import type { ContextMenuItem } from "./desktop-context-menu";
+import { useContextMenu } from "./use-context-menu";
 import styles from "./learn.module.css";
 
 const WIDGETS_VISIBLE_KEY = "learn-widgets-visible";
@@ -77,6 +78,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     openApp,
     closeWindow,
     minimizeWindow,
+    restoreWindow,
     toggleMaximize,
     moveWindow,
     resizeWindow,
@@ -88,10 +90,9 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [widgetsVisible, setWidgetsVisible] = useState(true);
-  const [contextMenu, setContextMenu] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [workspaceRect, setWorkspaceRect] = useState<DOMRect | null>(null);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const { menu: contextMenu, openContextMenu, closeContextMenu } = useContextMenu();
 
   const alternateLocale = locale === "en" ? "ar" : "en";
 
@@ -101,6 +102,17 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: useLayoutEffect reads localStorage before paint
       if (stored !== null) setWidgetsVisible(stored === "true");
     } catch {}
+  }, []);
+
+  useEffect(() => {
+    const el = workspaceRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setWorkspaceRect(entry.contentRect);
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   const toggleWidgets = useCallback(() => {
@@ -125,39 +137,6 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const handleOpenAbout = useCallback(() => {
     openDocument("__about__", "About Nour\u2019s Desktop");
   }, [openDocument]);
-
-  const contextMenuItems: ContextMenuItem[] = [
-    { id: "refresh", label: "Refresh" },
-    { id: "sep-1", label: "", separator: true },
-    {
-      id: "toggle-widgets",
-      label: widgetsVisible ? "Hide widgets" : "Show widgets",
-    },
-    { id: "about", label: "About this desktop" },
-    { id: "sep-2", label: "", separator: true },
-    { id: "return", label: "Return to Room" },
-  ];
-
-  const handleContextMenuAction = useCallback(
-    (id: string) => {
-      setContextMenu(null);
-      switch (id) {
-        case "refresh":
-          handleRefresh();
-          break;
-        case "toggle-widgets":
-          toggleWidgets();
-          break;
-        case "about":
-          handleOpenAbout();
-          break;
-        case "return":
-          handleReturnToRoom();
-          break;
-      }
-    },
-    [handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom],
-  );
 
   const handleOpenFolder = useCallback(
     (id: string, name: string) => {
@@ -188,10 +167,65 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     window.location.href = url.toString();
   }, [alternateLocale]);
 
+  const contextMenuItems: ContextMenuItem[] = [
+    { id: "refresh", label: "Refresh" },
+    { id: "sep-1", label: "", separator: true },
+    {
+      id: "toggle-widgets",
+      label: widgetsVisible ? "Hide widgets" : "Show widgets",
+    },
+    { id: "about", label: "About this desktop" },
+    { id: "sep-2", label: "", separator: true },
+    { id: "return", label: "Return to Room" },
+  ];
+
+  const itemContextMenuItems: ContextMenuItem[] = [
+    { id: "open", label: "Open" },
+    { id: "sep-open", label: "", separator: true },
+    { id: "refresh", label: "Refresh" },
+  ];
+
+  const handleContextMenuAction = useCallback(
+    (id: string) => {
+      const target = contextMenu.target;
+      closeContextMenu();
+      switch (id) {
+        case "refresh":
+          handleRefresh();
+          break;
+        case "toggle-widgets":
+          toggleWidgets();
+          break;
+        case "about":
+          handleOpenAbout();
+          break;
+        case "return":
+          handleReturnToRoom();
+          break;
+        case "open": {
+          if (target.type === "folder") {
+            const node = learnNodeMap.get(target.id);
+            if (node) handleOpenFolder(target.id, node.name[locale]);
+          } else if (target.type === "file") {
+            const node = learnNodeMap.get(target.id);
+            if (node) handleOpenFile(target.id, node.name[locale]);
+          } else if (target.type === "app") {
+            const node = learnNodeMap.get(target.id);
+            if (node) handleOpenApp(target.id, node.name[locale]);
+          }
+          break;
+        }
+      }
+    },
+    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale],
+  );
+
+  // Sync URL → state on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const folder = params.get("folder");
     const file = params.get("file");
+    const app = params.get("app");
 
     if (folder) {
       const node = learnNodeMap.get(folder);
@@ -203,41 +237,97 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
       if (node) {
         openDocument(file, node.name[locale]);
       }
+    } else if (app) {
+      const node = learnNodeMap.get(app);
+      if (node) {
+        openDocument(app, node.name[locale]);
+      }
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Sync state → URL using pushState
   useEffect(() => {
     const url = new URL(window.location.href);
-    const explorer = windows.find((w) => w.type === "explorer");
-    const doc = windows.find((w) => w.type === "document");
-    const app = windows.find((w) => w.type === "app");
+    const explorer = windows.find((w) => w.type === "explorer" && !w.minimized);
+    const doc = windows.find((w) => w.type === "document" && !w.minimized);
+    const app = windows.find((w) => w.type === "app" && !w.minimized);
+
+    const prevFolder = url.searchParams.get("folder");
+    const prevFile = url.searchParams.get("file");
+    const prevApp = url.searchParams.get("app");
+
+    let nextFolder: string | null = null;
+    let nextFile: string | null = null;
+    let nextApp: string | null = null;
 
     if (doc?.fileId) {
-      url.searchParams.set("file", doc.fileId);
-      url.searchParams.delete("folder");
-      url.searchParams.delete("app");
+      nextFile = doc.fileId;
     } else if (app?.appId) {
-      url.searchParams.set("app", app.appId);
-      url.searchParams.delete("folder");
-      url.searchParams.delete("file");
+      nextApp = app.appId;
     } else if (explorer?.folderId) {
-      url.searchParams.set("folder", explorer.folderId);
+      nextFolder = explorer.folderId;
+    }
+
+    const changed =
+      prevFolder !== nextFolder || prevFile !== nextFile || prevApp !== nextApp;
+
+    if (nextFolder) {
+      url.searchParams.set("folder", nextFolder);
       url.searchParams.delete("file");
       url.searchParams.delete("app");
+    } else if (nextFile) {
+      url.searchParams.set("file", nextFile);
+      url.searchParams.delete("folder");
+      url.searchParams.delete("app");
+    } else if (nextApp) {
+      url.searchParams.set("app", nextApp);
+      url.searchParams.delete("folder");
+      url.searchParams.delete("file");
     } else {
       url.searchParams.delete("folder");
       url.searchParams.delete("file");
       url.searchParams.delete("app");
     }
 
-    window.history.replaceState(null, "", url.toString());
+    if (changed) {
+      window.history.pushState(null, "", url.toString());
+    }
   }, [windows]);
+
+  // Handle browser Back/Forward
+  useEffect(() => {
+    function handlePopState() {
+      const params = new URLSearchParams(window.location.search);
+      const folder = params.get("folder");
+      const file = params.get("file");
+      const appParam = params.get("app");
+
+      if (folder) {
+        const node = learnNodeMap.get(folder);
+        if (node) {
+          openExplorer(folder, node.name[locale]);
+        }
+      } else if (file) {
+        const node = learnNodeMap.get(file);
+        if (node) {
+          openDocument(file, node.name[locale]);
+        }
+      } else if (appParam) {
+        const node = learnNodeMap.get(appParam);
+        if (node) {
+          openApp(appParam, node.name[locale]);
+        }
+      }
+    }
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [locale, openExplorer, openDocument, openApp]);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        if (contextMenu) {
-          setContextMenu(null);
+        if (contextMenu.open) {
+          closeContextMenu();
           return;
         }
         if (searchOpen) {
@@ -253,27 +343,57 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [searchOpen, startOpen, contextMenu]);
+  }, [searchOpen, startOpen, contextMenu.open, closeContextMenu]);
 
   useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: clears transient context menu state on layout
-    setContextMenu(null);
-  }, [startOpen, searchOpen]);
+    closeContextMenu();
+  }, [startOpen, searchOpen, closeContextMenu]);
+
+  const handleMinimize = useCallback(
+    (id: string) => {
+      minimizeWindow(id);
+    },
+    [minimizeWindow],
+  );
+
+  const handleRestore = useCallback(
+    (id: string) => {
+      restoreWindow(id);
+    },
+    [restoreWindow],
+  );
+
+  const handleContextMenuOpen = useCallback(
+    (x: number, y: number, target: { type: string; id?: string }) => {
+      openContextMenu(x, y, target as import("./use-context-menu").ContextMenuTarget);
+      setStartOpen(false);
+      setSearchOpen(false);
+    },
+    [openContextMenu],
+  );
+
+  const contextMenuItemLabel =
+    contextMenu.target.type !== "desktop"
+      ? (() => {
+          const node = learnNodeMap.get(contextMenu.target.id);
+          if (node) {
+            const name = node.name[locale];
+            return typeof name === "string" ? name : undefined;
+          }
+          return undefined;
+        })()
+      : undefined;
 
   return (
     <div className={styles.learn} data-locale={locale}>
       <div className={styles.wallpaper} aria-hidden="true" />
 
-      <div className={styles.windowsArea}>
+      <div className={styles.windowsArea} data-workspace ref={workspaceRef}>
         <LearnDesktop
           locale={locale}
           onOpenFolder={handleOpenFolder}
           onOpenApp={handleOpenApp}
-          onDesktopContextMenu={(x, y) => {
-            setContextMenu({ x, y });
-            setStartOpen(false);
-            setSearchOpen(false);
-          }}
+          onContextMenu={handleContextMenuOpen}
           refreshKey={refreshKey}
         />
 
@@ -292,16 +412,17 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
             window={win}
             active={win.id === activeWindowId}
             onClose={() => closeWindow(win.id)}
-            onMinimize={() => minimizeWindow()}
+            onMinimize={() => handleMinimize(win.id)}
             onMaximize={() => toggleMaximize(win.id)}
             onFocus={() => bringToFront(win.id)}
             onMove={(x, y) => moveWindow(win.id, x, y)}
             onResize={(w, h) => resizeWindow(win.id, w, h)}
+            workspaceRect={workspaceRect}
           >
             {win.type === "explorer" && win.folderId && (
               <FileExplorer
                 locale={locale}
-                initialFolderId={win.folderId}
+                folderId={win.folderId}
                 onOpenFile={handleOpenFile}
                 onOpenFolder={(id, name) => {
                   navigateWindow(win.id, id, name);
@@ -374,13 +495,14 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         />
       )}
 
-      {contextMenu && (
+      {contextMenu.open && (
         <DesktopContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
-          items={contextMenuItems}
+          items={contextMenu.target.type === "desktop" ? contextMenuItems : itemContextMenuItems}
           onSelect={handleContextMenuAction}
-          onClose={() => setContextMenu(null)}
+          onClose={closeContextMenu}
+          itemLabel={contextMenuItemLabel}
         />
       )}
 
@@ -389,6 +511,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         windows={windows}
         activeWindowId={activeWindowId}
         onFocusWindow={focusWindow}
+        onRestoreWindow={handleRestore}
         onOpenStart={() => setStartOpen((v) => !v)}
         onStartOpen={startOpen}
         onOpenSearch={() => setSearchOpen(true)}

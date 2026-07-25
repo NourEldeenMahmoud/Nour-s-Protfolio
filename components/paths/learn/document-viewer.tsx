@@ -23,6 +23,7 @@ interface DocumentViewerProps {
 export function DocumentViewer({
   locale,
   fileId,
+  onOpenFile,
   copy,
 }: DocumentViewerProps) {
   const [copied, setCopied] = useState(false);
@@ -135,8 +136,14 @@ export function DocumentViewer({
                 const related = learnNodeMap.get(rid);
                 if (!related) return null;
                 return (
-                  <li key={rid} className={styles.docRelatedTag}>
-                    {related.name[locale]}
+                  <li key={rid}>
+                    <button
+                      className={styles.docRelatedTag}
+                      type="button"
+                      onClick={() => onOpenFile(rid, related.name[locale])}
+                    >
+                      {related.name[locale]}
+                    </button>
                   </li>
                 );
               })}

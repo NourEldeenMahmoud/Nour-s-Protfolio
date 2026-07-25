@@ -1,17 +1,28 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import { desktopFolders, applications, type LearnNode, type LearnApplication } from "@/content/learn";
 import { DesktopIcon, AppIcon } from "./learn-icons";
 import { useDesktopSelectionMarquee } from "./use-desktop-selection-marquee";
+import {
+  useDesktopIconGridPositions,
+  computeDefaultPositions,
+  getMaxGridDimensions,
+  enforceBounds,
+  gridToPixel,
+  ICON_CELL_WIDTH,
+  ICON_CELL_HEIGHT,
+} from "./use-desktop-icon-positions";
+import { useDesktopIconDrag } from "./use-desktop-icon-drag";
+import type { ContextMenuTarget } from "./use-context-menu";
 import styles from "./learn.module.css";
 
 interface LearnDesktopProps {
   locale: Locale;
   onOpenFolder: (id: string, name: string) => void;
   onOpenApp?: (appId: string, name: string) => void;
-  onDesktopContextMenu?: (x: number, y: number) => void;
+  onContextMenu?: (x: number, y: number, target: ContextMenuTarget) => void;
   refreshKey?: number;
 }
 
@@ -19,10 +30,73 @@ export function LearnDesktop({
   locale,
   onOpenFolder,
   onOpenApp,
-  onDesktopContextMenu,
+  onContextMenu,
   refreshKey,
 }: LearnDesktopProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const desktopRef = useRef<HTMLDivElement>(null);
+  const { positions: customPositions, setPosition: setGridPosition } =
+    useDesktopIconGridPositions();
+  const [workspaceSize, setWorkspaceSize] = useState<{ w: number; h: number }>({
+    w: 0,
+    h: 0,
+  });
+
+  const allItemIds = useMemo(() => {
+    const folderIds = desktopFolders.map((f) => f.id);
+    const appIds = applications.map((a) => a.id);
+    return [...folderIds, ...appIds];
+  }, []);
+
+  const { maxCols, maxRows } = useMemo(
+    () =>
+      workspaceSize.w > 0
+        ? getMaxGridDimensions(workspaceSize.w, workspaceSize.h)
+        : { maxCols: 8, maxRows: 10 },
+    [workspaceSize.w, workspaceSize.h],
+  );
+
+  const defaultPositions = useMemo(
+    () => computeDefaultPositions(allItemIds, maxCols),
+    [allItemIds, maxCols],
+  );
+
+  useEffect(() => {
+    if (workspaceSize.w === 0) return;
+    const next = enforceBounds(customPositions, defaultPositions, maxCols, maxRows);
+    const changed = Object.keys(next).length !== Object.keys(customPositions).length;
+    if (!changed) {
+      for (const key of Object.keys(next)) {
+        const a = customPositions[key];
+        const b = next[key];
+        if (!a || !b || a.column !== b.column || a.row !== b.row) {
+          break;
+        }
+      }
+    }
+    for (const key of Object.keys(next)) {
+      const a = customPositions[key];
+      const b = next[key];
+      if (a && b && a.column === b.column && a.row === b.row) continue;
+      setGridPosition(key, b!.column, b!.row);
+    }
+  }, [workspaceSize.w, workspaceSize.h, customPositions, defaultPositions, maxCols, maxRows, setGridPosition]);
+
+  useEffect(() => {
+    const el = desktopRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setWorkspaceSize({
+          w: entry.contentRect.width,
+          h: entry.contentRect.height,
+        });
+      }
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const handleSelectionChange = useCallback((ids: Set<string>) => {
     setSelectedIds(ids);
@@ -34,15 +108,30 @@ export function LearnDesktop({
 
   const {
     marquee,
-    handlePointerDown,
-    handlePointerMove,
-    handlePointerUp,
-    handlePointerCancel,
+    handlePointerDown: marqueePointerDown,
+    handlePointerMove: marqueePointerMove,
+    handlePointerUp: marqueePointerUp,
+    handlePointerCancel: marqueePointerCancel,
     handleClickEmpty,
   } = useDesktopSelectionMarquee({
     selectedIds,
     onSelectionChange: handleSelectionChange,
     onClearSelection: handleClearSelection,
+  });
+
+  const {
+    draggingId,
+    previewCell,
+    handlePointerDown: dragPointerDown,
+    handlePointerMove: dragPointerMove,
+    handlePointerUp: dragPointerUp,
+    handlePointerCancel: dragPointerCancel,
+    getIconStyle,
+  } = useDesktopIconDrag({
+    customPositions,
+    defaultPositions,
+    allItemIds,
+    setGridPosition,
   });
 
   const handleSelect = useCallback(
@@ -88,82 +177,156 @@ export function LearnDesktop({
     [],
   );
 
-  const handleContextMenu = useCallback(
+  const handleDesktopContextMenu = useCallback(
     (e: React.MouseEvent) => {
       if (e.target !== e.currentTarget) return;
       e.preventDefault();
-      onDesktopContextMenu?.(e.clientX, e.clientY);
+      onContextMenu?.(e.clientX, e.clientY, { type: "desktop" });
     },
-    [onDesktopContextMenu],
+    [onContextMenu],
   );
+
+  const handleItemContextMenu = useCallback(
+    (e: React.MouseEvent, target: ContextMenuTarget) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onContextMenu?.(e.clientX, e.clientY, target);
+    },
+    [onContextMenu],
+  );
+
+  const handleIconPointerDown = useCallback(
+    (e: React.PointerEvent, itemId: string) => {
+      dragPointerDown(e, itemId);
+      marqueePointerDown(e);
+    },
+    [dragPointerDown, marqueePointerDown],
+  );
+
+  const handleDesktopPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      dragPointerMove(e);
+      marqueePointerMove(e);
+    },
+    [dragPointerMove, marqueePointerMove],
+  );
+
+  const handleDesktopPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      dragPointerUp(e);
+      marqueePointerUp(e);
+    },
+    [dragPointerUp, marqueePointerUp],
+  );
+
+  const handleDesktopPointerCancel = useCallback(
+    (e: React.PointerEvent) => {
+      dragPointerCancel(e);
+      marqueePointerCancel(e);
+    },
+    [dragPointerCancel, marqueePointerCancel],
+  );
+
+  const previewStyle = useMemo(() => {
+    if (!previewCell) return null;
+    const { x, y } = gridToPixel(previewCell.column, previewCell.row);
+    return { left: x, top: y, width: ICON_CELL_WIDTH, height: ICON_CELL_HEIGHT };
+  }, [previewCell]);
 
   return (
     <div
+      ref={desktopRef}
       className={styles.desktop}
       data-desktop-surface
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
+      onPointerDown={(e) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest("[data-desktop-item]")) {
+          marqueePointerDown(e);
+        }
+      }}
+      onPointerMove={handleDesktopPointerMove}
+      onPointerUp={handleDesktopPointerUp}
+      onPointerCancel={handleDesktopPointerCancel}
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClickEmpty();
       }}
-      onContextMenu={handleContextMenu}
+      onContextMenu={handleDesktopContextMenu}
       role="grid"
       aria-label="Desktop"
     >
-      <div className={styles.desktopFolders} key={`folders-${refreshKey}`}>
-        {desktopFolders.map((node) => (
-          <button
-            key={node.id}
-            className={styles.desktopIcon}
-            type="button"
-            role="gridcell"
-            data-desktop-item
-            data-desktop-item-id={node.id}
-            data-selected={selectedIds.has(node.id)}
-            aria-selected={selectedIds.has(node.id)}
-            aria-label={node.name[locale]}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSelect(node.id, e.ctrlKey || e.metaKey);
+      <div className={styles.desktopIconsLayer} key={`icons-${refreshKey}`}>
+        {draggingId && previewStyle && (
+          <div
+            className={styles.gridPreview}
+            style={{
+              left: previewStyle.left,
+              top: previewStyle.top,
+              width: previewStyle.width,
+              height: previewStyle.height,
             }}
-            onDoubleClick={() => handleOpenFolder(node)}
-            onKeyDown={(e) => handleKeyDown(e, () => handleOpenFolder(node))}
-          >
-            <span className={styles.desktopIconImage}>
-              <DesktopIcon kind={node.id === "this-pc" ? "pc" : "folder"} />
-            </span>
-            <span className={styles.desktopIconLabel}>{node.name[locale]}</span>
-          </button>
-        ))}
-      </div>
+            aria-hidden="true"
+          />
+        )}
 
-      <div className={styles.desktopApps} key={`apps-${refreshKey}`}>
-        {applications.map((app) => (
-          <button
-            key={app.id}
-            className={styles.desktopIcon}
-            type="button"
-            role="gridcell"
-            data-desktop-item
-            data-desktop-item-id={app.id}
-            data-selected={selectedIds.has(app.id)}
-            aria-selected={selectedIds.has(app.id)}
-            aria-label={app.name}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSelect(app.id, e.ctrlKey || e.metaKey);
-            }}
-            onDoubleClick={() => handleOpenApp(app)}
-            onKeyDown={(e) => handleKeyDown(e, () => handleOpenApp(app))}
-          >
-            <span className={styles.desktopIconImage}>
-              <AppIcon app={app} />
-            </span>
-            <span className={styles.desktopIconLabel}>{app.shortName ?? app.name}</span>
-          </button>
-        ))}
+        {allItemIds.map((id) => {
+          const folder = desktopFolders.find((f) => f.id === id);
+          const app = !folder ? applications.find((a) => a.id === id) : null;
+          if (!folder && !app) return null;
+
+          const defaultPos = defaultPositions.get(id);
+          const fallbackCol = defaultPos?.column ?? 0;
+          const fallbackRow = defaultPos?.row ?? 0;
+          const style = getIconStyle(id, fallbackCol, fallbackRow);
+          const isDragging = draggingId === id;
+          const label = folder ? folder.name[locale] : app?.name ?? "";
+
+          return (
+            <button
+              key={id}
+              className={`${styles.desktopIcon} ${isDragging ? styles.desktopIconDragging : ""}`}
+              type="button"
+              role="gridcell"
+              data-desktop-item
+              data-desktop-item-id={id}
+              data-selected={selectedIds.has(id)}
+              aria-selected={selectedIds.has(id)}
+              aria-label={label}
+              style={style}
+              onPointerDown={(e) => handleIconPointerDown(e, id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!draggingId) {
+                  handleSelect(id, e.ctrlKey || e.metaKey);
+                }
+              }}
+              onDoubleClick={() => {
+                if (folder) handleOpenFolder(folder);
+                else if (app) handleOpenApp(app);
+              }}
+              onKeyDown={(e) =>
+                handleKeyDown(e, () => {
+                  if (folder) handleOpenFolder(folder);
+                  else if (app) handleOpenApp(app);
+                })
+              }
+              onContextMenu={(e) =>
+                handleItemContextMenu(e, {
+                  type: folder ? "folder" : "app",
+                  id,
+                })
+              }
+            >
+              <span className={styles.desktopIconImage}>
+                {folder ? (
+                  <DesktopIcon kind={id === "this-pc" ? "pc" : "folder"} />
+                ) : (
+                  <AppIcon app={app!} />
+                )}
+              </span>
+              <span className={styles.desktopIconLabel}>{label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {marquee.isActive && (

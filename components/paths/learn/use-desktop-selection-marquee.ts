@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const DRAG_THRESHOLD = 5;
 
@@ -42,6 +42,7 @@ export function useDesktopSelectionMarquee({
     ctrlOrMeta: boolean;
     shift: boolean;
     rafId: number;
+    desktopEl: HTMLElement;
     desktopRect: DOMRect;
   } | null>(null);
 
@@ -108,6 +109,14 @@ export function useDesktopSelectionMarquee({
     [onSelectionChange],
   );
 
+  const finishMarquee = useCallback(() => {
+    const s = stateRef.current;
+    if (!s) return;
+    if (s.rafId) cancelAnimationFrame(s.rafId);
+    stateRef.current = null;
+    setMarquee((prev) => (prev.isActive ? { ...prev, isActive: false } : prev));
+  }, []);
+
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
       const target = e.target as HTMLElement;
@@ -124,8 +133,10 @@ export function useDesktopSelectionMarquee({
       const desktopEl = target.closest("[data-desktop-surface]") as HTMLElement;
       if (!desktopEl) return;
       const desktopRect = desktopEl.getBoundingClientRect();
-      const startX = e.clientX - desktopRect.left;
-      const startY = e.clientY - desktopRect.top;
+      const rawX = e.clientX - desktopRect.left;
+      const rawY = e.clientY - desktopRect.top;
+      const startX = Math.max(0, Math.min(rawX, desktopRect.width));
+      const startY = Math.max(0, Math.min(rawY, desktopRect.height));
 
       stateRef.current = {
         pointerId: e.pointerId,
@@ -138,6 +149,7 @@ export function useDesktopSelectionMarquee({
         ctrlOrMeta: e.ctrlKey || e.metaKey,
         shift: e.shiftKey,
         rafId: 0,
+        desktopEl,
         desktopRect,
       };
 
@@ -151,11 +163,10 @@ export function useDesktopSelectionMarquee({
       const s = stateRef.current;
       if (!s || e.pointerId !== s.pointerId) return;
 
-      const desktopEl = (e.target as HTMLElement).closest("[data-desktop-surface]") as HTMLElement | null;
-      if (!desktopEl) return;
-
-      const currentX = e.clientX - s.desktopRect.left;
-      const currentY = e.clientY - s.desktopRect.top;
+      const rawX = e.clientX - s.desktopRect.left;
+      const rawY = e.clientY - s.desktopRect.top;
+      const currentX = Math.max(0, Math.min(rawX, s.desktopRect.width));
+      const currentY = Math.max(0, Math.min(rawY, s.desktopRect.height));
       s.currentX = currentX;
       s.currentY = currentY;
 
@@ -176,14 +187,6 @@ export function useDesktopSelectionMarquee({
     },
     [computeMarquee, getIntersectingIds, updateSelection],
   );
-
-  const finishMarquee = useCallback(() => {
-    const s = stateRef.current;
-    if (!s) return;
-    if (s.rafId) cancelAnimationFrame(s.rafId);
-    stateRef.current = null;
-    setMarquee((prev) => (prev.isActive ? { ...prev, isActive: false } : prev));
-  }, []);
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent) => {
@@ -206,6 +209,26 @@ export function useDesktopSelectionMarquee({
   const handleClickEmpty = useCallback(() => {
     onClearSelection();
   }, [onClearSelection]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      const s = stateRef.current;
+      if (s) {
+        if (s.rafId) cancelAnimationFrame(s.rafId);
+        stateRef.current = null;
+      }
+    };
+  }, []);
+
+  // Cleanup on window blur
+  useEffect(() => {
+    function handleBlur() {
+      finishMarquee();
+    }
+    window.addEventListener("blur", handleBlur);
+    return () => window.removeEventListener("blur", handleBlur);
+  }, [finishMarquee]);
 
   return {
     marquee,

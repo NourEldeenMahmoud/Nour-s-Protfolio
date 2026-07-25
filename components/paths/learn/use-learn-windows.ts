@@ -10,6 +10,7 @@ export interface WindowState {
   fileId?: string;
   appId?: string;
   maximized: boolean;
+  minimized: boolean;
   position: { x: number; y: number };
   size: { width: number; height: number };
   zIndex: number;
@@ -25,7 +26,7 @@ export function useLearnWindows() {
     setActiveWindowId(id);
     setWindows((prev) =>
       prev.map((w) =>
-        w.id === id ? { ...w, zIndex: ++nextZ } : w,
+        w.id === id ? { ...w, zIndex: ++nextZ, minimized: false } : w,
       ),
     );
   }, []);
@@ -48,8 +49,9 @@ export function useLearnWindows() {
           type: "explorer",
           folderId,
           maximized: false,
+          minimized: false,
           position: { x: 2.5 + offset, y: 2 + offset },
-          size: { width: 52, height: 36 },
+          size: { width: 62, height: 64 },
           zIndex: ++nextZ,
         };
         setActiveWindowId(id);
@@ -91,8 +93,9 @@ export function useLearnWindows() {
           type: "document",
           fileId,
           maximized: false,
+          minimized: false,
           position: { x: 4 + offset, y: 3 + offset },
-          size: { width: 46, height: 34 },
+          size: { width: 55, height: 64 },
           zIndex: ++nextZ,
         };
         setActiveWindowId(id);
@@ -120,8 +123,9 @@ export function useLearnWindows() {
           type: "app",
           appId,
           maximized: false,
+          minimized: false,
           position: { x: 4 + offset, y: 3 + offset },
-          size: { width: 48, height: 36 },
+          size: { width: 52, height: 62 },
           zIndex: ++nextZ,
         };
         setActiveWindowId(id);
@@ -136,9 +140,21 @@ export function useLearnWindows() {
     setActiveWindowId((prev) => (prev === id ? null : prev));
   }, []);
 
-  const minimizeWindow = useCallback(() => {
-    setActiveWindowId(null);
+  const minimizeWindow = useCallback((id: string) => {
+    setWindows((prev) =>
+      prev.map((w) =>
+        w.id === id ? { ...w, minimized: true } : w,
+      ),
+    );
+    setActiveWindowId((prev) => {
+      if (prev === id) return null;
+      return prev;
+    });
   }, []);
+
+  const restoreWindow = useCallback((id: string) => {
+    focusWindow(id);
+  }, [focusWindow]);
 
   const toggleMaximize = useCallback((id: string) => {
     setWindows((prev) =>
@@ -180,6 +196,7 @@ export function useLearnWindows() {
     openApp,
     closeWindow,
     minimizeWindow,
+    restoreWindow,
     toggleMaximize,
     moveWindow,
     resizeWindow,
