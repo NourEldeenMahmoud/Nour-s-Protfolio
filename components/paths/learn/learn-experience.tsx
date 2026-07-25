@@ -5,6 +5,8 @@ import type { Locale } from "@/i18n/routing";
 import {
   learnNodeMap,
   applicationMap,
+  desktopFolders,
+  applications,
 } from "@/content/learn";
 import { useLearnWindows } from "./use-learn-windows";
 import { LearnDesktop } from "./learn-desktop";
@@ -22,6 +24,13 @@ import { useContextMenu } from "./use-context-menu";
 import type { ContextMenuTarget } from "./use-context-menu";
 import { useFileClipboard } from "./use-file-clipboard";
 import { copyTextToSystemClipboard } from "./copy-text";
+import {
+  useDesktopIconGridPositions,
+  getMaxGridDimensions,
+  sortItemsByName,
+  sortItemsByType,
+  type DesktopSortMode,
+} from "./use-desktop-icon-positions";
 import styles from "./learn.module.css";
 
 const WIDGETS_VISIBLE_KEY = "learn-widgets-visible";
@@ -46,6 +55,8 @@ function AboutPanel({
         contentKind: "about",
         selectedText: selection,
         fallbackText: fallback,
+        x: e.clientX,
+        y: e.clientY,
       });
     },
     [windowId, onContextMenuRequest],
@@ -106,6 +117,12 @@ interface LearnExperienceProps {
     toastFileCopied: string;
     toastTextCopied: string;
     toastCopyFailed: string;
+    menuSortBy: string;
+    sortName: string;
+    sortItemType: string;
+    sortDefault: string;
+    sortCustom: string;
+    toastDesktopRefreshed: string;
   };
 }
 
@@ -129,7 +146,6 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const [startOpen, setStartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [widgetsVisible, setWidgetsVisible] = useState(true);
   const [workspaceRect, setWorkspaceRect] = useState<DOMRect | null>(null);
   const [toast, setToast] = useState<{ message: string } | null>(null);
@@ -138,6 +154,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const { copyFile } = useFileClipboard();
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const explorerSelectionsRef = useRef<Record<string, { nodeId: string; nodeType: string; folderId: string } | null>>({});
+  const isApplyingPopStateRef = useRef(false);
+  const { positions: customPositions, sortMode, replacePositions } = useDesktopIconGridPositions();
 
   const alternateLocale = locale === "en" ? "ar" : "en";
 
@@ -183,13 +201,23 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   }, []);
 
   const handleReturnToRoom = useCallback(() => {
-    sessionStorage.setItem("learn-returning", "true");
+    try {
+      sessionStorage.setItem("learn-returning", "true");
+    } catch {}
     window.location.href = `/${locale}`;
   }, [locale]);
 
   const handleRefresh = useCallback(() => {
-    setRefreshKey((k) => k + 1);
-  }, []);
+    const allIds = [...desktopFolders.map((f) => f.id), ...applications.map((a) => a.id)];
+    const validIds = new Set(allIds);
+    const cleaned: Record<string, { column: number; row: number }> = {};
+    for (const [id, pos] of Object.entries(customPositions)) {
+      if (validIds.has(id)) cleaned[id] = pos;
+    }
+    replacePositions(cleaned, sortMode);
+    closeContextMenu();
+    showToast(copy.toastDesktopRefreshed);
+  }, [customPositions, replacePositions, sortMode, closeContextMenu, showToast, copy.toastDesktopRefreshed]);
 
   const handleOpenAbout = useCallback(() => {
     openDocument("__about__", "About Nour\u2019s Desktop");
@@ -216,6 +244,34 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
       setStartOpen(false);
     },
     [openApp],
+  );
+
+  const handleSortChange = useCallback(
+    (mode: DesktopSortMode) => {
+      const allIds = [...desktopFolders.map((f) => f.id), ...applications.map((a) => a.id)];
+      const getLabel = (id: string) => {
+        const folder = desktopFolders.find((f) => f.id === id);
+        if (folder) return folder.name[locale] ?? id;
+        const app = applications.find((a) => a.id === id);
+        return app?.name ?? id;
+      };
+      const isFolderFn = (id: string) => desktopFolders.some((f) => f.id === id);
+
+      const el = workspaceRef.current;
+      if (!el) return;
+      const { maxCols, maxRows } = getMaxGridDimensions(el.clientWidth, el.clientHeight);
+
+      if (mode === "name") {
+        const positions = sortItemsByName(allIds, maxCols, maxRows, getLabel);
+        replacePositions(positions, mode);
+      } else if (mode === "item-type") {
+        const positions = sortItemsByType(allIds, maxCols, maxRows, getLabel, isFolderFn);
+        replacePositions(positions, mode);
+      } else if (mode === "default") {
+        replacePositions({}, mode);
+      }
+    },
+    [locale, replacePositions],
   );
 
   const handleSwitchLocale = useCallback(() => {
@@ -250,12 +306,9 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const handleContentContextMenuRequest = useCallback(
     (target: ContextMenuTarget) => {
-      // Use the center of the viewport as the menu position for content menus
-      openContextMenu(
-        Math.min(window.innerWidth - 160, Math.max(10, window.innerWidth / 2)),
-        Math.min(window.innerHeight - 100, Math.max(10, window.innerHeight / 2)),
-        target,
-      );
+      const x = ("x" in target && target.x != null) ? target.x : Math.min(window.innerWidth - 160, Math.max(10, window.innerWidth / 2));
+      const y = ("y" in target && target.y != null) ? target.y : Math.min(window.innerHeight - 100, Math.max(10, window.innerHeight / 2));
+      openContextMenu(x, y, target);
     },
     [openContextMenu],
   );
@@ -267,6 +320,15 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           return [
             { id: "refresh", label: copy.menuRefresh },
             { id: "sep-1", label: "", separator: true },
+            {
+              id: "sort-by",
+              label: copy.menuSortBy,
+              submenu: [
+                { id: "sort-name", label: copy.sortName, checked: sortMode === "name" },
+                { id: "sort-item-type", label: copy.sortItemType, checked: sortMode === "item-type" },
+                { id: "sort-default", label: copy.sortDefault, checked: sortMode === "default" },
+              ],
+            },
             {
               id: "toggle-widgets",
               label: widgetsVisible ? copy.menuHideWidgets : copy.menuShowWidgets,
@@ -298,7 +360,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           return [];
       }
     },
-    [copy, widgetsVisible],
+    [copy, widgetsVisible, sortMode],
   );
 
   const handleContextMenuAction = useCallback(
@@ -308,6 +370,15 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
       switch (id) {
         case "refresh":
           handleRefresh();
+          break;
+        case "sort-name":
+          handleSortChange("name");
+          break;
+        case "sort-item-type":
+          handleSortChange("item-type");
+          break;
+        case "sort-default":
+          handleSortChange("default");
           break;
         case "toggle-widgets":
           toggleWidgets();
@@ -360,7 +431,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         }
       }
     },
-    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow, copyFile, showToast, copy],
+    [contextMenu.target, closeContextMenu, handleRefresh, handleSortChange, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow, copyFile, showToast, copy],
   );
 
   // Close context menu when target window is minimized or closed
@@ -402,6 +473,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   // Sync state → URL using pushState
   useEffect(() => {
+    if (isApplyingPopStateRef.current) return;
     const url = new URL(window.location.href);
     const explorer = windows.find((w) => w.type === "explorer" && !w.minimized);
     const doc = windows.find((w) => w.type === "document" && !w.minimized);
@@ -452,6 +524,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   // Handle browser Back/Forward
   useEffect(() => {
     function handlePopState() {
+      isApplyingPopStateRef.current = true;
       const params = new URLSearchParams(window.location.search);
       const folder = params.get("folder");
       const file = params.get("file");
@@ -477,6 +550,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           closeWindow(w.id);
         }
       }
+      isApplyingPopStateRef.current = false;
     }
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
@@ -519,10 +593,21 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           return;
         }
 
-        // Priority 3: Explorer file selection
-        const visibleWindows = windows.filter((w) => !w.minimized && w.type === "explorer");
-        for (const win of visibleWindows) {
-          const sel = explorerSelectionsRef.current[win.id];
+        // Priority 3: Explorer file selection — active visible explorer first, then highest z-index
+        const visibleExplorers = windows.filter((w) => !w.minimized && w.type === "explorer");
+        const activeExplorer = visibleExplorers.find((w) => w.id === activeWindowId);
+        if (activeExplorer) {
+          const sel = explorerSelectionsRef.current[activeExplorer.id];
+          if (sel && sel.nodeType === "file") {
+            e.preventDefault();
+            copyFile(sel.nodeId, sel.folderId);
+            showToast(copy.toastFileCopied);
+            return;
+          }
+        }
+        const highestZExplorer = [...visibleExplorers].sort((a, b) => b.zIndex - a.zIndex)[0];
+        if (highestZExplorer && highestZExplorer.id !== activeExplorer?.id) {
+          const sel = explorerSelectionsRef.current[highestZExplorer.id];
           if (sel && sel.nodeType === "file") {
             e.preventDefault();
             copyFile(sel.nodeId, sel.folderId);
@@ -536,7 +621,17 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [contextMenu.open, closeContextMenu, searchOpen, startOpen, windows, copyFile, showToast, copy]);
+  }, [contextMenu.open, closeContextMenu, searchOpen, startOpen, windows, activeWindowId, copyFile, showToast, copy]);
+
+  // Clean up stale explorer selections when windows close
+  useEffect(() => {
+    const openWindowIds = new Set(windows.map((w) => w.id));
+    for (const id of Object.keys(explorerSelectionsRef.current)) {
+      if (!openWindowIds.has(id)) {
+        delete explorerSelectionsRef.current[id];
+      }
+    }
+  }, [windows]);
 
   useLayoutEffect(() => {
     closeContextMenu();
@@ -589,7 +684,9 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
           onOpenFolder={handleOpenFolder}
           onOpenApp={handleOpenApp}
           onContextMenu={handleContextMenuOpen}
-          refreshKey={refreshKey}
+          onDragStart={() => closeContextMenu()}
+          sortMode={sortMode}
+          onSortChange={handleSortChange}
         />
 
         {widgetsVisible && (

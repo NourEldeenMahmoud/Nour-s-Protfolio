@@ -9,6 +9,8 @@ export interface ContextMenuItem {
   icon?: React.ReactNode;
   separator?: boolean;
   disabled?: boolean;
+  checked?: boolean;
+  submenu?: ContextMenuItem[];
 }
 
 interface DesktopContextMenuProps {
@@ -18,6 +20,7 @@ interface DesktopContextMenuProps {
   onSelect: (id: string) => void;
   onClose: () => void;
   itemLabel?: string;
+  onSubmenuOpen?: (parentId: string, x: number, y: number) => void;
 }
 
 export function DesktopContextMenu({
@@ -27,6 +30,7 @@ export function DesktopContextMenu({
   onSelect,
   onClose,
   itemLabel,
+  onSubmenuOpen,
 }: DesktopContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const invokerRef = useRef<HTMLElement | null>(null);
@@ -167,17 +171,27 @@ export function DesktopContextMenu({
             type="button"
             role="menuitem"
             aria-disabled={item.disabled || undefined}
+            data-has-submenu={item.submenu ? "" : undefined}
             tabIndex={clampedFocusIndex === nonSepItems.indexOf(item) ? 0 : -1}
             onMouseEnter={() => {
               if (!item.disabled) setFocusIndex(nonSepItems.indexOf(item));
             }}
             onClick={(e) => {
               e.stopPropagation();
-              if (!item.disabled) onSelect(item.id);
+              if (!item.disabled) {
+                if (item.submenu && onSubmenuOpen) {
+                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                  onSubmenuOpen(item.id, rect.right, rect.top);
+                } else {
+                  onSelect(item.id);
+                }
+              }
             }}
           >
+            {item.checked && <span className={styles.contextMenuCheck}>✓</span>}
             {item.icon && <span className={styles.contextMenuIcon}>{item.icon}</span>}
             {item.label}
+            {item.submenu && <span className={styles.contextMenuChevron}>▸</span>}
           </button>
         ),
       )}

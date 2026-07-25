@@ -12,6 +12,10 @@ import {
   findNearestAvailableCell,
   computeDefaultPositions,
   resolveDesktopLayout,
+  computeColumnFirstPositions,
+  sortItemsByName,
+  sortItemsByType,
+  removeStalePositions,
   ICON_CELL_WIDTH,
   ICON_CELL_HEIGHT,
   ICON_GAP_X,
@@ -780,6 +784,199 @@ describe("ContextMenuTarget types", () => {
     expect(target.type).toBe("folder");
     if (target.type === "folder") {
       expect(target.explorerWindowId).toBeUndefined();
+    }
+  });
+});
+
+describe("computeColumnFirstPositions", () => {
+  it("fills top-to-bottom then next column", () => {
+    const result = computeColumnFirstPositions(["a", "b", "c", "d", "e"], 3, 4);
+    expect(result["a"]).toEqual({ column: 0, row: 0 });
+    expect(result["b"]).toEqual({ column: 0, row: 1 });
+    expect(result["c"]).toEqual({ column: 0, row: 2 });
+    expect(result["d"]).toEqual({ column: 0, row: 3 });
+    expect(result["e"]).toEqual({ column: 1, row: 0 });
+  });
+
+  it("respects maxCols limit", () => {
+    const result = computeColumnFirstPositions(["a", "b", "c", "d"], 2, 2);
+    expect(result["a"]).toEqual({ column: 0, row: 0 });
+    expect(result["b"]).toEqual({ column: 0, row: 1 });
+    expect(result["c"]).toEqual({ column: 1, row: 0 });
+    expect(result["d"]).toEqual({ column: 1, row: 1 });
+  });
+
+  it("skips items that exceed maxCols", () => {
+    const result = computeColumnFirstPositions(["a", "b", "c", "d", "e"], 2, 2);
+    expect(result["e"]).toBeUndefined();
+  });
+
+  it("handles empty list", () => {
+    const result = computeColumnFirstPositions([], 3, 4);
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+});
+
+describe("sortItemsByName", () => {
+  const getLabel = (id: string) => {
+    const labels: Record<string, string> = { a: "Charlie", b: "Alpha", c: "Bravo" };
+    return labels[id] ?? id;
+  };
+
+  it("sorts items alphabetically by label", () => {
+    const result = sortItemsByName(["a", "b", "c"], 3, 4, getLabel);
+    expect(result["b"]?.column).toBe(0);
+    expect(result["b"]?.row).toBe(0);
+    expect(result["c"]?.column).toBe(0);
+    expect(result["c"]?.row).toBe(1);
+    expect(result["a"]?.column).toBe(0);
+    expect(result["a"]?.row).toBe(2);
+  });
+
+  it("handles numeric names with natural sort", () => {
+    const getLabelNum = (id: string) => {
+      const labels: Record<string, string> = { a: "File 2", b: "File 10", c: "File 1" };
+      return labels[id] ?? id;
+    };
+    const result = sortItemsByName(["a", "b", "c"], 3, 4, getLabelNum);
+    expect(result["c"]?.row).toBe(0);
+    expect(result["a"]?.row).toBe(1);
+    expect(result["b"]?.row).toBe(2);
+  });
+
+  it("uses column-first layout", () => {
+    const ids = ["a", "b", "c", "d", "e", "f"];
+    const getLabels = (id: string) => id;
+    const result = sortItemsByName(ids, 2, 3, getLabels);
+    expect(result["a"]).toEqual({ column: 0, row: 0 });
+    expect(result["d"]).toEqual({ column: 1, row: 0 });
+  });
+});
+
+describe("sortItemsByType", () => {
+  const getLabel = (id: string) => {
+    const labels: Record<string, string> = { f1: "Zebra", f2: "Apple", a1: "Mango" };
+    return labels[id] ?? id;
+  };
+  const isFolder = (id: string) => id.startsWith("f");
+
+  it("puts folders before apps", () => {
+    const result = sortItemsByType(["a1", "f1", "f2"], 3, 4, getLabel, isFolder);
+    expect(result["f2"]?.row).toBe(0);
+    expect(result["f1"]?.row).toBe(1);
+    expect(result["a1"]?.row).toBe(2);
+  });
+
+  it("sorts alphabetically within each group", () => {
+    const result = sortItemsByType(["f1", "f2", "a1"], 3, 4, getLabel, isFolder);
+    expect(result["f2"]?.row).toBe(0);
+    expect(result["f1"]?.row).toBe(1);
+    expect(result["a1"]?.row).toBe(2);
+  });
+
+  it("uses column-first layout", () => {
+    const result = sortItemsByType(["a1", "f1", "f2"], 2, 2, getLabel, isFolder);
+    expect(result["f2"]).toEqual({ column: 0, row: 0 });
+    expect(result["f1"]).toEqual({ column: 0, row: 1 });
+    expect(result["a1"]).toEqual({ column: 1, row: 0 });
+  });
+});
+
+describe("removeStalePositions", () => {
+  it("removes positions with ids not in validIds", () => {
+    const positions = { a: { column: 0, row: 0 }, b: { column: 1, row: 1 }, c: { column: 2, row: 2 } };
+    const validIds = new Set(["a", "c"]);
+    const result = removeStalePositions(positions, validIds);
+    expect(result).toEqual({ a: { column: 0, row: 0 }, c: { column: 2, row: 2 } });
+  });
+
+  it("returns empty when no valid ids", () => {
+    const positions = { a: { column: 0, row: 0 } };
+    const result = removeStalePositions(positions, new Set());
+    expect(result).toEqual({});
+  });
+
+  it("keeps all when all ids are valid", () => {
+    const positions = { a: { column: 0, row: 0 }, b: { column: 1, row: 1 } };
+    const result = removeStalePositions(positions, new Set(["a", "b"]));
+    expect(result).toEqual(positions);
+  });
+});
+
+describe("useDesktopIconGridPositions replacePositions", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("replacePositions updates positions and sortMode atomically", () => {
+    const { result } = renderHook(() => useDesktopIconGridPositions());
+    act(() => {
+      result.current.replacePositions({ a: { column: 0, row: 0 } }, "name");
+    });
+    expect(result.current.positions).toEqual({ a: { column: 0, row: 0 } });
+    expect(result.current.sortMode).toBe("name");
+  });
+
+  it("replacePositions persists to localStorage", () => {
+    const { result } = renderHook(() => useDesktopIconGridPositions());
+    act(() => {
+      result.current.replacePositions({ b: { column: 1, row: 2 } }, "item-type");
+    });
+    const stored = JSON.parse(localStorage.getItem("learn-desktop-icon-grid-positions") ?? "{}");
+    expect(stored).toEqual({ b: { column: 1, row: 2 } });
+    expect(localStorage.getItem("learn-desktop-sort-mode")).toBe("item-type");
+  });
+
+  it("starts with default sortMode", () => {
+    const { result } = renderHook(() => useDesktopIconGridPositions());
+    expect(result.current.sortMode).toBe("default");
+  });
+
+  it("loads sortMode from localStorage on mount", () => {
+    localStorage.setItem("learn-desktop-sort-mode", "name");
+    const { result } = renderHook(() => useDesktopIconGridPositions());
+    expect(result.current.sortMode).toBe("name");
+  });
+
+  it("handles invalid sortMode in localStorage gracefully", () => {
+    localStorage.setItem("learn-desktop-sort-mode", "invalid");
+    const { result } = renderHook(() => useDesktopIconGridPositions());
+    expect(result.current.sortMode).toBe("default");
+  });
+});
+
+describe("ContextMenuTarget content with pointer coordinates", () => {
+  it("content target can include x and y coordinates", () => {
+    const target: import("@/components/paths/learn/use-context-menu").ContextMenuTarget = {
+      type: "content",
+      windowId: "doc-1",
+      contentId: "doc-1",
+      contentKind: "document",
+      selectedText: "hello",
+      fallbackText: "fallback",
+      x: 150,
+      y: 250,
+    };
+    expect(target.type).toBe("content");
+    if (target.type === "content") {
+      expect(target.x).toBe(150);
+      expect(target.y).toBe(250);
+    }
+  });
+
+  it("content target works without x and y coordinates", () => {
+    const target: import("@/components/paths/learn/use-context-menu").ContextMenuTarget = {
+      type: "content",
+      windowId: "doc-1",
+      contentId: "doc-1",
+      contentKind: "document",
+      selectedText: "hello",
+      fallbackText: "fallback",
+    };
+    expect(target.type).toBe("content");
+    if (target.type === "content") {
+      expect(target.x).toBeUndefined();
+      expect(target.y).toBeUndefined();
     }
   });
 });

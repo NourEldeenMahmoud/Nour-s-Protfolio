@@ -56,6 +56,8 @@ export function DocumentViewer({
         contentKind: "document",
         selectedText: selection,
         fallbackText: fallback,
+        x: e.clientX,
+        y: e.clientY,
       });
     },
     [windowId, fileId, onContextMenuRequest],

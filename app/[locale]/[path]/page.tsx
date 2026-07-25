@@ -67,6 +67,12 @@ export default async function DestinationContractPage({
           toastFileCopied: t("toastFileCopied"),
           toastTextCopied: t("toastTextCopied"),
           toastCopyFailed: t("toastCopyFailed"),
+          menuSortBy: t("menuSortBy"),
+          sortName: t("sortName"),
+          sortItemType: t("sortItemType"),
+          sortDefault: t("sortDefault"),
+          sortCustom: t("sortCustom"),
+          toastDesktopRefreshed: t("toastDesktopRefreshed"),
         }}
       />
     );

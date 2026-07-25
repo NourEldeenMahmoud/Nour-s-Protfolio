@@ -21,7 +21,6 @@ interface FileExplorerProps {
   onReturnToRoom: () => void;
   onItemContextMenu?: (e: React.MouseEvent, target: import("./use-context-menu").ContextMenuTarget) => void;
   onSelectionChange?: (windowId: string | undefined, selection: { nodeId: string; nodeType: "file" | "folder"; folderId: string } | null) => void;
-  copiedFileId?: string | null;
   copy: {
     returnToRoom: string;
     searchPlaceholder: string;
@@ -66,14 +65,21 @@ export function FileExplorer({
 
   useEffect(() => {
     if (selectedId) {
-      const node = children.find((c) => c.id === selectedId);
-      if (node) {
-        onSelectionChange?.(windowId, { nodeId: node.id, nodeType: node.type as "file" | "folder", folderId });
+      const child = children.find((c) => c.id === selectedId);
+      if (child) {
+        onSelectionChange?.(windowId, { nodeId: child.id, nodeType: child.type as "file" | "folder", folderId });
         return;
+      }
+      if (searchQuery.length >= 2) {
+        const searchResult = searchResults.find((r) => r.id === selectedId);
+        if (searchResult) {
+          onSelectionChange?.(windowId, { nodeId: searchResult.id, nodeType: searchResult.type as "file" | "folder", folderId: searchResult.parentId ?? folderId });
+          return;
+        }
       }
     }
     onSelectionChange?.(windowId, null);
-  }, [selectedId, windowId, folderId, children, onSelectionChange]);
+  }, [selectedId, windowId, folderId, children, searchResults, searchQuery, onSelectionChange]);
 
   // Sync external folderId changes into history
   useEffect(() => {
@@ -158,10 +164,6 @@ export function FileExplorer({
   const handleItemKeyDown = useCallback(
     (e: React.KeyboardEvent, node: LearnNode) => {
       if (e.key === "Enter") {
-        e.preventDefault();
-        handleItemOpen(node);
-      }
-      if (e.key === " " && node.type === "folder") {
         e.preventDefault();
         handleItemOpen(node);
       }

@@ -43,6 +43,8 @@ export function AppProfileViewer({
         contentKind: "app",
         selectedText: selection,
         fallbackText: fallback,
+        x: e.clientX,
+        y: e.clientY,
       });
     },
     [windowId, appId, onContextMenuRequest],

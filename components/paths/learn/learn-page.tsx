@@ -39,6 +39,12 @@ interface LearnExperiencePageProps {
     toastFileCopied: string;
     toastTextCopied: string;
     toastCopyFailed: string;
+    menuSortBy: string;
+    sortName: string;
+    sortItemType: string;
+    sortDefault: string;
+    sortCustom: string;
+    toastDesktopRefreshed: string;
   };
 }
 

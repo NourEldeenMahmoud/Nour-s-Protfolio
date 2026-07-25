@@ -1671,6 +1671,23 @@
   font-size: 0.85rem;
 }
 
+.contextMenuCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.contextMenuChevron {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .contextMenuSep {
   height: 1px;
   margin: 0.25rem 0.9rem;
@@ -1918,4 +1935,20 @@
 @keyframes toastOut {
   from { opacity: 1; }
   to   { opacity: 0; }
+}
+
+/* ─── Desktop Refresh Animation ─── */
+.desktopIconsRefreshing {
+  animation: desktopRefreshFade 160ms ease-out;
+}
+
+@keyframes desktopRefreshFade {
+  from { opacity: 0.35; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktopIconsRefreshing {
+    animation: none;
+  }
 }

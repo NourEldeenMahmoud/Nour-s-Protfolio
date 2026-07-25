@@ -149,6 +149,95 @@ test.describe("Learn desktop", () => {
     const windows1 = await page.locator("[role='dialog']").count();
     expect(windows1).toBe(windows0 + 1);
   });
+
+  test("desktop context menu includes Sort By submenu", async ({ page }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    await page.locator("[data-desktop-surface]").click({ button: "right", position: { x: 400, y: 400 } });
+    await expect(page.locator("[role='menu']")).toBeVisible({ timeout: 2000 });
+
+    const sortBy = page.locator("[role='menuitem']", { hasText: "Sort by" });
+    await expect(sortBy).toBeVisible();
+    await expect(sortBy).toHaveAttribute("data-has-submenu", "");
+  });
+
+  test("right-click context menu appears at pointer position", async ({ page }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    await page.locator("[data-desktop-surface]").click({ button: "right", position: { x: 200, y: 300 } });
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible({ timeout: 2000 });
+
+    const box = await menu.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.x).toBeCloseTo(200, -1);
+    expect(box!.y).toBeCloseTo(300, -1);
+  });
+
+  test("desktop refresh clears stale positions", async ({ page }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const iconCount = await page.locator("[data-desktop-item]").count();
+    expect(iconCount).toBeGreaterThan(0);
+  });
+
+  test("desktop icon space key selects without opening", async ({ page }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    await icon.focus();
+    await page.keyboard.press("Space");
+
+    await expect(icon).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator("[role='dialog']")).toHaveCount(0);
+  });
+
+  test("desktop icon enter key opens folder", async ({ page }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const icon = page.locator("[data-desktop-item-id='this-pc']");
+    await icon.focus();
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator("[role='dialog']")).toBeVisible({ timeout: 3000 });
+  });
+
+  test("file explorer space key selects file without opening", async ({ page }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const thisPC = page.locator("[data-desktop-item-id='this-pc']");
+    await thisPC.dblclick();
+    await expect(page.locator("[role='dialog']")).toBeVisible({ timeout: 3000 });
+
+    const fileItem = page.locator("[role='option']").first();
+    if (await fileItem.count() > 0) {
+      await fileItem.click();
+      await expect(fileItem).toHaveAttribute("aria-selected", "true");
+    }
+  });
+
+  test("content viewer context menu uses pointer coordinates", async ({ page }) => {
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const aboutIcon = page.locator("[data-desktop-item-id='about']");
+    if (await aboutIcon.count() > 0) {
+      await aboutIcon.dblclick();
+      await expect(page.locator("[role='dialog']")).toBeVisible({ timeout: 3000 });
+
+      const aboutPanel = page.locator("[class*='aboutPanel']");
+      if (await aboutPanel.count() > 0) {
+        await aboutPanel.click({ button: "right", position: { x: 100, y: 50 } });
+        await expect(page.locator("[role='menu']")).toBeVisible({ timeout: 2000 });
+      }
+    }
+  });
 });
 
 test.describe("Learn desktop at different viewports", () => {

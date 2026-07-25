@@ -14,6 +14,8 @@ export const DESKTOP_PADDING_TOP = 12;
 export type DesktopIconGridPosition = { column: number; row: number };
 export type DesktopIconGridPositions = Record<string, DesktopIconGridPosition>;
 
+export type DesktopSortMode = "default" | "name" | "item-type" | "custom";
+
 export interface DesktopLayoutItem {
   id: string;
   col: number;
@@ -27,6 +29,8 @@ export interface DesktopLayout {
   maxCols: number;
   maxRows: number;
 }
+
+const SORT_MODE_KEY = "learn-desktop-sort-mode";
 
 function readPositions(): DesktopIconGridPositions {
   try {
@@ -61,6 +65,20 @@ function writePositions(positions: DesktopIconGridPositions) {
     } else {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
     }
+  } catch {}
+}
+
+function readSortMode(): DesktopSortMode {
+  try {
+    const raw = localStorage.getItem(SORT_MODE_KEY);
+    if (raw === "default" || raw === "name" || raw === "item-type" || raw === "custom") return raw;
+  } catch {}
+  return "default";
+}
+
+function writeSortMode(mode: DesktopSortMode) {
+  try {
+    localStorage.setItem(SORT_MODE_KEY, mode);
   } catch {}
 }
 
@@ -231,12 +249,76 @@ export function resolveDesktopLayout(
   return { items, maxCols, maxRows };
 }
 
+export function computeColumnFirstPositions(
+  orderedIds: string[],
+  maxCols: number,
+  maxRows: number,
+): DesktopIconGridPositions {
+  const positions: DesktopIconGridPositions = {};
+  for (let i = 0; i < orderedIds.length; i++) {
+    const id = orderedIds[i]!;
+    const row = i % maxRows;
+    const column = Math.floor(i / maxRows);
+    if (column >= maxCols) break;
+    positions[id] = { column, row };
+  }
+  return positions;
+}
+
+export function sortItemsByName(
+  allItemIds: string[],
+  maxCols: number,
+  maxRows: number,
+  getLabel: (id: string) => string,
+): DesktopIconGridPositions {
+  const sorted = [...allItemIds].sort((a, b) => {
+    return new Intl.Collator(undefined, { numeric: true, sensitivity: "base" }).compare(
+      getLabel(a),
+      getLabel(b),
+    );
+  });
+  return computeColumnFirstPositions(sorted, maxCols, maxRows);
+}
+
+export function sortItemsByType(
+  allItemIds: string[],
+  maxCols: number,
+  maxRows: number,
+  getLabel: (id: string) => string,
+  isFolder: (id: string) => boolean,
+): DesktopIconGridPositions {
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+  const sorted = [...allItemIds].sort((a, b) => {
+    const aFolder = isFolder(a);
+    const bFolder = isFolder(b);
+    if (aFolder && !bFolder) return -1;
+    if (!aFolder && bFolder) return 1;
+    return collator.compare(getLabel(a), getLabel(b));
+  });
+  return computeColumnFirstPositions(sorted, maxCols, maxRows);
+}
+
+export function removeStalePositions(
+  positions: DesktopIconGridPositions,
+  validIds: Set<string>,
+): DesktopIconGridPositions {
+  const cleaned: DesktopIconGridPositions = {};
+  for (const [id, pos] of Object.entries(positions)) {
+    if (validIds.has(id)) {
+      cleaned[id] = pos;
+    }
+  }
+  return cleaned;
+}
+
 export function useDesktopIconGridPositions() {
   const [positions, setPositions] = useState<DesktopIconGridPositions>({});
+  const [sortMode, setSortMode] = useState<DesktopSortMode>("default");
 
   useLayoutEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: reads localStorage before paint
     setPositions(readPositions());
+    setSortMode(readSortMode());
   }, []);
 
   const setPosition = useCallback((id: string, col: number, row: number) => {
@@ -266,5 +348,13 @@ export function useDesktopIconGridPositions() {
     [positions],
   );
 
-  return { positions, setPosition, removePosition, resetPositions, getPosition };
+  const replacePositions = useCallback((nextPositions: DesktopIconGridPositions, mode: DesktopSortMode) => {
+    const cleaned = removeStalePositions(nextPositions, new Set(Object.keys(nextPositions)));
+    setPositions(cleaned);
+    setSortMode(mode);
+    writePositions(cleaned);
+    writeSortMode(mode);
+  }, []);
+
+  return { positions, setPosition, removePosition, resetPositions, getPosition, sortMode, replacePositions };
 }

@@ -149,11 +149,6 @@ export function useDesktopIconDrag({
           } catch {}
         }
 
-        try {
-          const cm = document.querySelector("[role='menu']");
-          if (cm instanceof HTMLElement) cm.remove();
-        } catch {}
-
         setDraggingId(s.itemId);
         onDragStart?.();
       }

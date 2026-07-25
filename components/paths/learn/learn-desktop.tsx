@@ -14,6 +14,11 @@ import {
   ICON_CELL_WIDTH,
   ICON_CELL_HEIGHT,
 } from "./use-desktop-icon-positions";
+import type { DesktopSortMode } from "./use-desktop-icon-positions";
+import {
+  sortItemsByName,
+  sortItemsByType,
+} from "./use-desktop-icon-positions";
 import { useDesktopIconDrag, type DropUpdates } from "./use-desktop-icon-drag";
 import type { ContextMenuTarget } from "./use-context-menu";
 import styles from "./learn.module.css";
@@ -23,7 +28,10 @@ interface LearnDesktopProps {
   onOpenFolder: (id: string, name: string) => void;
   onOpenApp?: (appId: string, name: string) => void;
   onContextMenu?: (x: number, y: number, target: ContextMenuTarget) => void;
-  refreshKey?: number;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  sortMode?: DesktopSortMode;
+  onSortChange?: (mode: DesktopSortMode) => void;
 }
 
 export function LearnDesktop({
@@ -31,11 +39,13 @@ export function LearnDesktop({
   onOpenFolder,
   onOpenApp,
   onContextMenu,
-  refreshKey,
+  onDragStart,
+  onDragEnd,
+  sortMode = "default",
 }: LearnDesktopProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const desktopRef = useRef<HTMLDivElement>(null);
-  const { positions: customPositions, setPosition: setGridPosition } =
+  const { positions: customPositions, replacePositions } =
     useDesktopIconGridPositions();
   const [workspaceSize, setWorkspaceSize] = useState<{ w: number; h: number }>({
     w: 0,
@@ -47,6 +57,21 @@ export function LearnDesktop({
     const appIds = applications.map((a) => a.id);
     return [...folderIds, ...appIds];
   }, []);
+
+  const getLabel = useCallback(
+    (id: string) => {
+      const folder = desktopFolders.find((f) => f.id === id);
+      if (folder) return folder.name[locale] ?? id;
+      const app = applications.find((a) => a.id === id);
+      return app?.name ?? id;
+    },
+    [locale],
+  );
+
+  const isFolder = useCallback(
+    (id: string) => desktopFolders.some((f) => f.id === id),
+    [],
+  );
 
   const { maxCols, maxRows } = useMemo(
     () =>
@@ -61,11 +86,20 @@ export function LearnDesktop({
     [allItemIds, maxCols],
   );
 
-  const layout = useMemo(
-    () =>
-      resolveDesktopLayout(allItemIds, customPositions, defaultPositions, maxCols, maxRows),
-    [allItemIds, customPositions, defaultPositions, maxCols, maxRows],
-  );
+  const layout = useMemo(() => {
+    if (sortMode === "default") {
+      return resolveDesktopLayout(allItemIds, customPositions, defaultPositions, maxCols, maxRows);
+    }
+    let sortedPositions = customPositions;
+    if (sortMode === "name") {
+      sortedPositions = sortItemsByName(allItemIds, maxCols, maxRows, getLabel);
+    } else if (sortMode === "item-type") {
+      sortedPositions = sortItemsByType(allItemIds, maxCols, maxRows, getLabel, isFolder);
+    } else if (sortMode === "custom") {
+      sortedPositions = customPositions;
+    }
+    return resolveDesktopLayout(allItemIds, sortedPositions, defaultPositions, maxCols, maxRows);
+  }, [allItemIds, customPositions, defaultPositions, maxCols, maxRows, sortMode, getLabel, isFolder]);
 
   const getOccupancy = useCallback(
     (excludeId: string | null) =>
@@ -116,11 +150,13 @@ export function LearnDesktop({
 
   const handleDrop = useCallback(
     (updates: DropUpdates) => {
+      const next = { ...customPositions };
       for (const [id, pos] of Object.entries(updates)) {
-        setGridPosition(id, pos.column, pos.row);
+        next[id] = pos;
       }
+      replacePositions(next, "custom");
     },
-    [setGridPosition],
+    [customPositions, replacePositions],
   );
 
   const {
@@ -138,6 +174,8 @@ export function LearnDesktop({
     maxCols,
     maxRows,
     onDrop: handleDrop,
+    onDragStart,
+    onDragEnd,
   });
 
   const handleSelect = useCallback(
@@ -278,7 +316,7 @@ export function LearnDesktop({
       role="grid"
       aria-label="Desktop"
     >
-      <div className={styles.desktopIconsLayer} key={`icons-${refreshKey}`}>
+      <div className={`${styles.desktopIconsLayer} ${sortMode !== "custom" ? styles.desktopIconsRefreshing : ""}`}>
         {draggingId && previewStyle && (
           <div
             className={styles.gridPreview}
