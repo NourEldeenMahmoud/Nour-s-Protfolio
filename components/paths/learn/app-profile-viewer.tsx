@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import type { Locale } from "@/i18n/routing";
 import { applicationMap, learnNodeMap } from "@/content/learn";
 import { getProject } from "@/content/portfolio";
@@ -8,6 +9,8 @@ import styles from "./learn.module.css";
 interface AppProfileViewerProps {
   locale: Locale;
   appId: string;
+  windowId?: string;
+  onContextMenuRequest?: (target: import("./use-context-menu").ContextMenuTarget) => void;
   copy: {
     usedFor: string;
     workflowUses: string;
@@ -21,9 +24,29 @@ interface AppProfileViewerProps {
 export function AppProfileViewer({
   locale,
   appId,
+  windowId,
+  onContextMenuRequest,
   copy,
 }: AppProfileViewerProps) {
   const app = applicationMap.get(appId);
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const selection = window.getSelection()?.toString().trim() ?? "";
+      const container = e.currentTarget.querySelector("[data-copy-content]");
+      const fallback = container?.textContent?.trim().slice(0, 500) ?? "";
+      onContextMenuRequest?.({
+        type: "content",
+        windowId: windowId ?? "",
+        contentId: appId,
+        contentKind: "app",
+        selectedText: selection,
+        fallbackText: fallback,
+      });
+    },
+    [windowId, appId, onContextMenuRequest],
+  );
 
   if (!app) {
     return (
@@ -36,8 +59,8 @@ export function AppProfileViewer({
   }
 
   return (
-    <div className={styles.docViewer}>
-      <div className={styles.docContent}>
+    <div className={styles.docViewer} onContextMenu={handleContextMenu}>
+      <div className={styles.docContent} data-copy-content={windowId}>
         <div className={styles.appProfileHeader}>
           <div className={styles.appProfileBadge}>
             <span className={styles.appProfileCategory}>{app.category}</span>

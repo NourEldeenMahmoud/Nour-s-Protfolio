@@ -19,25 +19,53 @@ import { LearnWidgets } from "./learn-widgets";
 import { DesktopContextMenu } from "./desktop-context-menu";
 import type { ContextMenuItem } from "./desktop-context-menu";
 import { useContextMenu } from "./use-context-menu";
+import type { ContextMenuTarget } from "./use-context-menu";
 import { useFileClipboard } from "./use-file-clipboard";
+import { copyTextToSystemClipboard } from "./copy-text";
 import styles from "./learn.module.css";
 
 const WIDGETS_VISIBLE_KEY = "learn-widgets-visible";
 
-function AboutPanel() {
+function AboutPanel({
+  windowId,
+  onContextMenuRequest,
+}: {
+  windowId: string;
+  onContextMenuRequest?: (target: ContextMenuTarget) => void;
+}) {
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const selection = window.getSelection()?.toString().trim() ?? "";
+      const container = e.currentTarget.querySelector("[data-copy-content]");
+      const fallback = container?.textContent?.trim().slice(0, 500) ?? "";
+      onContextMenuRequest?.({
+        type: "content",
+        windowId,
+        contentId: "about",
+        contentKind: "about",
+        selectedText: selection,
+        fallbackText: fallback,
+      });
+    },
+    [windowId, onContextMenuRequest],
+  );
+
   return (
-    <div className={styles.aboutPanel}>
-      <h2>About Nour&apos;s Desktop</h2>
-      <p>
-        This desktop is a visual map of the tools, knowledge, workflows, and
-        engineering practices Nour uses to learn and build software.
-      </p>
-      <ul>
-        <li>Knowledge and technical summaries</li>
-        <li>Applications and development tools</li>
-        <li>AI-assisted workflows</li>
-        <li>Skills connected to real project evidence</li>
-      </ul>
+    <div className={styles.aboutPanel} onContextMenu={handleContextMenu}>
+      <div data-copy-content={windowId}>
+        <h2>About Nour&apos;s Desktop</h2>
+        <p>
+          This desktop is a visual map of the tools, knowledge, workflows, and
+          engineering practices Nour uses to learn and build software.
+        </p>
+        <ul>
+          <li>Knowledge and technical summaries</li>
+          <li>Applications and development tools</li>
+          <li>AI-assisted workflows</li>
+          <li>Skills connected to real project evidence</li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -67,6 +95,17 @@ interface LearnExperienceProps {
     usedFor: string;
     workflowUses: string;
     relatedSkills: string;
+    menuCopy: string;
+    menuRefresh: string;
+    menuOpen: string;
+    menuHideWidgets: string;
+    menuShowWidgets: string;
+    menuAbout: string;
+    menuReturn: string;
+    menuPaste: string;
+    toastFileCopied: string;
+    toastTextCopied: string;
+    toastCopyFailed: string;
   };
 }
 
@@ -93,12 +132,26 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [widgetsVisible, setWidgetsVisible] = useState(true);
   const [workspaceRect, setWorkspaceRect] = useState<DOMRect | null>(null);
+  const [toast, setToast] = useState<{ message: string } | null>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const { menu: contextMenu, openContextMenu, closeContextMenu } = useContextMenu();
-  const { copiedId, copyFile } = useFileClipboard();
-  const selectedFileRef = useRef<string | null>(null);
+  const { copyFile } = useFileClipboard();
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const explorerSelectionsRef = useRef<Record<string, { nodeId: string; nodeType: string; folderId: string } | null>>({});
 
   const alternateLocale = locale === "en" ? "ar" : "en";
+
+  const showToast = useCallback((message: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ message });
+    toastTimerRef.current = setTimeout(() => setToast(null), 2000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     try {
@@ -171,29 +224,82 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     window.location.href = url.toString();
   }, [alternateLocale]);
 
-  const contextMenuItems: ContextMenuItem[] = [
-    { id: "refresh", label: "Refresh" },
-    { id: "sep-1", label: "", separator: true },
-    {
-      id: "toggle-widgets",
-      label: widgetsVisible ? "Hide widgets" : "Show widgets",
+  const handleSelectionChange = useCallback(
+    (_windowId: string | undefined, selection: { nodeId: string; nodeType: string; folderId: string } | null) => {
+      const wid = _windowId ?? "default";
+      explorerSelectionsRef.current[wid] = selection;
     },
-    { id: "about", label: "About this desktop" },
-    { id: "sep-2", label: "", separator: true },
-    { id: "return", label: "Return to Room" },
-  ];
+    [],
+  );
 
-  const itemContextMenuItems: ContextMenuItem[] = [
-    { id: "open", label: "Open" },
-    ...(contextMenu.target.type === "file"
-      ? [
-          { id: "sep-copy", label: "", separator: true },
-          { id: "copy", label: "Copy" },
-        ]
-      : []),
-    { id: "sep-open", label: "", separator: true },
-    { id: "refresh", label: "Refresh" },
-  ];
+  const handleContextMenuOpen = useCallback(
+    (x: number, y: number, target: ContextMenuTarget) => {
+      openContextMenu(x, y, target);
+      setStartOpen(false);
+      setSearchOpen(false);
+    },
+    [openContextMenu],
+  );
+
+  const handleExplorerItemContextMenu = useCallback(
+    (e: React.MouseEvent, target: ContextMenuTarget) => {
+      handleContextMenuOpen(e.clientX, e.clientY, target);
+    },
+    [handleContextMenuOpen],
+  );
+
+  const handleContentContextMenuRequest = useCallback(
+    (target: ContextMenuTarget) => {
+      // Use the center of the viewport as the menu position for content menus
+      openContextMenu(
+        Math.min(window.innerWidth - 160, Math.max(10, window.innerWidth / 2)),
+        Math.min(window.innerHeight - 100, Math.max(10, window.innerHeight / 2)),
+        target,
+      );
+    },
+    [openContextMenu],
+  );
+
+  const getContextMenuItems = useCallback(
+    (target: ContextMenuTarget): ContextMenuItem[] => {
+      switch (target.type) {
+        case "desktop":
+          return [
+            { id: "refresh", label: copy.menuRefresh },
+            { id: "sep-1", label: "", separator: true },
+            {
+              id: "toggle-widgets",
+              label: widgetsVisible ? copy.menuHideWidgets : copy.menuShowWidgets,
+            },
+            { id: "about", label: copy.menuAbout },
+            { id: "sep-2", label: "", separator: true },
+            { id: "return", label: copy.menuReturn },
+          ];
+        case "file":
+          return [
+            { id: "open", label: copy.menuOpen },
+            { id: "sep-copy", label: "", separator: true },
+            { id: "copy", label: copy.menuCopy },
+          ];
+        case "folder":
+          return [
+            { id: "open", label: copy.menuOpen },
+            { id: "sep-open", label: "", separator: true },
+            { id: "refresh", label: copy.menuRefresh },
+          ];
+        case "app":
+          return [];
+        case "content":
+          if (target.selectedText) {
+            return [{ id: "copy-text", label: copy.menuCopy }];
+          }
+          return [{ id: "copy-text", label: copy.menuCopy, disabled: true }];
+        default:
+          return [];
+      }
+    },
+    [copy, widgetsVisible],
+  );
 
   const handleContextMenuAction = useCallback(
     (id: string) => {
@@ -217,6 +323,20 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
             const node = learnNodeMap.get(target.id);
             if (node?.parentId) {
               copyFile(target.id, node.parentId);
+              showToast(copy.toastFileCopied);
+            }
+          }
+          break;
+        }
+        case "copy-text": {
+          if (target.type === "content") {
+            const text = target.selectedText || target.fallbackText;
+            if (text) {
+              copyTextToSystemClipboard(text).then((ok) => {
+                showToast(ok ? copy.toastTextCopied : copy.toastCopyFailed);
+              });
+            } else {
+              showToast(copy.toastCopyFailed);
             }
           }
           break;
@@ -240,8 +360,20 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         }
       }
     },
-    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow, copyFile],
+    [contextMenu.target, closeContextMenu, handleRefresh, toggleWidgets, handleOpenAbout, handleReturnToRoom, handleOpenFolder, handleOpenFile, handleOpenApp, locale, navigateWindow, copyFile, showToast, copy],
   );
+
+  // Close context menu when target window is minimized or closed
+  useEffect(() => {
+    if (!contextMenu.open) return;
+    const target = contextMenu.target;
+    if (target.type === "content" || target.type === "file" || target.type === "folder") {
+      const targetWindowId = "windowId" in target ? target.windowId : ("explorerWindowId" in target ? target.explorerWindowId : undefined);
+      if (targetWindowId && !windows.some((w) => w.id === targetWindowId)) {
+        closeContextMenu();
+      }
+    }
+  }, [windows, contextMenu, closeContextMenu]);
 
   // Sync URL → state on mount
   useEffect(() => {
@@ -350,6 +482,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [locale, openExplorer, openDocument, openApp, windows, closeWindow]);
 
+  // Ctrl+C priority: native text > explorer file > nothing
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -368,19 +501,42 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         setSearchOpen(true);
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "c") {
+        if (e.repeat) return;
+
+        // Priority 1: Native input/textarea — let browser handle it
         const el = document.activeElement;
-        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return;
-        const fid = selectedFileRef.current;
-        if (!fid) return;
-        const node = learnNodeMap.get(fid);
-        if (node?.parentId) {
-          copyFile(fid, node.parentId);
+        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || (el instanceof HTMLElement && el.isContentEditable)) {
+          return;
         }
+
+        // Priority 2: Browser text selection
+        const selection = window.getSelection()?.toString().trim();
+        if (selection) {
+          e.preventDefault();
+          copyTextToSystemClipboard(selection).then((ok) => {
+            showToast(ok ? copy.toastTextCopied : copy.toastCopyFailed);
+          });
+          return;
+        }
+
+        // Priority 3: Explorer file selection
+        const visibleWindows = windows.filter((w) => !w.minimized && w.type === "explorer");
+        for (const win of visibleWindows) {
+          const sel = explorerSelectionsRef.current[win.id];
+          if (sel && sel.nodeType === "file") {
+            e.preventDefault();
+            copyFile(sel.nodeId, sel.folderId);
+            showToast(copy.toastFileCopied);
+            return;
+          }
+        }
+
+        // Priority 4: Folder — do nothing
       }
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [searchOpen, startOpen, contextMenu.open, closeContextMenu, copyFile]);
+  }, [contextMenu.open, closeContextMenu, searchOpen, startOpen, windows, copyFile, showToast, copy]);
 
   useLayoutEffect(() => {
     closeContextMenu();
@@ -400,21 +556,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     [restoreWindow],
   );
 
-  const handleContextMenuOpen = useCallback(
-    (x: number, y: number, target: { type: string; id?: string }) => {
-      openContextMenu(x, y, target as import("./use-context-menu").ContextMenuTarget);
-      setStartOpen(false);
-      setSearchOpen(false);
-    },
-    [openContextMenu],
-  );
-
-  const handleExplorerItemContextMenu = useCallback(
-    (e: React.MouseEvent, target: import("./use-context-menu").ContextMenuTarget) => {
-      handleContextMenuOpen(e.clientX, e.clientY, target);
-    },
-    [handleContextMenuOpen],
-  );
+  const contextMenuItems = getContextMenuItems(contextMenu.target);
 
   const contextMenuItemLabel =
     contextMenu.target.type !== "desktop"
@@ -423,10 +565,15 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
             const app = applicationMap.get(contextMenu.target.id);
             return app?.name;
           }
-          const node = learnNodeMap.get(contextMenu.target.id);
-          if (node) {
-            const name = node.name[locale];
-            return typeof name === "string" ? name : undefined;
+          if (contextMenu.target.type === "content") {
+            return undefined;
+          }
+          if ("id" in contextMenu.target) {
+            const node = learnNodeMap.get(contextMenu.target.id as string);
+            if (node) {
+              const name = node.name[locale];
+              return typeof name === "string" ? name : undefined;
+            }
           }
           return undefined;
         })()
@@ -478,8 +625,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
                 }}
                 onReturnToRoom={handleReturnToRoom}
                 onItemContextMenu={handleExplorerItemContextMenu}
-                onSelectionChange={(id) => { selectedFileRef.current = id; }}
-                copiedFileId={copiedId}
+                onSelectionChange={handleSelectionChange}
                 copy={{
                   returnToRoom: copy.returnToRoom,
                   searchPlaceholder: copy.searchPlaceholder,
@@ -491,13 +637,18 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
               />
             )}
             {win.type === "document" && win.fileId === "__about__" && (
-              <AboutPanel />
+              <AboutPanel
+                windowId={win.id}
+                onContextMenuRequest={handleContentContextMenuRequest}
+              />
             )}
             {win.type === "document" && win.fileId && win.fileId !== "__about__" && (
               <DocumentViewer
                 locale={locale}
                 fileId={win.fileId}
+                windowId={win.id}
                 onOpenFile={handleOpenFile}
+                onContextMenuRequest={handleContentContextMenuRequest}
                 copy={{
                   copyLink: copy.copyLink,
                   copied: copy.copied,
@@ -512,6 +663,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
               <AppProfileViewer
                 locale={locale}
                 appId={win.appId}
+                windowId={win.id}
+                onContextMenuRequest={handleContentContextMenuRequest}
                 copy={{
                   usedFor: copy.usedFor,
                   workflowUses: copy.workflowUses,
@@ -551,11 +704,17 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         <DesktopContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
-          items={contextMenu.target.type === "desktop" ? contextMenuItems : itemContextMenuItems}
+          items={contextMenuItems}
           onSelect={handleContextMenuAction}
           onClose={closeContextMenu}
           itemLabel={contextMenuItemLabel}
         />
+      )}
+
+      {toast && (
+        <div className={styles.globalToast} role="status" aria-live="polite" data-testid="global-toast">
+          {toast.message}
+        </div>
       )}
 
       <LearnTaskbar

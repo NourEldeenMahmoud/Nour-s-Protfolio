@@ -104,6 +104,17 @@
     "languageLabel": "تغيير اللغة",
     "usedFor": "يُستخدم لـ",
     "workflowUses": "استخدامات في سير العمل",
-    "relatedSkills": "مهارات ذات صلة"
+    "relatedSkills": "مهارات ذات صلة",
+    "menuCopy": "نسخ",
+    "menuRefresh": "تحديث",
+    "menuOpen": "فتح",
+    "menuHideWidgets": "إخفاء الأدوات",
+    "menuShowWidgets": "إظهار الأدوات",
+    "menuAbout": "حول سطح المكتب",
+    "menuReturn": "العودة إلى الغرفة",
+    "menuPaste": "لصق",
+    "toastFileCopied": "تم نسخ الملف",
+    "toastTextCopied": "تم نسخ النص",
+    "toastCopyFailed": "فشل النسخ"
   }
 }

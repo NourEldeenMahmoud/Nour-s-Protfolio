@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import {
   type LearnNode,
@@ -20,7 +20,7 @@ interface FileExplorerProps {
   onOpenFolder: (folderId: string, title: string) => void;
   onReturnToRoom: () => void;
   onItemContextMenu?: (e: React.MouseEvent, target: import("./use-context-menu").ContextMenuTarget) => void;
-  onSelectionChange?: (id: string | null) => void;
+  onSelectionChange?: (windowId: string | undefined, selection: { nodeId: string; nodeType: "file" | "folder"; folderId: string } | null) => void;
   copiedFileId?: string | null;
   copy: {
     returnToRoom: string;
@@ -41,7 +41,6 @@ export function FileExplorer({
   onReturnToRoom,
   onItemContextMenu,
   onSelectionChange,
-  copiedFileId,
   copy,
 }: FileExplorerProps) {
   const [history, setHistory] = useState<string[]>([folderId]);
@@ -50,22 +49,31 @@ export function FileExplorer({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const isNavigatingRef = useRef(false);
 
-  useEffect(() => {
-    onSelectionChange?.(selectedId);
-  }, [selectedId, onSelectionChange]);
-
   const currentFolder = learnNodeMap.get(folderId);
-  const children = currentFolder
-    ? getChildNodes(folderId, learnNodeMap)
-    : [];
-  const breadcrumbPath = currentFolder
-    ? getNodePath(folderId, learnNodeMap)
-    : [];
+  const children = useMemo(
+    () => (currentFolder ? getChildNodes(folderId, learnNodeMap) : []),
+    [currentFolder, folderId],
+  );
+  const breadcrumbPath = useMemo(
+    () => (currentFolder ? getNodePath(folderId, learnNodeMap) : []),
+    [currentFolder, folderId],
+  );
 
-  const searchResults =
-    searchQuery.length >= 2
-      ? searchNodes(searchQuery, learnNodeMap, locale)
-      : [];
+  const searchResults = useMemo(
+    () => (searchQuery.length >= 2 ? searchNodes(searchQuery, learnNodeMap, locale) : []),
+    [searchQuery, locale],
+  );
+
+  useEffect(() => {
+    if (selectedId) {
+      const node = children.find((c) => c.id === selectedId);
+      if (node) {
+        onSelectionChange?.(windowId, { nodeId: node.id, nodeType: node.type as "file" | "folder", folderId });
+        return;
+      }
+    }
+    onSelectionChange?.(windowId, null);
+  }, [selectedId, windowId, folderId, children, onSelectionChange]);
 
   // Sync external folderId changes into history
   useEffect(() => {
@@ -294,11 +302,22 @@ export function FileExplorer({
                     onContextMenu={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      onItemContextMenu?.(e, {
-                        type: node.type === "folder" ? "folder" : "file",
-                        id: node.id,
-                        explorerWindowId: node.type === "folder" ? windowId : undefined,
-                      });
+                      setSelectedId(node.id);
+                      if (node.type === "folder") {
+                        onItemContextMenu?.(e, {
+                          type: "folder",
+                          id: node.id,
+                          explorerWindowId: windowId,
+                          sourceFolderId: folderId,
+                        });
+                      } else {
+                        onItemContextMenu?.(e, {
+                          type: "file",
+                          id: node.id,
+                          explorerWindowId: windowId ?? "",
+                          sourceFolderId: folderId,
+                        });
+                      }
                     }}
                   >
                     <span className={styles.fileItemIcon}>
@@ -330,11 +349,22 @@ export function FileExplorer({
                   onContextMenu={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    onItemContextMenu?.(e, {
-                      type: node.type === "folder" ? "folder" : "file",
-                      id: node.id,
-                      explorerWindowId: node.type === "folder" ? windowId : undefined,
-                    });
+                    setSelectedId(node.id);
+                    if (node.type === "folder") {
+                      onItemContextMenu?.(e, {
+                        type: "folder",
+                        id: node.id,
+                        explorerWindowId: windowId,
+                        sourceFolderId: folderId,
+                      });
+                    } else {
+                      onItemContextMenu?.(e, {
+                        type: "file",
+                        id: node.id,
+                        explorerWindowId: windowId ?? "",
+                        sourceFolderId: folderId,
+                      });
+                    }
                   }}
                 >
                   <span className={styles.fileItemIcon}>
@@ -350,9 +380,7 @@ export function FileExplorer({
         </div>
 
         <div className={styles.explorerStatus}>
-          {copiedFileId ? (
-            <span className={styles.copiedToast} data-testid="copied-toast">Copied</span>
-          ) : searchQuery.length >= 2 ? (
+          {searchQuery.length >= 2 ? (
             `${searchResults.length} result${searchResults.length !== 1 ? "s" : ""}`
           ) : (
             copy.itemCountPattern.replace("{{count}}", String(children.length))

@@ -1060,7 +1060,7 @@ test.describe("File copy", () => {
     await expect(menu).toBeVisible();
     await menu.locator("[role='menuitem']", { hasText: "Copy" }).click();
 
-    const toast = page.locator("[data-testid='copied-toast']");
+    const toast = page.locator("[data-testid='global-toast']");
     await expect(toast).toBeVisible({ timeout: 2000 });
 
     const clipData = await page.evaluate(() => {
@@ -1117,7 +1117,7 @@ test.describe("File copy", () => {
 
     await page.keyboard.press("Control+c");
 
-    const toast = page.locator("[data-testid='copied-toast']");
+    const toast = page.locator("[data-testid='global-toast']");
     await expect(toast).toBeVisible({ timeout: 2000 });
 
     const clipData = await page.evaluate(() => {
@@ -1139,7 +1139,7 @@ test.describe("File copy", () => {
 
     await page.keyboard.press("Control+c");
 
-    const toast = page.locator("[data-testid='copied-toast']");
+    const toast = page.locator("[data-testid='global-toast']");
     await expect(toast).toHaveCount(0, { timeout: 500 });
 
     const clipData = await page.evaluate(() => {
@@ -1147,5 +1147,159 @@ test.describe("File copy", () => {
       return raw ? JSON.parse(raw) : null;
     });
     expect(clipData).toBeNull();
+  });
+});
+
+test.describe("Content copy and context menu quality", () => {
+  test("right-click on document viewer shows Copy in context menu", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    const knowledgeIcon = page.locator("[data-desktop-item-id='knowledge']");
+    await knowledgeIcon.dblclick();
+    await page.waitForSelector("[role='dialog']");
+
+    const explorer = page.locator("[role='dialog'] [role='listbox']");
+    const firstItem = explorer.locator("[role='option']").first();
+    await expect(firstItem).toBeVisible();
+
+    const nodeType = await firstItem.getAttribute("data-node-type");
+    if (nodeType !== "file") {
+      // Navigate into a subfolder to find a file
+      const folderItem = explorer.locator("[role='option'][data-node-type='folder']").first();
+      if (await folderItem.isVisible()) {
+        await folderItem.dblclick();
+        await page.waitForTimeout(300);
+      }
+    }
+
+    const fileItem = explorer.locator("[role='option'][data-node-type='file']").first();
+    if (await fileItem.isVisible()) {
+      await fileItem.dblclick();
+      await page.waitForSelector("[role='dialog'] [data-copy-content]", { timeout: 5000 }).catch(() => {});
+
+      const docContent = page.locator("[role='dialog'] [data-copy-content]");
+      if (await docContent.isVisible()) {
+        await docContent.click({ button: "right" });
+        const menu = page.locator("[role='menu']");
+        await expect(menu).toBeVisible();
+        const copyItem = menu.locator("[role='menuitem']", { hasText: /Copy/ });
+        await expect(copyItem).toBeVisible();
+      }
+    }
+  });
+
+  test("right-click on about panel shows Copy in context menu", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    // Open About Panel via desktop context menu
+    const desktop = page.locator("[data-desktop-surface]");
+    await desktop.click({ button: "right" });
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible();
+    await menu.locator("[role='menuitem']", { hasText: /About this desktop/ }).click();
+
+    await page.waitForSelector("[role='dialog'] [data-copy-content]", { timeout: 5000 });
+
+    const aboutContent = page.locator("[role='dialog'] [data-copy-content]");
+    await expect(aboutContent).toBeVisible();
+
+    await aboutContent.click({ button: "right" });
+
+    const ctxMenu = page.locator("[role='menu']");
+    await expect(ctxMenu).toBeVisible();
+
+    const copyItem = ctxMenu.locator("[role='menuitem']", { hasText: /Copy/ });
+    await expect(copyItem).toBeVisible();
+  });
+
+  test("right-click on app profile viewer shows Copy in context menu", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    // Open an app via Start menu or desktop icon
+    const vscodeIcon = page.locator("[data-desktop-item-id='app-vscode']");
+    await vscodeIcon.dblclick();
+
+    await page.waitForSelector("[role='dialog'] [data-copy-content]", { timeout: 5000 });
+
+    const appContent = page.locator("[role='dialog'] [data-copy-content]");
+    await expect(appContent).toBeVisible();
+
+    await appContent.click({ button: "right" });
+
+    const ctxMenu = page.locator("[role='menu']");
+    await expect(ctxMenu).toBeVisible();
+
+    const copyItem = ctxMenu.locator("[role='menuitem']", { hasText: /Copy/ });
+    await expect(copyItem).toBeVisible();
+  });
+
+  test("content Copy with no text selection is disabled", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    // Open About Panel via context menu
+    const desktop = page.locator("[data-desktop-surface]");
+    await desktop.click({ button: "right" });
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible();
+    await menu.locator("[role='menuitem']", { hasText: /About this desktop/ }).click();
+
+    await page.waitForSelector("[role='dialog'] [data-copy-content]", { timeout: 5000 });
+
+    const aboutContent = page.locator("[role='dialog'] [data-copy-content]");
+    await expect(aboutContent).toBeVisible();
+
+    await aboutContent.click({ button: "right" });
+
+    const ctxMenu = page.locator("[role='menu']");
+    await expect(ctxMenu).toBeVisible();
+
+    const copyItem = ctxMenu.locator("[role='menuitem']", { hasText: /Copy/ });
+    const isDisabled = await copyItem.getAttribute("aria-disabled");
+    expect(isDisabled).toBe("true");
+  });
+
+  test("context menu closes when target window is minimized", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "Desktop-only");
+    await page.goto("/en/learn");
+    await page.waitForSelector("[data-desktop-surface]");
+
+    // Open About Panel via context menu
+    const desktop = page.locator("[data-desktop-surface]");
+    await desktop.click({ button: "right" });
+    const menu = page.locator("[role='menu']");
+    await expect(menu).toBeVisible();
+    await menu.locator("[role='menuitem']", { hasText: /About this desktop/ }).click();
+
+    await page.waitForSelector("[role='dialog'] [data-copy-content]", { timeout: 5000 });
+
+    const aboutContent = page.locator("[role='dialog'] [data-copy-content]");
+    await expect(aboutContent).toBeVisible();
+
+    await aboutContent.click({ button: "right" });
+    const ctxMenu = page.locator("[role='menu']");
+    await expect(ctxMenu).toBeVisible();
+
+    const minimizeBtn = page.locator("[role='dialog'] [aria-label='Minimize']");
+    await minimizeBtn.click();
+
+    await expect(ctxMenu).toHaveCount(0, { timeout: 1000 });
   });
 });

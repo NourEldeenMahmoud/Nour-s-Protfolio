@@ -56,6 +56,17 @@ export default async function DestinationContractPage({
           usedFor: t("usedFor"),
           workflowUses: t("workflowUses"),
           relatedSkills: t("relatedSkills"),
+          menuCopy: t("menuCopy"),
+          menuRefresh: t("menuRefresh"),
+          menuOpen: t("menuOpen"),
+          menuHideWidgets: t("menuHideWidgets"),
+          menuShowWidgets: t("menuShowWidgets"),
+          menuAbout: t("menuAbout"),
+          menuReturn: t("menuReturn"),
+          menuPaste: t("menuPaste"),
+          toastFileCopied: t("toastFileCopied"),
+          toastTextCopied: t("toastTextCopied"),
+          toastCopyFailed: t("toastCopyFailed"),
         }}
       />
     );

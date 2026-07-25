@@ -58,9 +58,9 @@ describe("useContextMenu", () => {
   it("opens with a file target", () => {
     const { result } = renderHook(() => useContextMenu());
     act(() => {
-      result.current.openContextMenu(10, 20, { type: "file", id: "about-profile" });
+      result.current.openContextMenu(10, 20, { type: "file", id: "about-profile", explorerWindowId: "explorer-1", sourceFolderId: "about" });
     });
-    expect(result.current.menu.target).toEqual({ type: "file", id: "about-profile" });
+    expect(result.current.menu.target).toEqual({ type: "file", id: "about-profile", explorerWindowId: "explorer-1", sourceFolderId: "about" });
   });
 
   it("opens with an app target", () => {
@@ -690,5 +690,96 @@ describe("useFileClipboard", () => {
   it("getCopiedFile returns null for missing fields", () => {
     sessionStorage.setItem("learn-clipboard", JSON.stringify({ fileId: "x" }));
     expect(getCopiedFile()).toBeNull();
+  });
+});
+
+describe("copyTextToSystemClipboard", () => {
+  it("returns false for empty string", async () => {
+    const { copyTextToSystemClipboard } = await import("@/components/paths/learn/copy-text");
+    const result = await copyTextToSystemClipboard("");
+    expect(result).toBe(false);
+  });
+
+  it("returns true when clipboard API succeeds", async () => {
+    const { copyTextToSystemClipboard } = await import("@/components/paths/learn/copy-text");
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
+    const result = await copyTextToSystemClipboard("hello");
+    expect(result).toBe(true);
+    expect(writeTextMock).toHaveBeenCalledWith("hello");
+  });
+
+  it("falls back to execCommand when clipboard API fails", async () => {
+    const { copyTextToSystemClipboard } = await import("@/components/paths/learn/copy-text");
+    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockRejectedValue(new Error("blocked")) } });
+    document.execCommand = vi.fn().mockReturnValue(true);
+    const result = await copyTextToSystemClipboard("fallback text");
+    expect(result).toBe(true);
+  });
+
+  it("returns false when both methods fail", async () => {
+    const { copyTextToSystemClipboard } = await import("@/components/paths/learn/copy-text");
+    Object.assign(navigator, { clipboard: undefined });
+    document.execCommand = vi.fn().mockReturnValue(false);
+    const result = await copyTextToSystemClipboard("fail text");
+    expect(result).toBe(false);
+  });
+
+  it("handles special characters", async () => {
+    const { copyTextToSystemClipboard } = await import("@/components/paths/learn/copy-text");
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
+    const special = "hello 🌍 <div>\"quotes\" & 'apostrophes'";
+    const result = await copyTextToSystemClipboard(special);
+    expect(result).toBe(true);
+    expect(writeTextMock).toHaveBeenCalledWith(special);
+  });
+});
+
+describe("ContextMenuTarget types", () => {
+  it("desktop target has type desktop", () => {
+    const target: import("@/components/paths/learn/use-context-menu").ContextMenuTarget = { type: "desktop" };
+    expect(target.type).toBe("desktop");
+  });
+
+  it("content target has all required fields", () => {
+    const target: import("@/components/paths/learn/use-context-menu").ContextMenuTarget = {
+      type: "content",
+      windowId: "doc-1",
+      contentId: "doc-1",
+      contentKind: "document",
+      selectedText: "hello",
+      fallbackText: "fallback",
+    };
+    expect(target.type).toBe("content");
+    if (target.type === "content") {
+      expect(target.windowId).toBe("doc-1");
+      expect(target.contentKind).toBe("document");
+    }
+  });
+
+  it("file target requires explorerWindowId", () => {
+    const target: import("@/components/paths/learn/use-context-menu").ContextMenuTarget = {
+      type: "file",
+      id: "my-file",
+      explorerWindowId: "explorer-1",
+      sourceFolderId: "folder-a",
+    };
+    expect(target.type).toBe("file");
+    if (target.type === "file") {
+      expect(target.explorerWindowId).toBe("explorer-1");
+      expect(target.sourceFolderId).toBe("folder-a");
+    }
+  });
+
+  it("folder target can have optional explorerWindowId", () => {
+    const target: import("@/components/paths/learn/use-context-menu").ContextMenuTarget = {
+      type: "folder",
+      id: "my-folder",
+    };
+    expect(target.type).toBe("folder");
+    if (target.type === "folder") {
+      expect(target.explorerWindowId).toBeUndefined();
+    }
   });
 });

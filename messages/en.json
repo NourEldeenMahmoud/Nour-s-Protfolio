@@ -104,6 +104,17 @@
     "languageLabel": "Switch language",
     "usedFor": "Used for",
     "workflowUses": "Workflow uses",
-    "relatedSkills": "Related skills"
+    "relatedSkills": "Related skills",
+    "menuCopy": "Copy",
+    "menuRefresh": "Refresh",
+    "menuOpen": "Open",
+    "menuHideWidgets": "Hide widgets",
+    "menuShowWidgets": "Show widgets",
+    "menuAbout": "About this desktop",
+    "menuReturn": "Return to Room",
+    "menuPaste": "Paste",
+    "toastFileCopied": "File copied",
+    "toastTextCopied": "Text copied",
+    "toastCopyFailed": "Copy failed"
   }
 }

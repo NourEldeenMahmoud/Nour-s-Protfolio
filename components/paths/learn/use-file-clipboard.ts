@@ -10,29 +10,43 @@ export interface ClipboardData {
   folderId: string;
 }
 
-export function getCopiedFile(): ClipboardData | null {
+function safeGetClipboard(): ClipboardData | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw) as ClipboardData;
-    if (typeof data.fileId === "string" && typeof data.folderId === "string") {
-      return data;
-    }
-    return null;
+    const data = JSON.parse(raw);
+    if (
+      typeof data !== "object" || data === null ||
+      typeof data.fileId !== "string" || !data.fileId ||
+      typeof data.folderId !== "string" || !data.folderId
+    ) return null;
+    return data;
   } catch {
     return null;
   }
 }
 
+export function getCopiedFile(): ClipboardData | null {
+  return safeGetClipboard();
+}
+
 export function copyFileToClipboard(fileId: string, folderId: string): void {
   if (typeof window === "undefined") return;
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ fileId, folderId }));
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ fileId, folderId }));
+  } catch {
+    // storage full or unavailable
+  }
 }
 
 export function clearClipboard(): void {
   if (typeof window === "undefined") return;
-  sessionStorage.removeItem(STORAGE_KEY);
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 export function useFileClipboard() {

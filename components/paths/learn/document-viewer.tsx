@@ -4,12 +4,15 @@ import { useCallback, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import { learnNodeMap, getNodePath } from "@/content/learn";
 import { getProject } from "@/content/portfolio";
+import { copyTextToSystemClipboard } from "./copy-text";
 import styles from "./learn.module.css";
 
 interface DocumentViewerProps {
   locale: Locale;
   fileId: string;
+  windowId?: string;
   onOpenFile: (fileId: string, title: string) => void;
+  onContextMenuRequest?: (target: import("./use-context-menu").ContextMenuTarget) => void;
   copy: {
     copyLink: string;
     copied: string;
@@ -23,7 +26,9 @@ interface DocumentViewerProps {
 export function DocumentViewer({
   locale,
   fileId,
+  windowId,
   onOpenFile,
+  onContextMenuRequest,
   copy,
 }: DocumentViewerProps) {
   const [copied, setCopied] = useState(false);
@@ -32,11 +37,29 @@ export function DocumentViewer({
   const handleCopyLink = useCallback(() => {
     const url = new URL(window.location.href);
     url.searchParams.set("file", fileId);
-    navigator.clipboard.writeText(url.toString()).then(() => {
-      setCopied(true);
+    copyTextToSystemClipboard(url.toString()).then((ok) => {
+      if (ok) setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   }, [fileId]);
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const selection = window.getSelection()?.toString().trim() ?? "";
+      const container = e.currentTarget.querySelector("[data-copy-content]");
+      const fallback = container?.textContent?.trim().slice(0, 500) ?? "";
+      onContextMenuRequest?.({
+        type: "content",
+        windowId: windowId ?? "",
+        contentId: fileId,
+        contentKind: "document",
+        selectedText: selection,
+        fallbackText: fallback,
+      });
+    },
+    [windowId, fileId, onContextMenuRequest],
+  );
 
   if (!node) {
     return (
@@ -52,8 +75,8 @@ export function DocumentViewer({
   const pathString = breadcrumbPath.map((b) => b.name[locale]).join(" › ");
 
   return (
-    <div className={styles.docViewer}>
-      <div className={styles.docContent}>
+    <div className={styles.docViewer} onContextMenu={handleContextMenu}>
+      <div className={styles.docContent} data-copy-content={windowId}>
         <p className={styles.docPath}>{pathString}</p>
         <h2 className={styles.docTitle}>{node.name[locale]}</h2>
 

@@ -8,6 +8,7 @@ export interface ContextMenuItem {
   label: string;
   icon?: React.ReactNode;
   separator?: boolean;
+  disabled?: boolean;
 }
 
 interface DesktopContextMenuProps {
@@ -28,10 +29,31 @@ export function DesktopContextMenu({
   itemLabel,
 }: DesktopContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [focusIndex, setFocusIndex] = useState(0);
+  const invokerRef = useRef<HTMLElement | null>(null);
+  const [focusIndex, setFocusIndex] = useState(-1);
   const [pos, setPos] = useState({ x, y });
 
   const nonSepItems = items.filter((i) => !i.separator);
+
+  // Capture invoker on open
+  useEffect(() => {
+    invokerRef.current = document.activeElement as HTMLElement;
+  }, []);
+
+  // Restore focus to invoker on close
+  useEffect(() => {
+    return () => {
+      if (invokerRef.current && typeof invokerRef.current.focus === "function") {
+        invokerRef.current.focus();
+      }
+    };
+  }, []);
+
+  // Clamp focusIndex to valid range — avoids setState in effect for item changes
+  const clampedFocusIndex = Math.min(
+    Math.max(focusIndex, nonSepItems.length > 0 ? 0 : -1),
+    nonSepItems.length - 1,
+  );
 
   const clampToViewport = useCallback(() => {
     const el = menuRef.current;
@@ -65,24 +87,38 @@ export function DesktopContextMenu({
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setFocusIndex((i) => (i + 1) % nonSepItems.length);
+        setFocusIndex((prev) => {
+          let next = prev + 1;
+          while (next < nonSepItems.length && nonSepItems[next]?.disabled) next++;
+          return next < nonSepItems.length ? next : prev;
+        });
       }
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        setFocusIndex((i) => (i - 1 + nonSepItems.length) % nonSepItems.length);
+        setFocusIndex((prev) => {
+          let next = prev - 1;
+          while (next >= 0 && nonSepItems[next]?.disabled) next--;
+          return next >= 0 ? next : prev;
+        });
       }
       if (e.key === "Home") {
         e.preventDefault();
-        setFocusIndex(0);
+        const first = nonSepItems.findIndex((i) => !i.disabled);
+        if (first >= 0) setFocusIndex(first);
       }
       if (e.key === "End") {
         e.preventDefault();
-        setFocusIndex(nonSepItems.length - 1);
+        for (let i = nonSepItems.length - 1; i >= 0; i--) {
+          if (!nonSepItems[i]?.disabled) {
+            setFocusIndex(i);
+            break;
+          }
+        }
       }
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        const item = nonSepItems[focusIndex];
-        if (item) onSelect(item.id);
+        const item = nonSepItems[clampedFocusIndex];
+        if (item && !item.disabled) onSelect(item.id);
       }
     }
     function handleResize() {
@@ -96,7 +132,7 @@ export function DesktopContextMenu({
       document.removeEventListener("keydown", handleKey);
       window.removeEventListener("resize", handleResize);
     };
-  }, [onClose, onSelect, focusIndex, nonSepItems]);
+  }, [onClose, onSelect, clampedFocusIndex, nonSepItems]);
 
   useEffect(() => {
     menuRef.current?.focus();
@@ -107,9 +143,9 @@ export function DesktopContextMenu({
     const el = menuRef.current;
     if (!el) return;
     const items = el.querySelectorAll<HTMLElement>("[role='menuitem']");
-    const active = items[focusIndex];
+    const active = items[clampedFocusIndex];
     if (active) active.focus();
-  }, [focusIndex]);
+  }, [clampedFocusIndex]);
 
   return (
     <div
@@ -130,11 +166,14 @@ export function DesktopContextMenu({
             className={styles.contextMenuItem}
             type="button"
             role="menuitem"
-            tabIndex={focusIndex === nonSepItems.indexOf(item) ? 0 : -1}
-            onMouseEnter={() => setFocusIndex(nonSepItems.indexOf(item))}
+            aria-disabled={item.disabled || undefined}
+            tabIndex={clampedFocusIndex === nonSepItems.indexOf(item) ? 0 : -1}
+            onMouseEnter={() => {
+              if (!item.disabled) setFocusIndex(nonSepItems.indexOf(item));
+            }}
             onClick={(e) => {
               e.stopPropagation();
-              onSelect(item.id);
+              if (!item.disabled) onSelect(item.id);
             }}
           >
             {item.icon && <span className={styles.contextMenuIcon}>{item.icon}</span>}

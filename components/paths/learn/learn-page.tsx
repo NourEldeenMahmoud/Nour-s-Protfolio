@@ -28,6 +28,17 @@ interface LearnExperiencePageProps {
     usedFor: string;
     workflowUses: string;
     relatedSkills: string;
+    menuCopy: string;
+    menuRefresh: string;
+    menuOpen: string;
+    menuHideWidgets: string;
+    menuShowWidgets: string;
+    menuAbout: string;
+    menuReturn: string;
+    menuPaste: string;
+    toastFileCopied: string;
+    toastTextCopied: string;
+    toastCopyFailed: string;
   };
 }
 

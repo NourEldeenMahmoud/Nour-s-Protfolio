@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 
 export type ContextMenuTarget =
   | { type: "desktop" }
-  | { type: "folder"; id: string; explorerWindowId?: string }
-  | { type: "file"; id: string }
-  | { type: "app"; id: string };
+  | { type: "folder"; id: string; explorerWindowId?: string; sourceFolderId?: string }
+  | { type: "file"; id: string; explorerWindowId: string; sourceFolderId: string }
+  | { type: "app"; id: string }
+  | { type: "content"; windowId: string; contentId: string; contentKind: "document" | "app" | "about"; selectedText: string; fallbackText: string };
 
 export interface ContextMenuState {
   open: boolean;
