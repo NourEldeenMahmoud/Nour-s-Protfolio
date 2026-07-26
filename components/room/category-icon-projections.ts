@@ -40,11 +40,11 @@ export const HERO_ANCHORS: Record<CategoryId, Anchor> = {
 
 /** Authoritative bottom/height anchors from Blender Explore GLB focus render. */
 export const EXPLORE_ANCHORS: Record<CategoryId, Anchor> = {
-  web: { cx: 0.300376, by: 0.713796, h: 0.082738 },
-  "game-development": { cx: 0.40016, by: 0.702132, h: 0.05946 },
-  desktop: { cx: 0.5, by: 0.709908, h: 0.074979 },
-  "mobile-applications": { cx: 0.599828, by: 0.715891, h: 0.08691 },
-  bots: { cx: 0.699621, by: 0.70602, h: 0.06722 },
+  web: { cx: 0.309199, by: 0.6452, h: 0.080861 },
+  "game-development": { cx: 0.4046, by: 0.6452, h: 0.05811 },
+  desktop: { cx: 0.5, by: 0.6452, h: 0.073282 },
+  "mobile-applications": { cx: 0.5954, by: 0.6452, h: 0.084937 },
+  bots: { cx: 0.690801, by: 0.6452, h: 0.065694 },
 };
 
 /** Ordered list of all category IDs (matches tab order). */
