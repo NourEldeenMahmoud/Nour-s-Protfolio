@@ -29,6 +29,10 @@ const HOVER_SCALE = 1.05;
 const ACTIVE_SCALE = 1.06;
 const TILT_X = 0.12;
 const EXPLORE_TILT_X = 0.04;
+/** Global front-direction correction — GLB icons already face the orthographic
+ *  camera (−Z view) so no additive Y rotation is needed. Applied once,
+ *  centrally. */
+const MODEL_FRONT_YAW = 0;
 
 /** Per-icon yaw in radians — hero state, converging inward ±6° at edges. */
 const HERO_YAW: Record<CategoryId, number> = {
@@ -242,7 +246,7 @@ function IconMesh({
       (EXPLORE_YAW[categoryId] - HERO_YAW[categoryId]) * t;
     group.rotation.set(
       xTilt,
-      baseYaw + animState.floatRotY + animState.hoverFacing,
+      MODEL_FRONT_YAW + baseYaw + animState.floatRotY + animState.hoverFacing,
       0,
     );
 

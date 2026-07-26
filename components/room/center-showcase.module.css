@@ -136,7 +136,7 @@
   position: absolute;
   top: 50%;
   z-index: 2;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   width: clamp(1.4rem, 2vw, 1.8rem);
@@ -385,19 +385,20 @@
 .projectArrow {
   position: absolute;
   top: 38.8630%;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
   width: clamp(1.6rem, 2.8vw, 2.4rem);
   height: clamp(1.6rem, 2.8vw, 2.4rem);
-  border: 1px solid transparent;
+  border: 1px solid rgb(216 167 92 / 25%);
   border-radius: 50%;
-  background: transparent;
-  color: transparent;
+  background: rgb(7 11 16 / 45%);
+  color: rgb(246 240 229 / 50%);
   font-size: clamp(0.6rem, 0.9vw, 0.85rem);
   cursor: pointer;
   transform: translate(-50%, -50%);
-  text-shadow: none;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 50%);
   transition:
     color 200ms ease,
     border-color 200ms ease,
@@ -406,12 +407,21 @@
     transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.projectArrow:hover,
-.projectArrow:focus-visible {
-  color: rgb(246 240 229 / 70%);
-  border-color: rgb(216 167 92 / 35%);
-  background: rgb(7 11 16 / 50%);
+.projectArrow:hover {
+  color: rgb(246 240 229 / 85%);
+  border-color: rgb(216 167 92 / 50%);
+  background: rgb(7 11 16 / 60%);
   box-shadow: 0 0 12px rgb(216 167 92 / 25%);
+  transform: translate(-50%, calc(-50% - 2px));
+}
+
+.projectArrow:focus-visible {
+  color: #fff;
+  border-color: #66a7aa;
+  background: rgb(102 167 170 / 15%);
+  box-shadow:
+    0 0 0 2px rgb(102 167 170 / 60%),
+    0 0 12px rgb(102 167 170 / 20%);
   transform: translate(-50%, calc(-50% - 2px));
 }
 
@@ -698,6 +708,7 @@
 
   /* Screen arrows become visible on mobile */
   .screenArrow {
+    display: flex;
     width: 2rem;
     height: 2rem;
     font-size: 0.75rem;
