@@ -74,6 +74,18 @@
         "description": "للمطورين والزملاء وصنّاع البرمجيات.",
         "path": "learn"
       }
+    },
+    "showcase": {
+      "categoriesLabel": "فئات المشاريع",
+      "previousProject": "المشروع السابق",
+      "nextProject": "المشروع التالي",
+      "previousMedia": "الصورة السابقة",
+      "nextMedia": "الصورة التالية",
+      "projectCount": "{current} من {total}",
+      "viewDetails": "عرض التفاصيل",
+      "mediaSlides": "شرائح الوسائط",
+      "mediaUnavailable": "الوسائط غير متاحة",
+      "emptyState": "لا توجد دراسة حالة منشورة متاحة حالياً."
     }
   },
   "placeholder": {

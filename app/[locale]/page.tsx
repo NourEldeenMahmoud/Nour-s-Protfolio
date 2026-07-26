@@ -48,6 +48,18 @@ export default async function EntryPage({
             path: "learn",
           },
         },
+        showcase: {
+          categoriesLabel: t("showcase.categoriesLabel"),
+          previousProject: t("showcase.previousProject"),
+          nextProject: t("showcase.nextProject"),
+          previousMedia: t("showcase.previousMedia"),
+          nextMedia: t("showcase.nextMedia"),
+          mediaSlides: t("showcase.mediaSlides"),
+          projectCount: t.raw("showcase.projectCount"),
+          viewDetails: t("showcase.viewDetails"),
+          mediaUnavailable: t("showcase.mediaUnavailable"),
+          emptyState: t("showcase.emptyState"),
+        },
       }}
     />
   );

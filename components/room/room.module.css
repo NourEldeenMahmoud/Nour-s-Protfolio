@@ -68,7 +68,7 @@
 }
 
 .focusStill[data-focus-still="exploration"] {
-  object-position: 50% 8%;
+  object-position: 50% 50%;
 }
 
 .introLights {
@@ -445,9 +445,7 @@
   opacity: 0.78;
 }
 
-.room[data-focused-area]
-  .hotspot:not([aria-current="true"])
-  .hotspotCopy {
+.room[data-focused-area] .hotspot:not([aria-current="true"]) .hotspotCopy {
   opacity: 0;
   transform: translateY(0.75rem);
 }
@@ -474,13 +472,18 @@
   transform: translateX(-50%);
 }
 
-.room[data-focused-area]
-  .hotspot[aria-current="true"]:hover
-  .hotspotMarker,
+.room[data-focused-area] .hotspot[aria-current="true"]:hover .hotspotMarker,
 .room[data-focused-area]
   .hotspot[aria-current="true"]:focus-visible
   .hotspotMarker {
   transform: translate(-50%, -0.5rem);
+}
+
+/* Hide exploration hotspot labels and heading when showcase is open */
+.room[data-focused-area="exploration"] .hotspots,
+.room[data-focused-area="exploration"] .roomHeading {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .returnToRoom {
@@ -720,6 +723,40 @@
 
   .topbar {
     inset-inline-end: 1.25rem;
+  }
+
+  /* Return button: visible above dark mobile theater sheet for exploration only */
+  /* Raise .controls stacking context (z-index: 7) above .centerShowcase (z-index: 9)
+     so the Return button inside .pathUi can reach the top.
+     Set pointer-events: none on the raised container so it cannot intercept
+     showcase tab/input; re-enable only on .returnToRoom. */
+  .room[data-focused-area="exploration"] .controls {
+    z-index: 12;
+    pointer-events: none;
+  }
+
+  .room[data-focused-area="exploration"] .returnToRoom {
+    position: fixed;
+    z-index: 15;
+    inset-block-end: clamp(1.4rem, 4vh, 2.75rem);
+    left: 50%;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.7rem 1.6rem;
+    border: 1px solid rgb(216 167 92 / 80%);
+    background: rgb(6 11 16 / 80%);
+    color: rgb(246 240 229 / 95%);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 60%);
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
+  }
+
+  .room[data-focused-area="exploration"] .returnToRoom:hover,
+  .room[data-focused-area="exploration"] .returnToRoom:focus-visible {
+    border-color: #d8a75c;
+    background: rgb(216 167 92 / 15%);
+    color: #fff;
+    box-shadow: 0 4px 24px rgb(216 167 92 / 20%);
   }
 }
 

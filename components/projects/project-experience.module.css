@@ -1,0 +1,632 @@
+/* ── Project Experience ──
+   Cinematic technical briefing connected to the dark warm Engineering Room.
+   Warm amber practical light, cool blue technical accents,
+   subtle grain/grid, strong editorial hierarchy.
+*/
+
+.experience {
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: #070b10;
+  color: #f6f0e5;
+}
+
+/* ── Sticky Navigation ── */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.9rem clamp(1.5rem, 5vw, 5rem);
+  background: linear-gradient(
+    180deg,
+    rgb(7 11 16 / 98%) 0%,
+    rgb(7 11 16 / 92%) 100%
+  );
+  border-block-end: 1px solid rgb(216 167 92 / 18%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.headerNav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header a {
+  color: rgb(246 240 229 / 72%);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    color 200ms ease,
+    transform 200ms ease;
+}
+
+.header a:hover {
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.roomLink {
+  padding: 0.45rem 1rem;
+  border: 1px solid rgb(216 167 92 / 50%);
+  background: rgb(216 167 92 / 10%);
+  color: #f6d89b !important;
+  border-radius: 2px;
+}
+
+.roomLink:hover {
+  border-color: #f4c070;
+  background: rgb(216 167 92 / 20%);
+}
+
+.watchLink {
+  color: rgb(246 240 229 / 55%) !important;
+}
+
+.watchLink:hover {
+  color: #fff !important;
+}
+
+/* ── Cinematic Hero ── */
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 1fr);
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+  min-height: 70vh;
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem);
+}
+
+.heroMedia {
+  position: relative;
+  min-height: clamp(18rem, 40vw, 36rem);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.heroImage {
+  object-fit: cover;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgb(216 167 92 / 8%) 0%,
+    transparent 40%,
+    rgb(102 167 170 / 6%) 100%
+  );
+  pointer-events: none;
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.kicker {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.25rem 0.65rem;
+  margin-block-end: 1rem;
+  border: 1px solid rgb(102 167 170 / 40%);
+  border-radius: 2px;
+  background: rgb(102 167 170 / 8%);
+  color: rgb(166 220 226 / 85%);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heroCopy h1 {
+  margin: 0 0 1rem;
+  color: #f1d19a;
+  font-family: var(--font-sans);
+  font-size: clamp(2.5rem, 5.5vw, 5rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.heroSummary {
+  margin: 0 0 1.5rem;
+  color: rgb(246 240 229 / 70%);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.65;
+  max-width: 42ch;
+}
+
+.stackList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stackItem {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgb(216 167 92 / 30%);
+  border-radius: 2px;
+  background: rgb(216 167 92 / 8%);
+  color: rgb(216 167 92 / 75%);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.stackItem:hover {
+  background: rgb(216 167 92 / 14%);
+  border-color: rgb(216 167 92 / 50%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
+/* ── Facts Rail ── */
+
+.factsRail {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 5vw, 5rem);
+  border-block: 1px solid rgb(216 167 92 / 12%);
+  background: rgb(12 18 26 / 60%);
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.factLabel {
+  color: rgb(216 167 92 / 65%);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.factValue {
+  color: rgb(246 240 229 / 90%);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.factMuted {
+  color: rgb(246 240 229 / 45%);
+  font-style: italic;
+}
+
+.factDivider {
+  width: 1px;
+  height: 2.5rem;
+  background: rgb(216 167 92 / 15%);
+  flex-shrink: 0;
+}
+
+/* ── Content Sections ── */
+
+.section {
+  padding: clamp(3rem, 6vw, 5.5rem) clamp(1.5rem, 5vw, 5rem);
+}
+
+.sectionInner {
+  max-width: 52rem;
+}
+
+.sectionIndex {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  margin-block-end: 1rem;
+  border: 1px solid rgb(102 167 170 / 25%);
+  border-radius: 2px;
+  background: rgb(102 167 170 / 6%);
+  color: rgb(102 167 170 / 70%);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.section h2 {
+  margin: 0 0 1rem;
+  color: #f1d19a;
+  font-family: var(--font-sans);
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.section p {
+  margin: 0;
+  color: rgb(246 240 229 / 75%);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  line-height: 1.72;
+  max-width: 60ch;
+}
+
+/* ── Highlights List ── */
+
+.highlightsList {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.highlightsList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.highlightIndex {
+  flex-shrink: 0;
+  color: rgb(102 167 170 / 60%);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding-top: 0.15rem;
+}
+
+.highlightsList p {
+  margin: 0;
+  color: rgb(246 240 229 / 70%);
+  font-size: clamp(0.88rem, 1.1vw, 1rem);
+  line-height: 1.6;
+}
+
+/* ── Process Note ── */
+
+.processNote {
+  color: rgb(246 240 229 / 45%) !important;
+  font-style: italic;
+}
+
+/* ── Boundary Card ── */
+
+.boundary {
+  background: linear-gradient(
+    135deg,
+    rgb(14 20 28 / 70%) 0%,
+    rgb(10 14 20 / 50%) 100%
+  );
+  border-block: 1px solid rgb(216 167 92 / 10%);
+}
+
+.boundary .sectionIndex {
+  border-color: rgb(216 167 92 / 25%);
+  background: rgb(216 167 92 / 6%);
+  color: rgb(216 167 92 / 60%);
+}
+
+.boundary h2 {
+  color: #f6e8cc;
+}
+
+.boundary p {
+  color: rgb(246 240 229 / 60%);
+}
+
+/* ── Gallery ── */
+
+.gallery {
+  padding: clamp(3rem, 6vw, 5.5rem) clamp(1.5rem, 5vw, 5rem);
+}
+
+.galleryTitle {
+  margin: 0 0 1.5rem;
+  color: #f1d19a;
+  font-family: var(--font-sans);
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 28rem), 1fr));
+  gap: 1rem;
+}
+
+.galleryItem {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgb(102 167 170 / 10%);
+}
+
+.galleryItem img {
+  object-fit: cover;
+}
+
+/* ── Actions ── */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 5vw, 5rem);
+  border-block: 1px solid rgb(216 167 92 / 12%);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.5rem;
+  border: 1px solid rgb(102 167 170 / 50%);
+  border-radius: 2px;
+  background: rgb(102 167 170 / 8%);
+  color: rgb(166 220 226 / 85%);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.actionBtn:hover {
+  color: #fff;
+  border-color: #66a7aa;
+  background: rgb(102 167 170 / 18%);
+  transform: translateY(-2px);
+}
+
+/* ── Project Navigation ── */
+
+.projectNav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-block: 1px solid rgb(216 167 92 / 12%);
+}
+
+.projectNavLink {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 5vw, 5rem);
+  text-decoration: none;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease;
+}
+
+.projectNavLink + .projectNavLink {
+  border-inline-start: 1px solid rgb(216 167 92 / 12%);
+}
+
+.projectNavLinkNext {
+  text-align: end;
+  align-items: flex-end;
+}
+
+.projectNavLabel {
+  color: rgb(216 167 92 / 55%);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.projectNavTitle {
+  color: rgb(246 240 229 / 85%);
+  font-family: var(--font-sans);
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  transition: color 200ms ease;
+}
+
+.projectNavLink:hover {
+  background: rgb(216 167 92 / 4%);
+}
+
+.projectNavLink:hover .projectNavTitle {
+  color: #f1d19a;
+}
+
+/* ── Footer ── */
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 5vw, 5rem);
+  border-block-end: 1px solid rgb(216 167 92 / 10%);
+}
+
+.finalReturn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.6rem;
+  border: 1px solid rgb(216 167 92 / 50%);
+  border-radius: 2px;
+  background: rgb(216 167 92 / 8%);
+  color: rgb(246 240 229 / 82%);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease,
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+.finalReturn:hover {
+  color: #fff;
+  border-color: #d8a75c;
+  background: rgb(216 167 92 / 16%);
+  transform: translateY(-2px);
+}
+
+/* ── RTL ── */
+
+[dir="rtl"] .header a {
+  font-family: var(--font-arabic);
+  font-size: 0.85rem;
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .kicker {
+  font-family: var(--font-arabic);
+  font-size: 0.78rem;
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .heroCopy h1 {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+[dir="rtl"] .heroSummary {
+  font-family: var(--font-arabic);
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  line-height: 1.75;
+}
+
+[dir="rtl"] .stackItem {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .factLabel {
+  font-family: var(--font-arabic);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .factValue {
+  font-family: var(--font-arabic);
+}
+
+[dir="rtl"] .section h2 {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+[dir="rtl"] .section p,
+[dir="rtl"] .highlightsList p {
+  font-family: var(--font-arabic);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.8;
+}
+
+[dir="rtl"] .galleryTitle {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .actionBtn,
+[dir="rtl"] .finalReturn {
+  font-family: var(--font-arabic);
+  font-size: 0.85rem;
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .projectNavLabel {
+  font-family: var(--font-arabic);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .projectNavTitle {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+
+/* ── Mobile / Tablet ── */
+
+@media (max-width: 880px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+
+  .heroMedia {
+    min-height: clamp(14rem, 50vw, 22rem);
+    grid-row: 1;
+  }
+
+  .factsRail {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .factDivider {
+    display: none;
+  }
+
+  .fact {
+    min-width: 8rem;
+  }
+
+  .projectNav {
+    grid-template-columns: 1fr;
+  }
+
+  .projectNavLink + .projectNavLink {
+    border-inline-start: none;
+    border-block-start: 1px solid rgb(216 167 92 / 12%);
+  }
+
+  .projectNavLinkNext {
+    text-align: start;
+    align-items: flex-start;
+  }
+}
+
+/* ── Reduced Motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .animateIn,
+  .stackItem,
+  .actionBtn,
+  .finalReturn,
+  .projectNavLink {
+    transition: none;
+  }
+}

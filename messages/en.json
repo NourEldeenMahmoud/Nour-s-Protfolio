@@ -74,6 +74,18 @@
         "description": "For developers, peers, and fellow builders.",
         "path": "learn"
       }
+    },
+    "showcase": {
+      "categoriesLabel": "Project categories",
+      "previousProject": "Previous project",
+      "nextProject": "Next project",
+      "previousMedia": "Previous image",
+      "nextMedia": "Next image",
+      "projectCount": "{current} of {total}",
+      "viewDetails": "View details",
+      "mediaSlides": "Media slides",
+      "mediaUnavailable": "Media unavailable",
+      "emptyState": "No published case study currently available."
     }
   },
   "placeholder": {

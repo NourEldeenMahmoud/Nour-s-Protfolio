@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import { CaseStudy } from "@/components/projects/case-study";
+import { ProjectExperience } from "@/components/projects/project-experience";
 import { getProject, projectSlugs } from "@/content/portfolio";
 import { isLocale } from "@/i18n/routing";
 
@@ -23,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProjectCaseStudyPage({
+export default async function ProjectDetailPage({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
@@ -33,5 +33,5 @@ export default async function ProjectCaseStudyPage({
   const project = getProject(slug);
   if (!project) notFound();
   setRequestLocale(locale);
-  return <CaseStudy locale={locale} project={project} />;
+  return <ProjectExperience locale={locale} project={project} />;
 }

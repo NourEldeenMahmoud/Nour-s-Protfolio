@@ -1,0 +1,726 @@
+/* ── Center Showcase Overlay ──
+   Authoritative Blender Explore GLB focus-render projection coordinates
+   (Explore_Focus_Camera, 4200×2700, source aspect 1.5555556):
+   - Screen glass opening: left 26.6156%, top 28.4359%, right 26.6156%, bottom 64.1583%
+   - Arrow prev center: 22.8876%, 46.3661%
+   - Arrow next center: 77.1124%, 46.3661%
+   - Pedestal ring centers y: 72.6476%
+     Web 30.3955%, Game 40.1978%, Desktop 50%, Mobile 59.8022%, Bots 69.6045%
+*/
+
+.showcase {
+  position: absolute;
+  z-index: 9;
+  left: 50%;
+  top: 50%;
+  width: max(100vw, calc(100vh * 1.5555555556));
+  height: max(100vh, calc(100vw / 1.5555555556));
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.showcase > * {
+  pointer-events: auto;
+}
+
+/* ── Screen (authoritative inner physical screen-glass opening) ── */
+
+.screen {
+  position: absolute;
+  top: 28.4359%;
+  left: 26.6156%;
+  right: 26.6156%;
+  bottom: 35.8417%;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+/* ── Media Area (full-bleed behind all overlays) ── */
+
+.mediaArea {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mediaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+.mediaVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mediaFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgb(18 23 30) 0%, rgb(25 32 42) 100%);
+}
+
+.mediaFallbackText {
+  color: rgb(246 240 229 / 40%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.42rem, 0.6vw, 0.52rem);
+  letter-spacing: 0.04em;
+}
+
+/* ── Media Dots (inside clipped screen) ── */
+
+.mediaDots {
+  position: absolute;
+  bottom: clamp(0.25rem, 0.6vh, 0.4rem);
+  left: 50%;
+  display: flex;
+  gap: 0.3rem;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* Hit area is 24×24 for Lighthouse target-size; visual dot rendered via ::after */
+.dot {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dot::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(246 240 229 / 35%);
+  transform: translate(-50%, -50%);
+  transition:
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+.dot:hover::after {
+  background: rgb(246 240 229 / 70%);
+}
+
+.dot:focus-visible {
+  outline: 1px solid #66a7aa;
+  outline-offset: 2px;
+}
+
+.dotActive::after {
+  background: rgb(102 167 170 / 90%);
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+/* ── Screen Arrows (inside screen, for media nav) ── */
+
+.screenArrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(1.4rem, 2vw, 1.8rem);
+  height: clamp(1.4rem, 2vw, 1.8rem);
+  border: 1px solid rgb(246 240 229 / 20%);
+  border-radius: 50%;
+  background: rgb(7 11 16 / 45%);
+  color: rgb(246 240 229 / 70%);
+  font-size: 0.6rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.screenArrow:hover,
+.screenArrow:focus-visible {
+  color: #fff;
+  border-color: rgb(102 167 170 / 60%);
+  background: rgb(102 167 170 / 15%);
+}
+
+.screenArrowPrev {
+  inset-inline-start: clamp(0.2rem, 0.4vw, 0.35rem);
+}
+
+.screenArrowNext {
+  inset-inline-end: clamp(0.2rem, 0.4vw, 0.35rem);
+}
+
+/* ── Category Badge ── */
+
+.categoryBadge {
+  position: absolute;
+  top: clamp(0.2rem, 0.4vh, 0.35rem);
+  left: clamp(0.3rem, 0.5vw, 0.5rem);
+  z-index: 3;
+  padding: 0.1rem clamp(0.25rem, 0.4vw, 0.4rem);
+  border: 1px solid rgb(216 167 92 / 25%);
+  border-radius: 2px;
+  background: rgb(7 11 16 / 65%);
+  color: rgb(216 167 92 / 80%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.32rem, 0.42vw, 0.38rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ── Info Bar (compact bottom overlay rail over media) ── */
+
+.infoBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: clamp(0.35rem, 0.7vh, 0.55rem) clamp(0.4rem, 0.7vw, 0.6rem);
+  background: linear-gradient(
+    0deg,
+    rgb(7 11 16 / 95%) 0%,
+    rgb(7 11 16 / 70%) 100%
+  );
+}
+
+.infoText {
+  min-width: 0;
+  flex: 1;
+}
+
+.projectTitle {
+  margin: 0;
+  color: #f1d19a;
+  font-family: var(--font-sans);
+  font-size: clamp(0.55rem, 0.85vw, 0.88rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projectSummary {
+  margin: 0.15rem 0 0;
+  color: rgb(246 240 229 / 65%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.4rem, 0.6vw, 0.58rem);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: 0.05rem 0.3rem;
+  border: 1px solid rgb(216 167 92 / 30%);
+  border-radius: 2px;
+  background: rgb(216 167 92 / 8%);
+  color: rgb(216 167 92 / 75%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.35rem, 0.5vw, 0.48rem);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.detailsLink {
+  flex-shrink: 0;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgb(102 167 170 / 50%);
+  border-radius: 2px;
+  background: rgb(102 167 170 / 10%);
+  color: rgb(166 220 226 / 85%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.38rem, 0.55vw, 0.54rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.detailsLink:hover,
+.detailsLink:focus-visible {
+  color: #fff;
+  border-color: #66a7aa;
+  background: rgb(102 167 170 / 20%);
+}
+
+/* ── Category Tabs (aligned over five physical pedestal rings) ── */
+
+.tabs {
+  position: absolute;
+  bottom: 27.3524%;
+  left: 0;
+  right: 0;
+  pointer-events: auto;
+}
+
+.tab {
+  position: absolute;
+  top: 0;
+  translate: -50% -50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(2.2rem, 4.4vw, 3.6rem);
+  min-height: clamp(1.6rem, 3vw, 2.2rem);
+  padding: 0.2rem clamp(0.35rem, 0.7vw, 0.6rem);
+  border: 1px solid rgb(216 167 92 / 35%);
+  border-radius: 4px;
+  background: rgb(7 11 16 / 55%);
+  color: rgb(246 240 229 / 70%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.5rem, 0.72vw, 0.68rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 60%);
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease,
+    background 200ms ease,
+    box-shadow 280ms ease,
+    translate 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab:hover {
+  color: rgb(246 240 229 / 95%);
+  border-color: rgb(216 167 92 / 60%);
+  background: rgb(7 11 16 / 75%);
+  translate: -50% calc(-50% - 2px);
+}
+
+.tab:focus-visible {
+  outline: 2px solid #66a7aa;
+  outline-offset: 2px;
+  color: #fff;
+}
+
+.tabActive {
+  color: #fff;
+  border-color: rgb(102 167 170 / 80%);
+  background: rgb(102 167 170 / 15%);
+  box-shadow:
+    0 0 10px rgb(102 167 170 / 30%),
+    0 0 24px rgb(102 167 170 / 12%);
+}
+
+.tabActive:hover {
+  box-shadow:
+    0 0 12px rgb(102 167 170 / 40%),
+    0 0 28px rgb(102 167 170 / 18%);
+  translate: -50% calc(-50% - 2px);
+}
+
+.tabLabel {
+  white-space: nowrap;
+}
+
+/* Per-category left positioning aligned to Blender ring centers */
+
+.tab:nth-child(1) {
+  left: 30.3955%;
+}
+
+.tab:nth-child(2) {
+  left: 40.1978%;
+}
+
+.tab:nth-child(3) {
+  left: 50%;
+}
+
+.tab:nth-child(4) {
+  left: 59.8022%;
+}
+
+.tab:nth-child(5) {
+  left: 69.6045%;
+}
+
+/* ── Project Navigation Arrows ──
+   Aligned over the measured physical arrow housings:
+   prev center 22.8876% / 46.3661%, next center 77.1124% / 46.3661% */
+
+.projectArrow {
+  position: absolute;
+  top: 46.3661%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(1.6rem, 2.8vw, 2.4rem);
+  height: clamp(1.6rem, 2.8vw, 2.4rem);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+  font-size: clamp(0.6rem, 0.9vw, 0.85rem);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  text-shadow: none;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease,
+    background 200ms ease,
+    box-shadow 280ms ease,
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.projectArrow:hover,
+.projectArrow:focus-visible {
+  color: rgb(246 240 229 / 70%);
+  border-color: rgb(216 167 92 / 35%);
+  background: rgb(7 11 16 / 50%);
+  box-shadow: 0 0 12px rgb(216 167 92 / 25%);
+  transform: translate(-50%, calc(-50% - 2px));
+}
+
+.projectArrowPrev {
+  left: 22.8876%;
+}
+
+.projectArrowNext {
+  left: 77.1124%;
+}
+
+/* ── Project Counter (desktop, inside screen) ── */
+
+.projectCounterDesktop {
+  position: absolute;
+  bottom: clamp(0.15rem, 0.4vh, 0.3rem);
+  right: clamp(0.4rem, 0.7vw, 0.6rem);
+  z-index: 1;
+  margin: 0;
+  color: rgb(246 240 229 / 40%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.32rem, 0.45vw, 0.4rem);
+  letter-spacing: 0.08em;
+}
+
+/* ── Mobile Project Navigation ──
+   Visible only on small viewports. Provides accessible project nav with >=44px
+   touch targets. Hidden on desktop where Blender-rendered housings are used. */
+
+.mobileProjectNav {
+  display: none;
+}
+
+.mobileProjectBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid rgb(216 167 92 / 40%);
+  border-radius: 50%;
+  background: rgb(7 11 16 / 60%);
+  color: rgb(246 240 229 / 80%);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.mobileProjectBtn:hover,
+.mobileProjectBtn:focus-visible {
+  color: #fff;
+  border-color: rgb(216 167 92 / 70%);
+  background: rgb(216 167 92 / 15%);
+}
+
+/* ── Empty State ── */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: clamp(0.6rem, 1.2vw, 1rem);
+  text-align: center;
+}
+
+.emptyCategory {
+  margin: 0;
+  color: #f1d19a;
+  font-family: var(--font-sans);
+  font-size: clamp(0.65rem, 1vw, 0.85rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.emptyMessage {
+  margin: 0.3rem 0 0;
+  color: rgb(246 240 229 / 50%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.42rem, 0.6vw, 0.52rem);
+  line-height: 1.4;
+  max-width: 16rem;
+}
+
+/* ── RTL ── */
+
+[dir="rtl"] .categoryBadge {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.35rem, 0.46vw, 0.42rem);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .tabLabel {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.55rem, 0.78vw, 0.72rem);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .projectTitle {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.6rem, 0.9vw, 0.82rem);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .projectSummary {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.45rem, 0.65vw, 0.56rem);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .detailsLink {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.42rem, 0.6vw, 0.52rem);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .emptyCategory {
+  font-family: var(--font-arabic);
+}
+
+[dir="rtl"] .emptyMessage {
+  font-family: var(--font-arabic);
+  font-size: clamp(0.48rem, 0.68vw, 0.58rem);
+  letter-spacing: 0;
+}
+
+/* ── Mobile / Tablet ── */
+
+@media (max-width: 780px) {
+  /* Full-viewport theater sheet with dark cinematic backdrop */
+  .showcase {
+    position: fixed;
+    inset: 0;
+    width: auto;
+    height: auto;
+    transform: none;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    background: rgb(7 11 16 / 96%);
+    padding-block-start: 3.2rem;
+    padding-block-end: 5rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    pointer-events: auto;
+  }
+
+  .showcase::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Scrollable tab row */
+  .tabs {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    display: flex;
+    padding: 0.5rem 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    justify-content: flex-start;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    position: static;
+    translate: none;
+    flex-shrink: 0;
+    min-width: auto;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.72rem;
+  }
+
+  /* Category badge — absolute inside screen */
+  .categoryBadge {
+    top: 0.4rem;
+    left: 0.5rem;
+    font-size: 0.38rem;
+  }
+
+  /* 16:9 centered screen with gutters */
+  .screen {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 1.5rem);
+    margin: 0.5rem auto 0;
+    aspect-ratio: 16 / 9;
+    border-radius: 4px;
+    border: 1px solid rgb(102 167 170 / 10%);
+    background: rgb(7 11 16 / 82%);
+  }
+
+  .infoBar {
+    position: static;
+    inset: auto;
+    z-index: auto;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  /* Reset desktop absolute media to normal-flow flex child */
+  .mediaArea {
+    position: relative;
+    inset: auto;
+    width: auto;
+    height: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .detailsLink {
+    align-self: flex-start;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.72rem;
+  }
+
+  .projectTitle {
+    font-size: 0.82rem;
+    white-space: normal;
+  }
+
+  .projectSummary {
+    font-size: 0.65rem;
+    -webkit-line-clamp: 3;
+  }
+
+  .tags {
+    margin-top: 0.3rem;
+  }
+
+  .tag {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .projectCounterDesktop {
+    display: none;
+  }
+
+  /* Mobile project navigation row */
+  .mobileProjectNav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-block-start: 1px solid rgb(102 167 170 / 10%);
+  }
+
+  .mobileProjectCounter {
+    flex: 1;
+    margin: 0;
+    text-align: center;
+    color: rgb(246 240 229 / 50%);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Hide desktop-positioned project arrows */
+  .projectArrow {
+    display: none;
+  }
+
+  /* Screen arrows become visible on mobile */
+  .screenArrow {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+
+  .emptyState {
+    padding: 1.5rem;
+  }
+
+  .emptyCategory {
+    font-size: 0.82rem;
+  }
+
+  .emptyMessage {
+    font-size: 0.72rem;
+  }
+}
+
+/* ── Reduced Motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .dot::after,
+  .screenArrow,
+  .projectArrow,
+  .detailsLink {
+    transition: none;
+  }
+}

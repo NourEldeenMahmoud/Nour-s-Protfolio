@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
+  useEffect,
   useEffectEvent,
   useLayoutEffect,
   useRef,
@@ -11,14 +12,17 @@ import {
 } from "react";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/content/portfolio";
+import type { CategoryId } from "@/content/project-showcase";
 import { CaseStudyModal } from "./case-study-modal";
 import { CaseStudyPaperMap } from "./case-study-paper-map";
+import { CenterShowcase, type ShowcaseCopy } from "./center-showcase";
+import { CategoryIconsLayer } from "./category-icons-layer";
 import styles from "./room.module.css";
 
 const roomAreas = ["projects", "exploration", "lab"] as const;
 const focusStills = {
   projects: "/engineering-room-hire-straight.webp",
-  exploration: "/engineering-room-watch-straight.webp",
+  exploration: "/engineering-room-watch-contained-v2.webp",
   lab: "/engineering-room-learn-straight.webp",
 } as const;
 type RoomArea = (typeof roomAreas)[number];
@@ -45,6 +49,7 @@ type RoomCopy = {
       path: "hire" | "watch" | "general" | "learn";
     }
   >;
+  showcase: ShowcaseCopy;
 };
 
 export function RoomExperience({
@@ -74,6 +79,10 @@ export function RoomExperience({
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isIdle, setIsIdle] = useState(false);
   const [status, setStatus] = useState(copy.loading);
+  const [activeCategoryId, setActiveCategoryId] = useState<CategoryId>("web");
+  const [hoveredCategoryId, setHoveredCategoryId] = useState<CategoryId | null>(
+    null,
+  );
   const activeArea = hoveredArea ?? focusedArea;
 
   function clearAnimation() {
@@ -107,6 +116,20 @@ export function RoomExperience({
       // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: useLayoutEffect runs before paint
       setIsIdle(true);
       setStatus(copy.readyStatus);
+      return;
+    }
+
+    const focusParam =
+      new URLSearchParams(window.location.search).get("focus") ?? "";
+    if (focusParam && roomAreas.includes(focusParam as RoomArea)) {
+      const targetArea = focusParam as RoomArea;
+      window.history.replaceState(null, "", window.location.pathname);
+      clearAnimation();
+      if (rootRef.current) rootRef.current.dataset.roomState = "idle";
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: useLayoutEffect runs before paint
+      setIsIdle(true);
+      setStatus(copy.readyStatus);
+      requestAnimationFrame(() => transitionToArea(targetArea));
       return;
     }
 
@@ -302,10 +325,36 @@ export function RoomExperience({
     }
   }
 
+  /* ── Escape key exits focused area ── */
+  useEffect(() => {
+    if (focusedArea === null) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.defaultPrevented || event.key !== "Escape") return;
+      /* Don't close the room if an open <dialog> owns Escape. */
+      const dialog = document.querySelector<HTMLDialogElement>("dialog[open]");
+      if (dialog) return;
+      transitionToArea(null);
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [focusedArea, transitionToArea]);
+
   function focusArea(event: MouseEvent<HTMLAnchorElement>, area: RoomArea) {
     event.preventDefault();
-    if (!isIdle || (focusedArea !== null && focusedArea !== area)) return;
-    transitionToArea(focusedArea === area ? null : area);
+    if (!isIdle || focusedArea !== null) return;
+    transitionToArea(area);
+  }
+
+  function handleCategoryIconClick(categoryId: CategoryId) {
+    if (!isIdle || focusedArea !== null) return;
+    setActiveCategoryId(categoryId);
+    transitionToArea("exploration");
+  }
+
+  function handleCategoryIconHover(categoryId: CategoryId | null) {
+    setHoveredCategoryId(categoryId);
   }
 
   const alternateLocale = locale === "en" ? "ar" : "en";
@@ -471,6 +520,26 @@ export function RoomExperience({
         active={isIdle && focusedArea === "projects"}
         locale={locale}
         onOpen={setSelectedProject}
+      />
+
+      {isIdle && focusedArea === "exploration" && (
+        <CenterShowcase
+          locale={locale}
+          copy={copy.showcase}
+          activeCategoryId={activeCategoryId}
+          onCategoryChange={setActiveCategoryId}
+        />
+      )}
+
+      {/* Category icon 3D overlay — below showcase (z-index 5) */}
+      <CategoryIconsLayer
+        activeCategoryId={activeCategoryId}
+        focusedArea={focusedArea}
+        isIdle={isIdle}
+        isIntro={!isIdle && !focusedArea}
+        onCategoryClick={handleCategoryIconClick}
+        onCategoryHover={handleCategoryIconHover}
+        hoveredCategoryId={hoveredCategoryId}
       />
 
       {selectedProject && (
