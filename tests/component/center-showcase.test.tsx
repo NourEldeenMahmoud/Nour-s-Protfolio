@@ -28,18 +28,20 @@ const copy: ShowcaseCopy = {
   emptyState: "No published case study currently available.",
 };
 
-/** Return the desktop project arrow buttons (outside the screen panel). */
+/** Return a desktop project arrow button (inside the screen panel, disambiguated by data-project-arrow). */
 function getDesktopProjectArrow(name: string) {
-  const all = screen.getAllByRole("button", { name });
-  // Desktop arrows are siblings of the panel; mobile are inside it.
-  // The last match in DOM order is the desktop arrow.
-  return all[all.length - 1]!;
+  const panel = screen.getByRole("tabpanel");
+  const candidates = within(panel).getAllByRole("button", { name });
+  return candidates.find(
+    (el) => el.getAttribute("data-project-arrow") === "desktop",
+  )!;
 }
 
-/** Return the desktop project counter (outside the screen panel). */
+/** Return the desktop project counter (inside the screen panel). */
 function getDesktopProjectCounter() {
-  // Both counters have same text; the desktop one is the last <p> with that text.
-  const all = screen.getAllByText(/^\d+ of \d+$/);
+  const panel = screen.getByRole("tabpanel");
+  const all = within(panel).getAllByText(/^\d+ of \d+$/);
+  // The desktop counter is the last <p> with that text (mobile nav is before it).
   return all[all.length - 1]!;
 }
 
@@ -297,6 +299,55 @@ describe("CenterShowcase", () => {
     );
   });
 
+  /* ── Arrow SVG and direction tests ── */
+
+  it("project buttons contain SVGs and no Unicode triangle text", () => {
+    render(<CenterShowcase locale="en" copy={copy} />);
+
+    const prevBtn = getDesktopProjectArrow("Previous project");
+    const nextBtn = getDesktopProjectArrow("Next project");
+
+    // Both buttons must contain SVG elements
+    expect(prevBtn.querySelector("svg")).toBeInTheDocument();
+    expect(nextBtn.querySelector("svg")).toBeInTheDocument();
+
+    // No Unicode triangles should remain in button text
+    expect(prevBtn.textContent).not.toMatch(/[◀▶◁▷►▿▴◂]/);
+    expect(nextBtn.textContent).not.toMatch(/[◀▶◁▷►▿▴◂]/);
+  });
+
+  it("English project directions: prev=left, next=right via data-direction", () => {
+    render(<CenterShowcase locale="en" copy={copy} />);
+
+    const prevBtn = getDesktopProjectArrow("Previous project");
+    const nextBtn = getDesktopProjectArrow("Next project");
+
+    const prevSvg = prevBtn.querySelector("svg");
+    const nextSvg = nextBtn.querySelector("svg");
+
+    expect(prevSvg).toHaveAttribute("data-direction", "left");
+    expect(nextSvg).toHaveAttribute("data-direction", "right");
+  });
+
+  it("Arabic project directions: prev=right, next=left via data-direction", () => {
+    const arCopy: ShowcaseCopy = {
+      ...copy,
+      previousProject: "المشروع السابق",
+      nextProject: "المشروع التالي",
+    };
+
+    render(<CenterShowcase locale="ar" copy={arCopy} />);
+
+    const prevBtn = getDesktopProjectArrow("المشروع السابق");
+    const nextBtn = getDesktopProjectArrow("المشروع التالي");
+
+    const prevSvg = prevBtn.querySelector("svg");
+    const nextSvg = nextBtn.querySelector("svg");
+
+    expect(prevSvg).toHaveAttribute("data-direction", "right");
+    expect(nextSvg).toHaveAttribute("data-direction", "left");
+  });
+
   it("has an aria-live region for screen reader announcements", () => {
     render(<CenterShowcase locale="en" copy={copy} />);
 
@@ -313,6 +364,19 @@ describe("CenterShowcase", () => {
 
     await user.click(getDesktopProjectArrow("Next project"));
     expect(getDesktopProjectCounter()).toHaveTextContent("2 of 3");
+  });
+
+  it("desktop project arrows are inside role=tabpanel", () => {
+    render(<CenterShowcase locale="en" copy={copy} />);
+
+    const panel = screen.getByRole("tabpanel");
+    const prevBtn = getDesktopProjectArrow("Previous project");
+    const nextBtn = getDesktopProjectArrow("Next project");
+
+    expect(panel).toContainElement(prevBtn);
+    expect(panel).toContainElement(nextBtn);
+    expect(prevBtn).toHaveAttribute("data-project-arrow", "desktop");
+    expect(nextBtn).toHaveAttribute("data-project-arrow", "desktop");
   });
 
   /* ── Correction pass tests ── */

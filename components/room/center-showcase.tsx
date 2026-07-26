@@ -28,6 +28,39 @@ export type ShowcaseCopy = {
 
 type SlideDirection = "next" | "prev";
 
+/** Inline SVG chevron arrow — no external dependency. */
+function ChevronArrow({
+  direction,
+  "aria-hidden": ariaHidden = true,
+  focusable = false,
+}: {
+  direction: "left" | "right";
+  "aria-hidden"?: boolean;
+  focusable?: boolean;
+}) {
+  const d =
+    direction === "left"
+      ? "M15 4l-8 8 8 8"
+      : "M9 4l8 8-8 8";
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      width="1em"
+      height="1em"
+      aria-hidden={ariaHidden}
+      focusable={focusable}
+      data-direction={direction}
+    >
+      <path d={d} />
+    </svg>
+  );
+}
+
 /**
  * Resolves the localized project count string.
  * Falls back to "X of Y" plain text if pattern contains no placeholders.
@@ -191,10 +224,13 @@ export function CenterShowcase({
     tabs[nextIndex]?.click();
   }
 
-  /* ── RTL arrow icon mapping ── */
+  /* ── RTL arrow direction mapping ──
+   * English: previous=left chevron, next=right chevron
+   * Arabic:  previous=right chevron, next=left chevron
+   * Physical button positions remain fixed; only the chevron direction flips. */
 
-  const prevArrow = isRtl ? "\u25B6" : "\u25C0";
-  const nextArrow = isRtl ? "\u25C0" : "\u25B6";
+  const prevDir = isRtl ? "right" : "left";
+  const nextDir = isRtl ? "left" : "right";
 
   /* ── GSAP screen transition ── */
 
@@ -359,7 +395,7 @@ export function CenterShowcase({
                     aria-label={copy.previousMedia}
                     onClick={() => goToMedia("prev")}
                   >
-                    {prevArrow}
+                    <ChevronArrow direction={prevDir} />
                   </button>
                   <button
                     type="button"
@@ -367,7 +403,7 @@ export function CenterShowcase({
                     aria-label={copy.nextMedia}
                     onClick={() => goToMedia("next")}
                   >
-                    {nextArrow}
+                    <ChevronArrow direction={nextDir} />
                   </button>
                 </>
               )}
@@ -395,6 +431,30 @@ export function CenterShowcase({
               )}
             </div>
 
+            {/* Desktop project navigation arrows — inside screen as accessible DOM overlays */}
+            {hasMultipleProjects && (
+              <>
+                <button
+                  type="button"
+                  className={`${styles.projectArrow} ${styles.projectArrowPrev}`}
+                  aria-label={copy.previousProject}
+                  data-project-arrow="desktop"
+                  onClick={() => goToProject("prev")}
+                >
+                  <ChevronArrow direction={prevDir} />
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.projectArrow} ${styles.projectArrowNext}`}
+                  aria-label={copy.nextProject}
+                  data-project-arrow="desktop"
+                  onClick={() => goToProject("next")}
+                >
+                  <ChevronArrow direction={nextDir} />
+                </button>
+              </>
+            )}
+
             {/* Mobile project navigation — visible only on small viewports */}
             {hasMultipleProjects && (
               <div className={styles.mobileProjectNav}>
@@ -404,7 +464,7 @@ export function CenterShowcase({
                   aria-label={copy.previousProject}
                   onClick={() => goToProject("prev")}
                 >
-                  <span aria-hidden="true">{prevArrow}</span>
+                  <ChevronArrow direction={prevDir} />
                 </button>
                 <p className={styles.mobileProjectCounter}>
                   {resolveProjectCount(
@@ -419,7 +479,7 @@ export function CenterShowcase({
                   aria-label={copy.nextProject}
                   onClick={() => goToProject("next")}
                 >
-                  <span aria-hidden="true">{nextArrow}</span>
+                  <ChevronArrow direction={nextDir} />
                 </button>
               </div>
             )}
@@ -447,31 +507,6 @@ export function CenterShowcase({
           </div>
         )}
       </div>
-
-      {/* Project navigation arrows — aligned over physical circular arrow housings
-          The housings are baked into the Blender render and do not move for RTL.
-          Direction symbols and labels flip for RTL, but position percentages stay
-          fixed to match the rendered geometry. */}
-      {hasMultipleProjects && (
-        <>
-          <button
-            type="button"
-            className={`${styles.projectArrow} ${styles.projectArrowPrev}`}
-            aria-label={copy.previousProject}
-            onClick={() => goToProject("prev")}
-          >
-            <span aria-hidden="true">{prevArrow}</span>
-          </button>
-          <button
-            type="button"
-            className={`${styles.projectArrow} ${styles.projectArrowNext}`}
-            aria-label={copy.nextProject}
-            onClick={() => goToProject("next")}
-          >
-            <span aria-hidden="true">{nextArrow}</span>
-          </button>
-        </>
-      )}
 
       {/* Live region for screen reader status */}
       <div

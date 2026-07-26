@@ -2,13 +2,10 @@
    Authoritative Blender Explore GLB focus-render projection coordinates
    (Explore_Focus_Camera, 4200×2700, source aspect 1.5555556, shift_y +0.013):
    - Screen glass opening: left 26.9862%, top 21.1654%, right 26.9862%, bottom 43.7625%
-   - Arrow prev center: 28.5003%, 38.8630%
-   - Arrow next center: 71.4997%, 38.8630%
    - Pedestal ring centers y: 64.5200%
      Web 30.9199%, Game 40.4600%, Desktop 50%, Mobile 59.5400%, Bots 69.0801%
    Measurement method: Blender world_to_camera_view on named meshes
-   (SHOW_Screen_Glass for glass, SHOW_Nav_Prev_Body / SHOW_Nav_Next_Body
-    for arrows, SHOW_Pedestal_*_Ring for pedestal ring centers).
+   (SHOW_Screen_Glass for glass, SHOW_Pedestal_*_Ring for pedestal ring centers).
 */
 
 .showcase {
@@ -161,6 +158,13 @@
   background: rgb(102 167 170 / 15%);
 }
 
+.screenArrow > svg {
+  width: 42%;
+  height: 42%;
+  display: block;
+  pointer-events: none;
+}
+
 .screenArrowPrev {
   inset-inline-start: clamp(0.2rem, 0.4vw, 0.35rem);
 }
@@ -285,11 +289,15 @@
   background: rgb(102 167 170 / 20%);
 }
 
-/* ── Category Tabs (aligned over five physical pedestal rings) ── */
+/* ── Category Tabs (aligned over front plaques / pedestal base centers) ──
+   Tab Y is measured from Blender front pedestal-base/plaque centers at
+   bottom: 32.6926% (source by 67.3074%). This is distinct from the
+   ring/icon anchor centers at bottom: 35.48%. Tabs sit on plaques,
+   not on rings. */
 
 .tabs {
   position: absolute;
-  bottom: 35.4800%;
+  bottom: 32.6926%;
   left: 0;
   right: 0;
   pointer-events: auto;
@@ -307,7 +315,7 @@
   padding: 0.2rem clamp(0.35rem, 0.7vw, 0.6rem);
   border: 1px solid rgb(216 167 92 / 35%);
   border-radius: 4px;
-  background: rgb(7 11 16 / 55%);
+  background: rgb(7 11 16 / 84%);
   color: rgb(246 240 229 / 70%);
   font-family: var(--font-mono);
   font-size: clamp(0.5rem, 0.72vw, 0.68rem);
@@ -379,26 +387,26 @@
 }
 
 /* ── Project Navigation Arrows ──
-   Aligned over the measured physical arrow housings:
-   prev center 28.5003%, 38.8630%, next center 71.4997%, 38.8630% */
+   Screen-relative DOM overlays positioned at vertical center of .screen. */
 
 .projectArrow {
   position: absolute;
-  top: 38.8630%;
-  z-index: 10;
+  top: 50%;
+  z-index: 6;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(1.6rem, 2.8vw, 2.4rem);
-  height: clamp(1.6rem, 2.8vw, 2.4rem);
-  border: 1px solid rgb(216 167 92 / 25%);
+  width: clamp(2.75rem, 3.2vw, 3.25rem);
+  height: clamp(2.75rem, 3.2vw, 3.25rem);
+  border: 1px solid rgb(216 167 92 / 62%);
   border-radius: 50%;
-  background: rgb(7 11 16 / 45%);
-  color: rgb(246 240 229 / 50%);
-  font-size: clamp(0.6rem, 0.9vw, 0.85rem);
+  background: rgb(7 11 16 / 82%);
+  color: rgb(246 240 229 / 92%);
   cursor: pointer;
-  transform: translate(-50%, -50%);
-  text-shadow: 0 1px 4px rgb(0 0 0 / 50%);
+  transform: translateY(-50%);
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(246 240 229 / 8%);
   transition:
     color 200ms ease,
     border-color 200ms ease,
@@ -407,12 +415,21 @@
     transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.projectArrow > svg {
+  width: 42%;
+  height: 42%;
+  display: block;
+  pointer-events: none;
+}
+
 .projectArrow:hover {
-  color: rgb(246 240 229 / 85%);
-  border-color: rgb(216 167 92 / 50%);
-  background: rgb(7 11 16 / 60%);
-  box-shadow: 0 0 12px rgb(216 167 92 / 25%);
-  transform: translate(-50%, calc(-50% - 2px));
+  color: rgb(246 240 229 / 100%);
+  border-color: rgb(216 167 92 / 75%);
+  background: rgb(7 11 16 / 92%);
+  box-shadow:
+    0 2px 12px rgb(216 167 92 / 28%),
+    inset 0 1px 0 rgb(246 240 229 / 10%);
+  transform: translateY(calc(-50% - 2px));
 }
 
 .projectArrow:focus-visible {
@@ -422,15 +439,15 @@
   box-shadow:
     0 0 0 2px rgb(102 167 170 / 60%),
     0 0 12px rgb(102 167 170 / 20%);
-  transform: translate(-50%, calc(-50% - 2px));
+  transform: translateY(calc(-50% - 2px));
 }
 
 .projectArrowPrev {
-  left: 28.5003%;
+  inset-inline-start: clamp(0.5rem, 1.4vw, 1.25rem);
 }
 
 .projectArrowNext {
-  left: 71.4997%;
+  inset-inline-end: clamp(0.5rem, 1.4vw, 1.25rem);
 }
 
 /* ── Project Counter (desktop, inside screen) ── */
@@ -449,7 +466,7 @@
 
 /* ── Mobile Project Navigation ──
    Visible only on small viewports. Provides accessible project nav with >=44px
-   touch targets. Hidden on desktop where Blender-rendered housings are used. */
+   touch targets. Hidden on desktop where .projectArrow DOM overlays are used. */
 
 .mobileProjectNav {
   display: none;
@@ -478,6 +495,13 @@
   color: #fff;
   border-color: rgb(216 167 92 / 70%);
   background: rgb(216 167 92 / 15%);
+}
+
+.mobileProjectBtn > svg {
+  width: 42%;
+  height: 42%;
+  display: block;
+  pointer-events: none;
 }
 
 /* ── Empty State ── */

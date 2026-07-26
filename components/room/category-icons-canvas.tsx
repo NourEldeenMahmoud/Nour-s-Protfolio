@@ -14,12 +14,12 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { CategoryId } from "@/content/project-showcase";
 import type { ViewportAnchor } from "./category-icon-projections";
-import { CATEGORY_IDS } from "./category-icon-projections";
+import { CATEGORY_IDS, screenYToWorldY } from "./category-icon-projections";
 
 /* ── Constants ── */
 
 const MODEL_SCALE = 0.71; // ~6.6% further front-face reduction
-const DEPTH_SCALE = 3.0; // depth-axis extrusion — side faces clearly readable
+const DEPTH_SCALE = 1.65; // depth-axis extrusion — side faces readable, not exaggerated
 const BASE_Y_OFFSET = -7; // px — hover just above baked pedestal rings
 const FOCUS_DURATION = 1.1;
 const FLOAT_AMPLITUDE = 6; // 4–8 px idle float range
@@ -29,10 +29,6 @@ const HOVER_SCALE = 1.05;
 const ACTIVE_SCALE = 1.06;
 const TILT_X = 0.12;
 const EXPLORE_TILT_X = 0.04;
-/** Global front-direction correction — GLB icons already face the orthographic
- *  camera (−Z view) so no additive Y rotation is needed. Applied once,
- *  centrally. */
-const MODEL_FRONT_YAW = 0;
 
 /** Per-icon yaw in radians — hero state, converging inward ±6° at edges. */
 const HERO_YAW: Record<CategoryId, number> = {
@@ -90,8 +86,8 @@ function createAnimStates(): Record<CategoryId, IconAnimState> {
       hoverScale: 1,
       hoverFacing: 0,
       activeScale: 1,
-      emissiveIntensity: 0.012,
-      roughness: 0.48,
+      emissiveIntensity: 0.06,
+      roughness: 0.44,
     };
   }
   return s;
@@ -116,6 +112,7 @@ function IconMesh({
   animState,
   invalidate,
   onLoadError,
+  viewportHeight,
 }: {
   categoryId: CategoryId;
   heroAnchor: ViewportAnchor;
@@ -124,10 +121,11 @@ function IconMesh({
   animState: IconAnimState;
   invalidate: () => void;
   onLoadError: (id: CategoryId) => void;
+  viewportHeight: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group | null>(null);
-  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  const materialsRef = useRef<THREE.MeshStandardMaterial[]>([]);
   const loadedRef = useRef(false);
   const [loadFailed, setLoadFailed] = useState(false);
 
@@ -151,6 +149,7 @@ function IconMesh({
 
         // Clone material per mesh so each icon owns its own instance,
         // then apply dark room-matched metal treatment
+        const collected: THREE.MeshStandardMaterial[] = [];
         cloned.traverse((child) => {
           if (child instanceof THREE.Mesh) {
             const srcMat = child.material as THREE.Material;
@@ -161,22 +160,19 @@ function IconMesh({
 
             // Dark painted-metal / blue-black finish that responds to lighting
             if (mat instanceof THREE.MeshStandardMaterial) {
-              mat.color.multiplyScalar(0.55);
-              mat.metalness = 0.52;
-              mat.roughness = 0.48;
-              mat.emissive.set(0x0a0f18);
-              mat.emissiveIntensity = 0.012;
-            }
-
-            // Store the first mesh material for GSAP emphasis tweens
-            if (
-              !materialRef.current &&
-              mat instanceof THREE.MeshStandardMaterial
-            ) {
-              materialRef.current = mat;
+              mat.color.multiplyScalar(0.82);
+              mat.metalness = 0.30;
+              mat.roughness = 0.44;
+              // Warm cream emissive derived from source color
+              const src = mat.color.clone();
+              const warm = new THREE.Color(0xffd2a1);
+              mat.emissive.copy(src.lerp(warm, 0.40));
+              mat.emissiveIntensity = 0.06;
+              collected.push(mat);
             }
           }
         });
+        materialsRef.current = collected;
 
         modelRef.current = cloned;
         groupRef.current?.add(cloned);
@@ -196,10 +192,13 @@ function IconMesh({
     };
   }, [categoryId, loader, invalidate, loadFailed, onLoadError]);
 
-  /* ── Dispose cloned materials on unmount (not shared geometry) ── */
+  /* ── Dispose cloned materials on unmount (not shared geometry).
+     Read refs inside the cleanup callback so we always see the live value
+     at teardown time — the GLB load is async and may not have finished
+     when the effect first runs. ── */
   useEffect(() => {
-    const model = modelRef.current;
     return () => {
+      const model = modelRef.current;
       if (model) {
         model.traverse((child) => {
           if (child instanceof THREE.Mesh) {
@@ -208,6 +207,7 @@ function IconMesh({
         });
         modelRef.current = null;
       }
+      materialsRef.current = [];
     };
   }, []);
 
@@ -217,7 +217,6 @@ function IconMesh({
   /* ── Apply transforms from refs (driven by GSAP tweens in Scene) ── */
   useFrame(() => {
     const group = groupRef.current;
-    const mat = materialRef.current;
     if (!group) return;
 
     const t = focusProgressRef.current;
@@ -227,16 +226,12 @@ function IconMesh({
     const baseScale = displayH * animState.hoverScale * animState.activeScale;
     const px = heroAnchor.px + (exploreAnchor.px - heroAnchor.px) * t;
 
-    // Bottom-anchored with local pedestal offset
-    group.position.set(
-      px,
-      pb -
-        displayH / 2 +
-        BASE_Y_OFFSET +
-        animState.floatY -
-        animState.hoverLift,
-      0,
-    );
+    // Screen-center Y of the icon (CSS screen-space, top=0)
+    const screenCenterY = pb - displayH / 2 + BASE_Y_OFFSET + animState.floatY - animState.hoverLift;
+    // Convert CSS screen Y → Three.js Y-up world coordinate
+    const worldY = screenYToWorldY(screenCenterY, viewportHeight);
+
+    group.position.set(px, worldY, 0);
 
     // Per-icon yaw interpolated between hero and explore orientations,
     // composed with idle sway and hover facing offset
@@ -246,17 +241,18 @@ function IconMesh({
       (EXPLORE_YAW[categoryId] - HERO_YAW[categoryId]) * t;
     group.rotation.set(
       xTilt,
-      MODEL_FRONT_YAW + baseYaw + animState.floatRotY + animState.hoverFacing,
+      baseYaw + animState.floatRotY + animState.hoverFacing,
       0,
     );
 
     // Uniform XY scale × depth-extruded Z scale
     group.scale.set(baseScale, baseScale, baseScale * DEPTH_SCALE);
 
-    // Material emphasis — driven by GSAP tweens via animState
-    if (mat) {
-      mat.emissiveIntensity = animState.emissiveIntensity;
-      mat.roughness = animState.roughness;
+    // Material emphasis — driven by GSAP tweens via animState, applied to ALL materials
+    const mats = materialsRef.current;
+    for (let i = 0; i < mats.length; i++) {
+      mats[i]!.emissiveIntensity = animState.emissiveIntensity;
+      mats[i]!.roughness = animState.roughness;
     }
   });
 
@@ -272,7 +268,8 @@ function Scene({
   activeCategoryId,
   hoveredCategoryId,
   reducedMotion = false,
-}: Omit<CategoryIconsCanvasProps, "viewportWidth" | "viewportHeight">) {
+  viewportHeight,
+}: Omit<CategoryIconsCanvasProps, "viewportWidth">) {
   const invalidate = useThree((s) => s.invalidate);
   const focusProgressRef = useRef(0);
   const animStates = useMemo(() => createAnimStates(), []);
@@ -362,7 +359,7 @@ function Scene({
         animStates[id].hoverLift = isHov ? HOVER_LIFT : 0;
         animStates[id].hoverScale = isHov ? HOVER_SCALE : 1;
         animStates[id].hoverFacing = isHov ? -HERO_YAW[id] * 0.6 : 0;
-        animStates[id].emissiveIntensity = isHov ? 0.04 : 0.012;
+        animStates[id].emissiveIntensity = isHov ? 0.13 : 0.06;
       }
       invalidate();
       return;
@@ -374,7 +371,7 @@ function Scene({
           hoverLift: isHov ? HOVER_LIFT : 0,
           hoverScale: isHov ? HOVER_SCALE : 1,
           hoverFacing: isHov ? -HERO_YAW[id] * 0.6 : 0,
-          emissiveIntensity: isHov ? 0.04 : 0.012,
+          emissiveIntensity: isHov ? 0.13 : 0.06,
           duration: 0.35,
           ease: "power2.out",
           overwrite: "auto",
@@ -391,8 +388,8 @@ function Scene({
         const isAct = activeCategoryId === id;
         // eslint-disable-next-line react-hooks/immutability -- animStates is the mutable animation state machine
         animStates[id].activeScale = isAct ? ACTIVE_SCALE : 1;
-        animStates[id].emissiveIntensity = isAct ? 0.07 : 0.012;
-        animStates[id].roughness = isAct ? 0.42 : 0.48;
+        animStates[id].emissiveIntensity = isAct ? 0.19 : 0.06;
+        animStates[id].roughness = isAct ? 0.40 : 0.44;
       }
       invalidate();
       return;
@@ -402,8 +399,8 @@ function Scene({
         const isAct = activeCategoryId === id;
         gsap.to(animStates[id], {
           activeScale: isAct ? ACTIVE_SCALE : 1,
-          emissiveIntensity: isAct ? 0.07 : 0.012,
-          roughness: isAct ? 0.42 : 0.48,
+          emissiveIntensity: isAct ? 0.19 : 0.06,
+          roughness: isAct ? 0.40 : 0.44,
           duration: 0.35,
           ease: "power2.out",
           overwrite: "auto",
@@ -418,15 +415,18 @@ function Scene({
 
   return (
     <>
-      <ambientLight intensity={0.2} color={0xd0d8e8} />
+      <hemisphereLight
+        args={[0xb8c8d8, 0x3a2a1a, 0.42]}
+      />
+      <ambientLight intensity={0.14} color={0xd0d8e8} />
       <directionalLight
-        position={[180, -120, 300]}
-        intensity={0.85}
+        position={[160, -80, 420]}
+        intensity={0.95}
         color={0xffe4c0}
       />
       <directionalLight
-        position={[-150, 80, -200]}
-        intensity={0.35}
+        position={[-140, 90, -220]}
+        intensity={0.28}
         color={0xa8c0d8}
       />
 
@@ -440,6 +440,7 @@ function Scene({
           animState={animStates[id]}
           invalidate={invalidate}
           onLoadError={handleLoadError}
+          viewportHeight={viewportHeight}
         />
       ))}
     </>
@@ -495,8 +496,8 @@ export default function CategoryIconsCanvas({
       camera={{
         left: 0,
         right: viewportWidth,
-        top: 0,
-        bottom: viewportHeight,
+        top: viewportHeight,
+        bottom: 0,
         near: -1000,
         far: 1000,
         position: [0, 0, 500],
@@ -513,7 +514,7 @@ export default function CategoryIconsCanvas({
         gl.setClearColor(0x000000, 0);
       }}
     >
-      <Scene {...sceneProps} />
+      <Scene {...sceneProps} viewportHeight={viewportHeight} />
     </Canvas>
   );
 }

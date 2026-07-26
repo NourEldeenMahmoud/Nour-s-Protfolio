@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   sourceToViewport,
+  screenYToWorldY,
   HERO_ANCHORS,
   EXPLORE_ANCHORS,
   CATEGORY_IDS,
@@ -83,6 +84,57 @@ describe("category-icon-projections", () => {
         // pb should be greater than the midpoint (pb - ph/2)
         expect(result.pb).toBeGreaterThan(result.pb - result.ph);
       }
+    });
+  });
+
+  /* ── screenYToWorldY ── */
+
+  describe("screenYToWorldY", () => {
+    it("maps screen Y = 0 (top) to world Y = viewportHeight", () => {
+      expect(screenYToWorldY(0, 1080)).toBe(1080);
+    });
+
+    it("maps screen Y = viewportHeight (bottom) to world Y = 0", () => {
+      expect(screenYToWorldY(1080, 1080)).toBe(0);
+    });
+
+    it("maps screen Y = viewportHeight/2 (center) to world Y = viewportHeight/2", () => {
+      expect(screenYToWorldY(540, 1080)).toBe(540);
+    });
+
+    it("increasing screenY decreases worldY", () => {
+      const vpH = 1080;
+      expect(screenYToWorldY(100, vpH)).toBeGreaterThan(screenYToWorldY(200, vpH));
+      expect(screenYToWorldY(200, vpH)).toBeGreaterThan(screenYToWorldY(800, vpH));
+    });
+
+    it("subtracting positive hover lift from screenY produces a larger (upward) worldY", () => {
+      const vpH = 1080;
+      const baseScreenY = 600;
+      const hoverLift = 8;
+      const withoutLift = screenYToWorldY(baseScreenY, vpH);
+      const withLift = screenYToWorldY(baseScreenY - hoverLift, vpH);
+      // Subtracting lift from screenY means the icon appears higher on screen,
+      // which in Y-up world space is a larger worldY value
+      expect(withLift).toBeGreaterThan(withoutLift);
+      expect(withLift - withoutLift).toBeCloseTo(hoverLift);
+    });
+
+    it("works with 1366×768 viewport", () => {
+      expect(screenYToWorldY(0, 768)).toBe(768);
+      expect(screenYToWorldY(768, 768)).toBe(0);
+    });
+
+    it("works with a tall viewport (1440 height)", () => {
+      const vpH = 1440;
+      expect(screenYToWorldY(0, vpH)).toBe(vpH);
+      expect(screenYToWorldY(vpH, vpH)).toBe(0);
+    });
+
+    it("works just above the 780px mobile breakpoint", () => {
+      const vpH = 781;
+      expect(screenYToWorldY(0, vpH)).toBe(vpH);
+      expect(screenYToWorldY(vpH, vpH)).toBe(0);
     });
   });
 

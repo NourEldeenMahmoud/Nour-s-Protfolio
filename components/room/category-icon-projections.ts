@@ -57,6 +57,15 @@ export const CATEGORY_IDS: CategoryId[] = [
 ];
 
 /**
+ * Convert a CSS screen Y coordinate (0 = top) into a Three.js Y-up world
+ * coordinate for the orthographic camera (top = viewportHeight, bottom = 0).
+ * This inverts the CSS screen-space Y axis so geometry renders upright.
+ */
+export function screenYToWorldY(screenY: number, viewportHeight: number): number {
+  return viewportHeight - screenY;
+}
+
+/**
  * Convert a source-normalized bottom-based anchor into viewport pixel
  * coordinates under centered object-fit:cover layout.
  *
