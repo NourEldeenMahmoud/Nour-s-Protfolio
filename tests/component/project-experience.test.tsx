@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProjectExperience } from "@/components/projects/project-experience";
-import { getProject, getProjectMedia } from "@/content/portfolio";
+import { getProject, getProjectDetailMedia } from "@/content/portfolio";
 
 vi.mock("gsap", () => ({
   gsap: {
@@ -88,7 +88,7 @@ describe("ProjectExperience", () => {
     render(<ProjectExperience locale="en" project={buildsense} />);
 
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(getProjectMedia(buildsense).length);
+    expect(tabs).toHaveLength(getProjectDetailMedia(buildsense).length);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tabpanel")).toHaveAttribute(
       "aria-labelledby",
@@ -159,7 +159,7 @@ describe("ProjectExperience", () => {
 
     expect(
       screen.getByRole("link", { name: /Previous project/ }),
-    ).toHaveAttribute("href", "/en/projects/cinemaverse");
+    ).toHaveAttribute("href", "/en/projects/met-summaries");
     expect(screen.getByRole("link", { name: /Next project/ })).toHaveAttribute(
       "href",
       "/en/projects/bookify",

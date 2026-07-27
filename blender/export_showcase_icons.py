@@ -22,7 +22,7 @@ SOURCE_ROOTS = {
     "game-development": "SHOW_Icon_GAME",
     "desktop": "SHOW_Icon_DESKTOP",
     "mobile-applications": "SHOW_Icon_MOBILE",
-    "bots": "SHOW_Icon_BOTS",
+    "summaries": "SHOW_Icon_SUMMARIES",
 }
 GLTF_Y_UP_PRE_ROTATION = Matrix.Rotation(1.5707963267948966, 4, "X")
 

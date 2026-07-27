@@ -35,7 +35,7 @@ export const HERO_ANCHORS: Record<CategoryId, Anchor> = {
   "game-development": { cx: 0.442644, by: 0.544987, h: 0.033884 },
   desktop: { cx: 0.5, by: 0.549245, h: 0.042451 },
   "mobile-applications": { cx: 0.557356, by: 0.552542, h: 0.049089 },
-  bots: { cx: 0.61447, by: 0.547117, h: 0.038168 },
+  summaries: { cx: 0.61447, by: 0.547117, h: 0.038168 },
 };
 
 /** Authoritative bottom/height anchors from Blender Explore GLB focus render. */
@@ -44,7 +44,7 @@ export const EXPLORE_ANCHORS: Record<CategoryId, Anchor> = {
   "game-development": { cx: 0.4046, by: 0.6452, h: 0.05811 },
   desktop: { cx: 0.5, by: 0.6452, h: 0.073282 },
   "mobile-applications": { cx: 0.5954, by: 0.6452, h: 0.084937 },
-  bots: { cx: 0.690801, by: 0.6452, h: 0.065694 },
+  summaries: { cx: 0.690801, by: 0.6452, h: 0.065694 },
 };
 
 /** Ordered list of all category IDs (matches tab order). */
@@ -53,7 +53,7 @@ export const CATEGORY_IDS: CategoryId[] = [
   "game-development",
   "desktop",
   "mobile-applications",
-  "bots",
+  "summaries",
 ];
 
 /**

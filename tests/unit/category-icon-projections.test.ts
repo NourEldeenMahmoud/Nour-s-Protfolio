@@ -234,8 +234,8 @@ describe("category-icon-projections", () => {
       expect(hero.px).toBeCloseTo(vpW / 2, -1);
     });
 
-    it("bots icon in hero state is right of center", () => {
-      const hero = sourceToViewport(HERO_ANCHORS.bots, vpW, vpH);
+    it("summaries icon in hero state is right of center", () => {
+      const hero = sourceToViewport(HERO_ANCHORS.summaries, vpW, vpH);
       expect(hero.px).toBeGreaterThan(vpW / 2);
     });
 

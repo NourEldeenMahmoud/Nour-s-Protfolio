@@ -35,7 +35,7 @@ const HERO_YAW: Record<CategoryId, number> = {
   "game-development": THREE.MathUtils.degToRad(3),
   desktop: 0,
   "mobile-applications": THREE.MathUtils.degToRad(-3),
-  bots: THREE.MathUtils.degToRad(-6),
+  summaries: THREE.MathUtils.degToRad(-6),
 };
 
 const EXPLORE_YAW: Record<CategoryId, number> = {
@@ -43,7 +43,7 @@ const EXPLORE_YAW: Record<CategoryId, number> = {
   "game-development": THREE.MathUtils.degToRad(1.75),
   desktop: 0,
   "mobile-applications": THREE.MathUtils.degToRad(-1.75),
-  bots: THREE.MathUtils.degToRad(-3.5),
+  summaries: THREE.MathUtils.degToRad(-3.5),
 };
 
 const FLOAT_PHASES = [0.08, 0.42, 0.73, 0.25, 0.61];
@@ -52,7 +52,7 @@ const HIT_WIDTHS: Record<CategoryId, number> = {
   "game-development": 1.5,
   desktop: 1.22,
   "mobile-applications": 0.86,
-  bots: 1.28,
+  summaries: 1.28,
 };
 
 export type CategoryIconsCanvasProps = {
@@ -64,7 +64,7 @@ export type CategoryIconsCanvasProps = {
   activeCategoryId: CategoryId;
   hoveredCategoryId?: CategoryId | null;
   focusedCategoryId?: CategoryId | null;
-  eventSource?: HTMLElement | null;
+  eventSourceRef?: React.RefObject<HTMLElement | null>;
   onCategoryClick?: (id: CategoryId) => void;
   onCategoryHover?: (id: CategoryId | null) => void;
   reducedMotion?: boolean;
@@ -711,7 +711,7 @@ class CanvasErrorBoundary extends Component<
 export default function CategoryIconsCanvas({
   viewportWidth,
   viewportHeight,
-  eventSource,
+  eventSourceRef,
   ...sceneProps
 }: CategoryIconsCanvasProps) {
   return (
@@ -727,7 +727,7 @@ export default function CategoryIconsCanvas({
         position: [0, 0, 500],
       }}
       dpr={CATEGORY_ICONS_DPR}
-      eventSource={eventSource ?? undefined}
+      eventSource={eventSourceRef as unknown as React.RefObject<HTMLElement>}
       eventPrefix="client"
       frameloop="demand"
       gl={{

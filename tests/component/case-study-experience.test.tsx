@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CaseStudyExperience } from "@/components/case-studies/case-study-experience";
 import { CaseStudyModal } from "@/components/room/case-study-modal";
 import { CaseStudyPaperMap } from "@/components/room/case-study-paper-map";
-import { caseStudies, getCaseStudy } from "@/content/case-studies";
-import { getProject, projectSlugs, type Project } from "@/content/portfolio";
+import { caseStudies, caseStudySlugs, getCaseStudy, hasCaseStudy } from "@/content/case-studies";
+import { getProject, type Project } from "@/content/portfolio";
 
 class MockIntersectionObserver {
   observe = vi.fn();
@@ -58,24 +58,28 @@ describe("Project Case Study", () => {
     vi.unstubAllGlobals();
   });
 
-  it("provides a separate verified case-study record for every published project", () => {
-    expect(Object.keys(caseStudies).sort()).toEqual([...projectSlugs].sort());
-    for (const slug of projectSlugs) {
+  it("provides a separate verified case-study record for projects with case studies", () => {
+    expect(Object.keys(caseStudies).sort()).toEqual([...caseStudySlugs].sort());
+    for (const slug of caseStudySlugs) {
       const study = getCaseStudy(slug)!;
       expect(study.projectSlug).toBe(slug);
       expect(study.problem.en).not.toHaveLength(0);
       expect(study.architecture.nodes.length).toBeGreaterThan(2);
       expect(study.evidence.length).toBeGreaterThan(0);
+      expect(hasCaseStudy(slug)).toBe(true);
     }
+    expect(hasCaseStudy("how-to-train-your-ai")).toBe(false);
+    expect(hasCaseStudy("met-summaries")).toBe(false);
   });
 
   it("presents BuildSense as a problem-first technical investigation", () => {
     const project = getProject("buildsense")!;
+    const study = getCaseStudy("buildsense")!;
     render(
       <CaseStudyExperience
         locale="en"
         project={project}
-        study={caseStudies.buildsense}
+        study={study}
       />,
     );
 
@@ -83,7 +87,7 @@ describe("Project Case Study", () => {
       screen.getByRole("heading", { level: 1, name: "BuildSense" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(caseStudies.buildsense.problem.en),
+      screen.getByText(study.problem.en),
     ).toBeInTheDocument();
     expect(screen.getByText(project.contribution.en)).toBeInTheDocument();
     expect(screen.getByText(project.limitation.en)).toBeInTheDocument();
@@ -111,11 +115,12 @@ describe("Project Case Study", () => {
 
   it("hides optional sections when repository evidence does not support them", () => {
     const project = getProject("dvld")!;
+    const study = getCaseStudy("dvld")!;
     render(
       <CaseStudyExperience
         locale="en"
         project={project}
-        study={caseStudies.dvld}
+        study={study}
       />,
     );
 
@@ -131,11 +136,12 @@ describe("Project Case Study", () => {
 
   it("localizes the investigation system and route actions for Arabic", () => {
     const project = getProject("bookify")!;
+    const study = getCaseStudy("bookify")!;
     render(
       <CaseStudyExperience
         locale="ar"
         project={project}
-        study={caseStudies.bookify}
+        study={study}
       />,
     );
 
@@ -173,8 +179,9 @@ describe("Project Case Study", () => {
     expect(
       screen.getByRole("link", { name: /Project Details/ }),
     ).toHaveAttribute("href", "/en/case-studies/buildsense");
+    const study = getCaseStudy("buildsense")!;
     expect(
-      screen.getByText(caseStudies.buildsense.problem.en),
+      screen.getByText(study.problem.en),
     ).toBeInTheDocument();
     expect(screen.getByText("Core technologies")).toBeInTheDocument();
     expect(screen.queryByText("Engineering shape")).not.toBeInTheDocument();

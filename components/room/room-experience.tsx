@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
+  useCallback,
   useEffect,
   useEffectEvent,
   useLayoutEffect,
@@ -105,6 +106,37 @@ export function RoomExperience({
 
   const completeIntroAfterEffect = useEffectEvent(completeIntro);
 
+  const transitionToArea = useCallback(
+    (nextArea: RoomArea | null) => {
+      setFocusedArea(nextArea);
+      setHoveredArea(null);
+      setStatus(nextArea ? `${copy.areas[nextArea].label}.` : copy.readyStatus);
+      if (rootRef.current) {
+        rootRef.current.dataset.roomState = nextArea ? "focused" : "idle";
+        const focusStills = rootRef.current.querySelectorAll<HTMLElement>(
+          `.${styles.focusStill}`,
+        );
+        focusStills.forEach((still) => {
+          const currentOpacity = getComputedStyle(still).opacity;
+          const targetOpacity = still.dataset.focusStill === nextArea ? 1 : 0;
+          still.getAnimations().forEach((animation) => animation.cancel());
+          still.style.opacity = currentOpacity;
+          const animation = still.animate(
+            [{ opacity: currentOpacity }, { opacity: targetOpacity }],
+            {
+              duration: 1100,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            },
+          );
+          animation.onfinish = () => {
+            still.style.opacity = String(targetOpacity);
+          };
+        });
+      }
+    },
+    [copy.areas, copy.readyStatus],
+  );
+
   useLayoutEffect(() => {
     if (!imageReady) return;
 
@@ -129,7 +161,6 @@ export function RoomExperience({
       window.history.replaceState(null, "", window.location.pathname);
       clearAnimation();
       if (rootRef.current) rootRef.current.dataset.roomState = "idle";
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: useLayoutEffect runs before paint
       setIsIdle(true);
       setStatus(copy.readyStatus);
       requestAnimationFrame(() => transitionToArea(targetArea));
@@ -284,7 +315,7 @@ export function RoomExperience({
       cancelled = true;
       clearAnimation();
     };
-  }, [copy.introStatus, copy.readyStatus, imageReady, run]);
+  }, [copy.introStatus, copy.readyStatus, imageReady, run, transitionToArea]);
 
   function replayIntro() {
     clearAnimation();
@@ -298,34 +329,6 @@ export function RoomExperience({
     setHoveredArea(null);
     setFocusedArea(null);
     setRun((value) => value + 1);
-  }
-
-  function transitionToArea(nextArea: RoomArea | null) {
-    setFocusedArea(nextArea);
-    setHoveredArea(null);
-    setStatus(nextArea ? `${copy.areas[nextArea].label}.` : copy.readyStatus);
-    if (rootRef.current) {
-      rootRef.current.dataset.roomState = nextArea ? "focused" : "idle";
-      const focusStills = rootRef.current.querySelectorAll<HTMLElement>(
-        `.${styles.focusStill}`,
-      );
-      focusStills.forEach((still) => {
-        const currentOpacity = getComputedStyle(still).opacity;
-        const targetOpacity = still.dataset.focusStill === nextArea ? 1 : 0;
-        still.getAnimations().forEach((animation) => animation.cancel());
-        still.style.opacity = currentOpacity;
-        const animation = still.animate(
-          [{ opacity: currentOpacity }, { opacity: targetOpacity }],
-          {
-            duration: 1100,
-            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-          },
-        );
-        animation.onfinish = () => {
-          still.style.opacity = String(targetOpacity);
-        };
-      });
-    }
   }
 
   /* ── Escape key exits focused area ── */
@@ -547,7 +550,7 @@ export function RoomExperience({
         onCategoryHover={handleCategoryIconHover}
         hoveredCategoryId={hoveredCategoryId}
         focusedCategoryId={focusedCategoryId}
-        eventSource={rootRef.current}
+        eventSourceRef={rootRef}
       />
 
       {selectedProject && (

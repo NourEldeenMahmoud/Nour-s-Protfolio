@@ -1,8 +1,12 @@
 import type { Locale } from "@/i18n/routing";
-import { getProjectMedia, type Project } from "@/content/portfolio";
+import { getProjectPreviewMedia, type Project } from "@/content/portfolio";
 
 export type CategoryId =
-  "web" | "game-development" | "desktop" | "mobile-applications" | "bots";
+  | "web"
+  | "game-development"
+  | "desktop"
+  | "mobile-applications"
+  | "summaries";
 
 export type MediaItem = {
   type: "image" | "video";
@@ -24,16 +28,23 @@ export const categories: ShowcaseCategory[] = [
   {
     id: "web",
     label: { en: "Web", ar: "ويب" },
-    projectSlugs: ["buildsense", "bookify", "cinemaverse"],
+    projectSlugs: [
+      "buildsense",
+      "cinemaverse",
+      "bookify",
+      "frontend-mini-projects",
+    ],
   },
   {
     id: "game-development",
     label: { en: "Game Dev", ar: "تطوير ألعاب" },
-    projectSlugs: [],
-    emptyCopy: {
-      en: "No published case study currently available.",
-      ar: "لا توجد دراسة حالة منشورة متاحة حالياً.",
-    },
+    projectSlugs: [
+      "how-to-train-your-ai",
+      "sharp-shooter",
+      "royal-run",
+      "galaxy-strike",
+      "rocket-boost",
+    ],
   },
   {
     id: "desktop",
@@ -46,22 +57,17 @@ export const categories: ShowcaseCategory[] = [
     projectSlugs: ["blood-bank-mobile"],
   },
   {
-    id: "bots",
-    label: { en: "Bots", ar: "بوتات" },
-    projectSlugs: [],
-    emptyCopy: {
-      en: "No published case study currently available.",
-      ar: "لا توجد دراسة حالة منشورة متاحة حالياً.",
-    },
+    id: "summaries",
+    label: { en: "Summaries", ar: "ملخصات" },
+    projectSlugs: ["met-summaries"],
   },
 ];
 
 /**
- * Build media items from a portfolio project's primary image + gallery.
- * Returns a non-empty array: at minimum the primary image.
+ * Build preview media items for Center Showcase player.
  */
 export function buildMediaItems(project: Project): MediaItem[] {
-  return getProjectMedia(project).map(({ type, src, alt, poster }) => ({
+  return getProjectPreviewMedia(project).map(({ type, src, alt, poster }) => ({
     type,
     src,
     alt,

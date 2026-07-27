@@ -12,11 +12,12 @@ import {
   type PointerEvent,
 } from "react";
 import {
-  getProjectMedia,
+  getProjectDetailMedia,
   projects,
   type Project,
   type ProjectMedia,
 } from "@/content/portfolio";
+import { hasCaseStudy } from "@/content/case-studies";
 import type { Locale } from "@/i18n/routing";
 import styles from "./project-experience.module.css";
 
@@ -124,10 +125,17 @@ const copy = {
 const categoryMap: Record<string, Record<Locale, string>> = {
   buildsense: { en: "Web product", ar: "منتج ويب" },
   bookify: { en: "Hotel reservation", ar: "حجز الفنادق" },
-  "blood-bank-desktop": { en: "Desktop operations", ar: "عمليات مكتبية" },
-  "blood-bank-mobile": { en: "Mobile experience", ar: "تجربة موبايل" },
-  dvld: { en: "Desktop system", ar: "نظام مكتبي" },
   cinemaverse: { en: "Cinema booking", ar: "حجز السينما" },
+  "frontend-mini-projects": { en: "Landing pages collection", ar: "مجموعة صفحات هبوط" },
+  "how-to-train-your-ai": { en: "Unity ML-Agents game", ar: "لعبة Unity ML-Agents" },
+  "sharp-shooter": { en: "Unity FPS game", ar: "لعبة تصويب Unity" },
+  "royal-run": { en: "Unity endless runner", ar: "لعبة ركض لانهائي Unity" },
+  "galaxy-strike": { en: "Unity space shooter", ar: "لعبة إطلاق نار فضائية Unity" },
+  "rocket-boost": { en: "Unity physics platformer", ar: "لعبة منصات فيزياء Unity" },
+  "blood-bank-desktop": { en: "Desktop operations", ar: "عمليات مكتبية" },
+  dvld: { en: "Desktop system", ar: "نظام مكتبي" },
+  "blood-bank-mobile": { en: "Mobile experience", ar: "تجربة موبايل" },
+  "met-summaries": { en: "Academic notes collection", ar: "مجموعة ملاحظات أكاديمية" },
 };
 
 function ProjectVisual({
@@ -183,7 +191,7 @@ export function ProjectExperience({
   const rootRef = useRef<HTMLElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const pointerStart = useRef<number | null>(null);
-  const media = getProjectMedia(project);
+  const media = getProjectDetailMedia(project);
   const [activeSection, setActiveSection] = useState("overview");
   const [activeExperience, setActiveExperience] = useState(0);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
@@ -490,10 +498,12 @@ export function ProjectExperience({
                   {c.demo} <span aria-hidden="true">↗</span>
                 </a>
               )}
-              <Link href={`/${locale}/case-studies/${project.slug}`}>
-                {c.caseStudy}{" "}
-                <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
-              </Link>
+              {hasCaseStudy(project.slug) && (
+                <Link href={`/${locale}/case-studies/${project.slug}`}>
+                  {c.caseStudy}{" "}
+                  <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

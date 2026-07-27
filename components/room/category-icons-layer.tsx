@@ -40,7 +40,7 @@ const FALLBACK_SVG_PATHS: Record<CategoryId, string> = {
   desktop: "/models/showcase-icons/fallback/desktop.svg",
   "mobile-applications":
     "/models/showcase-icons/fallback/mobile-applications.svg",
-  bots: "/models/showcase-icons/fallback/bots.svg",
+  summaries: "/models/showcase-icons/fallback/summaries.svg",
 };
 
 /* ── Lazy Canvas + Error Boundary ── */
@@ -71,7 +71,7 @@ export type CategoryIconsLayerProps = {
   onCategoryHover?: (id: CategoryId | null) => void;
   hoveredCategoryId?: CategoryId | null;
   focusedCategoryId?: CategoryId | null;
-  eventSource?: HTMLElement | null;
+  eventSourceRef?: React.RefObject<HTMLElement | null>;
 };
 
 /**
@@ -94,7 +94,7 @@ export function CategoryIconsLayer({
   onCategoryHover,
   hoveredCategoryId,
   focusedCategoryId,
-  eventSource,
+  eventSourceRef,
 }: CategoryIconsLayerProps) {
   const [capability, setCapability] = useState<CapabilityState>("pending");
   const [viewportSize, setViewportSize] = useState({ w: 0, h: 0 });
@@ -246,7 +246,7 @@ export function CategoryIconsLayer({
               activeCategoryId={activeCategoryId}
               hoveredCategoryId={hoveredCategoryId}
               focusedCategoryId={focusedCategoryId}
-              eventSource={eventSource}
+              eventSourceRef={eventSourceRef}
               onCategoryClick={onCategoryClick}
               onCategoryHover={onCategoryHover}
               reducedMotion={motionPolicy.effectiveReducedMotion}

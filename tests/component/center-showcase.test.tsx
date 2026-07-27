@@ -132,12 +132,17 @@ describe("CenterShowcase", () => {
     // Use desktop arrow to navigate
     await user.click(getDesktopProjectArrow("Next project"));
     expect(
+      screen.getByRole("heading", { name: "CinemaVerse" }),
+    ).toBeInTheDocument();
+
+    await user.click(getDesktopProjectArrow("Next project"));
+    expect(
       screen.getByRole("heading", { name: "Bookify Hotel Reservation System" }),
     ).toBeInTheDocument();
 
     await user.click(getDesktopProjectArrow("Next project"));
     expect(
-      screen.getByRole("heading", { name: "CinemaVerse" }),
+      screen.getByRole("heading", { name: "Frontend Mini Projects" }),
     ).toBeInTheDocument();
 
     // Wraps around
@@ -153,7 +158,7 @@ describe("CenterShowcase", () => {
 
     await user.click(getDesktopProjectArrow("Previous project"));
     expect(
-      screen.getByRole("heading", { name: "CinemaVerse" }),
+      screen.getByRole("heading", { name: "Frontend Mini Projects" }),
     ).toBeInTheDocument();
   });
 
@@ -178,7 +183,7 @@ describe("CenterShowcase", () => {
       name: "Project playback timeline",
     });
     expect(timeline).toHaveAttribute("min", "0");
-    expect(timeline).toHaveAttribute("max", "60");
+    expect(timeline).toHaveAttribute("max", "35");
     expect(
       screen.queryByRole("group", { name: /media slides/i }),
     ).not.toBeInTheDocument();
@@ -187,6 +192,8 @@ describe("CenterShowcase", () => {
   it("seeks across image items using the virtual timeline", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
+
+    await user.click(screen.getByRole("tab", { name: "Summaries" }));
 
     await user.click(
       screen.getByRole("button", { name: "Pause project film" }),
@@ -198,11 +205,14 @@ describe("CenterShowcase", () => {
     timeline.focus();
     await user.keyboard("{ArrowRight}");
     expect(timeline).toHaveValue("5");
-    expect(screen.getByText("2 of 12 scenes")).toBeInTheDocument();
+    expect(screen.getByText("2 of 6 scenes")).toBeInTheDocument();
   });
 
-  it("shows media arrows inside screen for multi-image projects", () => {
+  it("shows media arrows inside screen for multi-image projects", async () => {
+    const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
+
+    await user.click(screen.getByRole("tab", { name: "Summaries" }));
 
     expect(
       screen.getByRole("button", { name: "Previous image" }),
@@ -212,29 +222,32 @@ describe("CenterShowcase", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows honest empty state for Game Development", async () => {
+  it("shows project content for Game Development", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
     await user.click(screen.getByRole("tab", { name: "Game Dev" }));
 
     expect(
-      screen.getByText("No published case study currently available."),
+      screen.getByRole("heading", { name: "How To Train Your AI" }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: "Explore project" }),
-    ).not.toBeInTheDocument();
+      screen.getAllByRole("link", { name: "Explore project" })[0],
+    ).toHaveAttribute("href", "/en/projects/how-to-train-your-ai");
   });
 
-  it("shows honest empty state for Bots", async () => {
+  it("shows project content for Summaries", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    await user.click(screen.getByRole("tab", { name: "Bots" }));
+    await user.click(screen.getByRole("tab", { name: "Summaries" }));
 
     expect(
-      screen.getByText("No published case study currently available."),
+      screen.getByRole("heading", { name: "MET Summaries" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: "Explore project" })[0],
+    ).toHaveAttribute("href", "/en/projects/met-summaries");
   });
 
   it("has a tablist with correct ARIA semantics", () => {
@@ -274,7 +287,7 @@ describe("CenterShowcase", () => {
 
     await user.click(getDesktopProjectArrow("Next project"));
     expect(
-      screen.getByRole("heading", { name: "Bookify Hotel Reservation System" }),
+      screen.getByRole("heading", { name: "CinemaVerse" }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: "Desktop" }));
@@ -286,6 +299,8 @@ describe("CenterShowcase", () => {
   it("resets media index on project change", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
+
+    await user.click(screen.getByRole("tab", { name: "Game Dev" }));
 
     await user.click(
       screen.getByRole("button", { name: "Pause project film" }),
@@ -384,7 +399,7 @@ describe("CenterShowcase", () => {
     const liveRegion = screen.getByRole("status");
     expect(liveRegion).toHaveAttribute("aria-live", "polite");
     expect(liveRegion).toHaveTextContent(
-      "BuildSense: BuildSense hardware discovery home page, 1 of 12 scenes",
+      "BuildSense: BuildSense PC hardware discovery preview video, 1 of 1 scenes",
     );
   });
 
@@ -392,10 +407,10 @@ describe("CenterShowcase", () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    expect(getDesktopProjectCounter()).toHaveTextContent("1 / 3");
+    expect(getDesktopProjectCounter()).toHaveTextContent("1 / 4");
 
     await user.click(getDesktopProjectArrow("Next project"));
-    expect(getDesktopProjectCounter()).toHaveTextContent("2 / 3");
+    expect(getDesktopProjectCounter()).toHaveTextContent("2 / 4");
   });
 
   it("desktop project arrows are inside role=tabpanel", () => {
@@ -441,25 +456,17 @@ describe("CenterShowcase", () => {
 
     expect(
       screen.getByRole("slider", { name: "Project playback timeline" }),
-    ).toHaveAttribute("aria-valuetext", "0:00 / 1:00");
-    expect(screen.getByText("0:00 / 1:00")).toBeInTheDocument();
+    ).toHaveAttribute("aria-valuetext", "0:00 / 0:35");
+    expect(screen.getByText("0:00 / 0:35")).toBeInTheDocument();
   });
 
-  it("shows media unavailable fallback when image fails to load", async () => {
+  it("shows media unavailable fallback when media fails to load", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    const user = userEvent.setup();
-    render(<CenterShowcase locale="en" copy={copy} />);
+    const { container } = render(<CenterShowcase locale="en" copy={copy} />);
 
-    // Find the img element and fire onError via fireEvent
-    const imgEl = screen.getByRole("img");
-    // next/image wraps in an img; fireEvent to trigger the onError handler
     const { fireEvent } = await import("@testing-library/react");
-    fireEvent.error(imgEl);
-
-    // Navigate to next media (buildsense:1) which also fails
-    await user.click(screen.getByRole("button", { name: "Next image" }));
-    const secondImg = screen.getByRole("img");
-    fireEvent.error(secondImg);
+    const mediaEl = container.querySelector("video, img")!;
+    fireEvent.error(mediaEl);
 
     expect(screen.getByText("Media unavailable")).toBeInTheDocument();
     // Title and summary should still be visible
@@ -487,7 +494,7 @@ describe("CenterShowcase", () => {
 
     // In RTL, ArrowRight should move to the previous logical tab (wraps to last)
     await user.keyboard("{ArrowRight}");
-    const botsTab = screen.getByRole("tab", { name: "بوتات" });
-    expect(botsTab).toHaveFocus();
+    const summariesTab = screen.getByRole("tab", { name: "ملخصات" });
+    expect(summariesTab).toHaveFocus();
   });
 });

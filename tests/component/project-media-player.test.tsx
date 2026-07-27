@@ -103,7 +103,7 @@ describe("ProjectMediaPlayer video playback", () => {
     fireEvent.loadedMetadata(video);
     expect(screen.getByRole("slider", { name: copy.timeline })).toHaveAttribute(
       "max",
-      "12",
+      "7",
     );
 
     Object.defineProperty(video, "currentTime", {
@@ -114,7 +114,7 @@ describe("ProjectMediaPlayer video playback", () => {
     expect(screen.getByRole("slider", { name: copy.timeline })).toHaveValue(
       "3",
     );
-    expect(screen.getByText("0:03 / 0:12")).toBeInTheDocument();
+    expect(screen.getByText("0:03 / 0:07")).toBeInTheDocument();
   });
 
   it("pauses while the document is hidden and resumes when it becomes visible", () => {

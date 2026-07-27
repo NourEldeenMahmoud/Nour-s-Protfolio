@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { getCaseStudy } from "@/content/case-studies";
-import { getProjectMedia, type Project } from "@/content/portfolio";
+import { getCaseStudy, hasCaseStudy } from "@/content/case-studies";
+import { getProjectDetailMedia, type Project } from "@/content/portfolio";
 import type { Locale } from "@/i18n/routing";
 import styles from "./case-study-modal.module.css";
 
@@ -55,11 +55,10 @@ export function CaseStudyModal({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const labels = copy[locale];
-  const study = getCaseStudy(project.slug)!;
-  const media = getProjectMedia(project)
-    .filter((mediaItem) => mediaItem.type === "image")
-    .slice(0, 4);
-  const activeMedia = media[activeMediaIndex]!;
+  const caseStudyAvailable = hasCaseStudy(project.slug);
+  const study = caseStudyAvailable ? getCaseStudy(project.slug) : undefined;
+  const media = getProjectDetailMedia(project).slice(0, 4);
+  const activeMedia = media[activeMediaIndex] ?? media[0];
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -68,6 +67,7 @@ export function CaseStudyModal({
   }, []);
 
   function showMedia(offset: number) {
+    if (media.length <= 1) return;
     setActiveMediaIndex(
       (current) => (current + offset + media.length) % media.length,
     );
@@ -110,22 +110,24 @@ export function CaseStudyModal({
 
         <div className={styles.overview}>
           <section className={styles.mediaStage} aria-label={labels.preview}>
-            <figure>
-              <Image
-                key={activeMedia.id}
-                src={activeMedia.src}
-                alt={activeMedia.alt[locale]}
-                fill
-                preload={activeMediaIndex === 0}
-                sizes="(max-width: 760px) 94vw, 60vw"
-              />
-              <figcaption>
-                <span>
-                  {labels.imageStatus} {activeMediaIndex + 1} / {media.length}
-                </span>
-                {activeMedia.caption?.[locale] ?? activeMedia.alt[locale]}
-              </figcaption>
-            </figure>
+            {activeMedia ? (
+              <figure>
+                <Image
+                  key={activeMedia.id}
+                  src={activeMedia.src}
+                  alt={activeMedia.alt[locale]}
+                  fill
+                  priority={activeMediaIndex === 0}
+                  sizes="(max-width: 760px) 94vw, 60vw"
+                />
+                <figcaption>
+                  <span>
+                    {labels.imageStatus} {activeMediaIndex + 1} / {media.length}
+                  </span>
+                  {activeMedia.caption?.[locale] ?? activeMedia.alt[locale]}
+                </figcaption>
+              </figure>
+            ) : null}
 
             {media.length > 1 && (
               <div className={styles.mediaControls}>
@@ -157,13 +159,15 @@ export function CaseStudyModal({
 
           <section className={styles.projectOverview}>
             <div className={styles.actions}>
-              <Link
-                className={styles.primaryAction}
-                href={`/${locale}/case-studies/${project.slug}`}
-              >
-                {labels.details}
-                <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
-              </Link>
+              {caseStudyAvailable && (
+                <Link
+                  className={styles.primaryAction}
+                  href={`/${locale}/case-studies/${project.slug}`}
+                >
+                  {labels.details}
+                  <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
+                </Link>
+              )}
               <div className={styles.secondaryActions}>
                 <a href={project.repository} target="_blank" rel="noreferrer">
                   {labels.repository} <span aria-hidden="true">↗</span>
@@ -180,21 +184,32 @@ export function CaseStudyModal({
             <h2 id="project-overview-title">{project.title}</h2>
             <p className={styles.summary}>{project.summary[locale]}</p>
 
-            <aside className={styles.problem}>
-              <span>{labels.problem}</span>
-              <p>{study.problem[locale]}</p>
-            </aside>
+            {study ? (
+              <>
+                <aside className={styles.problem}>
+                  <span>{labels.problem}</span>
+                  <p>{study.problem[locale]}</p>
+                </aside>
 
-            <dl className={styles.projectFacts}>
-              <div>
-                <dt>{labels.projectType}</dt>
-                <dd>{study.projectType[locale]}</dd>
-              </div>
-              <div>
-                <dt>{labels.workingMode}</dt>
-                <dd>{study.teamContext[locale]}</dd>
-              </div>
-            </dl>
+                <dl className={styles.projectFacts}>
+                  <div>
+                    <dt>{labels.projectType}</dt>
+                    <dd>{study.projectType[locale]}</dd>
+                  </div>
+                  <div>
+                    <dt>{labels.workingMode}</dt>
+                    <dd>{study.teamContext[locale]}</dd>
+                  </div>
+                </dl>
+              </>
+            ) : (
+              <dl className={styles.projectFacts}>
+                <div>
+                  <dt>{labels.workingMode}</dt>
+                  <dd>{project.context[locale]}</dd>
+                </div>
+              </dl>
+            )}
 
             <div className={styles.technologies}>
               <h3>{labels.technologies}</h3>

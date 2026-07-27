@@ -20,7 +20,10 @@
     "test:e2e": "playwright test",
     "test:a11y": "playwright test tests/accessibility",
     "test:all": "npm run lint && npm run typecheck && npm run test && npm run build && npm run test:e2e",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "lhci autorun",
+    "media:scan": "node scripts/media/scan-projects.mjs",
+    "media:inspect": "node scripts/media/inspect-video.mjs",
+    "media:validate": "node scripts/media/validate-media.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",

@@ -13,7 +13,7 @@ import {
   type PointerEvent,
 } from "react";
 import {
-  getProjectMedia,
+  getProjectPreviewMedia,
   type Project,
   type ProjectMedia,
 } from "@/content/portfolio";
@@ -169,7 +169,7 @@ export function ProjectMediaPlayer({
   onPreviousProject?: () => void;
   onNextProject?: () => void;
 }) {
-  const playlist = useMemo(() => getProjectMedia(project), [project]);
+  const playlist = useMemo(() => getProjectPreviewMedia(project), [project]);
   const [durationOverrides, setDurationOverrides] = useState<
     Record<string, number>
   >({});
@@ -266,7 +266,7 @@ export function ProjectMediaPlayer({
       pendingVideoTimeRef.current = null;
     }
     if (canAdvance) {
-      void video.play().catch(() => setIsPlaying(false));
+      void Promise.resolve(video.play()).catch(() => setIsPlaying(false));
     } else {
       video.pause();
     }

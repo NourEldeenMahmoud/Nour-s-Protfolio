@@ -30,3 +30,7 @@ test-results/
 # Local environment files
 .env*
 !.env.example
+
+# Original source videos and media — never commit these
+# Optimized previews go into public/projects/{slug}/preview/ instead
+media-source/

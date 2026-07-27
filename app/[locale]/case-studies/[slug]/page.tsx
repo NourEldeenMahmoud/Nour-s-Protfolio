@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { CaseStudyExperience } from "@/components/case-studies/case-study-experience";
-import { getCaseStudy } from "@/content/case-studies";
-import { getProject, projectSlugs } from "@/content/portfolio";
+import { caseStudySlugs, getCaseStudy } from "@/content/case-studies";
+import { getProject } from "@/content/portfolio";
 import { isLocale } from "@/i18n/routing";
 
 export function generateStaticParams() {
-  return projectSlugs.map((slug) => ({ slug }));
+  return caseStudySlugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({

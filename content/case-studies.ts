@@ -65,7 +65,7 @@ export type CaseStudy = {
 
 const text = (en: string, ar: string): LocalizedCaseStudyText => ({ en, ar });
 
-export const caseStudies: Record<ProjectSlug, CaseStudy> = {
+export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
   buildsense: {
     projectSlug: "buildsense",
     projectType: text(
@@ -1428,3 +1428,10 @@ export const caseStudies: Record<ProjectSlug, CaseStudy> = {
 export function getCaseStudy(slug: string): CaseStudy | undefined {
   return caseStudies[slug as ProjectSlug];
 }
+
+export function hasCaseStudy(slug: string): boolean {
+  return Boolean(caseStudies[slug as ProjectSlug]);
+}
+
+export const caseStudySlugs = Object.keys(caseStudies) as ProjectSlug[];
+
