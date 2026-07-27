@@ -1,73 +1,174 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
+import {
+  getProjectMedia,
+  projects,
+  type Project,
+  type ProjectMedia,
+} from "@/content/portfolio";
 import type { Locale } from "@/i18n/routing";
-import { projects, type Project } from "@/content/portfolio";
 import styles from "./project-experience.module.css";
 
 const copy = {
   en: {
-    returnToRoom: "Return to Project Room",
-    allProjects: "All case studies",
-    contribution: "Contribution",
-    timeline: "Timeline",
-    notPublished: "Not published",
-    platform: "Platform",
-    technologies: "Technologies",
-    problemContext: "Problem & Context",
-    solutionContribution: "Solution & Contribution",
-    keyFeatures: "Key Features",
-    devProcess: "Development Process",
-    processNote:
-      "A verified step-by-step development process has not been published for this project.",
-    technicalImplementation: "Technical Implementation",
+    back: "Back to Explore",
+    repository: "View repository",
+    demo: "Open live product",
+    category: "Product world",
+    role: "Nour's role",
+    context: "Project context",
+    stack: "Built with",
+    overview: "Overview",
+    experience: "Experience",
+    highlights: "Highlights",
+    work: "My Work",
     gallery: "Gallery",
-    evidence: "Evidence & Outcomes",
-    honestBoundaries: "Honest Boundaries",
-    repository: "Open Repository",
-    demo: "Open Verified Demo",
+    behind: "Behind the Product",
+    storyEyebrow: "The product, at a glance",
+    storyTitle: "A useful product, experienced as a complete journey.",
+    experienceEyebrow: "Explore the product",
+    experienceTitle: "Move through the experience",
+    experienceHint: "Choose a view",
+    featureEyebrow: "Product highlights",
+    featureTitle: "The moments that make it substantial",
+    contributionEyebrow: "Nour's contribution",
+    contributionTitle: "Work connected to the product you can see",
+    teamNote:
+      "The verified project context and ownership boundaries are preserved.",
+    galleryEyebrow: "Project archive",
+    galleryTitle: "Inspect the product up close",
+    galleryDescription: "Open any view for a focused, full-screen inspection.",
+    allMedia: "All views",
+    mediaGroups: { overview: "Overview", product: "Product" },
+    view: "Open media viewer",
+    previousMedia: "Previous media",
+    nextMedia: "Next media",
+    closeViewer: "Close media viewer",
+    item: "View",
+    technicalTitle: "How the product is put together",
+    technicalIntro:
+      "Optional technical context, translated into the product decisions it supports.",
+    engineering: "How it works",
+    evidence: "Available evidence",
+    boundaries: "What is not claimed",
+    endingEyebrow: "End of project world",
+    endingTitle: "One product. A complete, inspectable body of work.",
+    return: "Return to Explore",
     previousProject: "Previous project",
     nextProject: "Next project",
-    finalReturn: "Return to Project Room",
+    navLabel: "Project exploration zones",
+    mediaStatus: "Showing media",
   },
   ar: {
-    returnToRoom: "العودة إلى غرفة المشاريع",
-    allProjects: "كل دراسات الحالة",
-    contribution: "المساهمة",
-    timeline: "الجدول الزمني",
-    notPublished: "غير منشور",
-    platform: "المنصة",
-    technologies: "التقنيات",
-    problemContext: "المشكلة والسياق",
-    solutionContribution: "الحل والمساهمة",
-    keyFeatures: "الخصائص الرئيسية",
-    devProcess: "عملية التطوير",
-    processNote: "لم يُنشر خطوات عملية التطوير المؤكدة لهذا المشروع.",
-    technicalImplementation: "التنفيذ التقني",
+    back: "العودة إلى الاستكشاف",
+    repository: "عرض المستودع",
+    demo: "فتح المنتج المنشور",
+    category: "عالم المنتج",
+    role: "دور نور",
+    context: "سياق المشروع",
+    stack: "بُني باستخدام",
+    overview: "نظرة عامة",
+    experience: "التجربة",
+    highlights: "أبرز المزايا",
+    work: "عملي",
     gallery: "المعرض",
-    evidence: "الأدلة والنتائج",
-    honestBoundaries: "الحدود الصريحة",
-    repository: "افتح المستودع",
-    demo: "افتح النسخة المؤكدة",
+    behind: "خلف المنتج",
+    storyEyebrow: "المنتج في لمحة",
+    storyTitle: "منتج مفيد يظهر كتجربة متكاملة.",
+    experienceEyebrow: "استكشف المنتج",
+    experienceTitle: "تنقّل داخل التجربة",
+    experienceHint: "اختر مشهداً",
+    featureEyebrow: "أبرز لحظات المنتج",
+    featureTitle: "التفاصيل التي تمنح المنتج قيمته",
+    contributionEyebrow: "مساهمة نور",
+    contributionTitle: "عمل مرتبط مباشرة بالمنتج الذي تراه",
+    teamNote: "يحتفظ العرض بسياق المشروع وحدود الملكية المؤكدة.",
+    galleryEyebrow: "أرشيف المشروع",
+    galleryTitle: "تفقّد المنتج عن قرب",
+    galleryDescription: "افتح أي مشهد لمعاينته بوضوح وفي مساحة كاملة.",
+    allMedia: "كل المشاهد",
+    mediaGroups: { overview: "نظرة عامة", product: "المنتج" },
+    view: "فتح عارض الوسائط",
+    previousMedia: "الوسائط السابقة",
+    nextMedia: "الوسائط التالية",
+    closeViewer: "إغلاق عارض الوسائط",
+    item: "مشهد",
+    technicalTitle: "كيف يعمل المنتج من الداخل",
+    technicalIntro: "سياق تقني اختياري يشرح القرارات من خلال أثرها على المنتج.",
+    engineering: "كيف يعمل",
+    evidence: "الأدلة المتاحة",
+    boundaries: "ما لا يدّعيه المشروع",
+    endingEyebrow: "نهاية عالم المشروع",
+    endingTitle: "منتج واحد، وعمل متكامل يمكن استكشافه.",
+    return: "العودة إلى الاستكشاف",
     previousProject: "المشروع السابق",
     nextProject: "المشروع التالي",
-    finalReturn: "العودة إلى غرفة المشاريع",
+    navLabel: "مناطق استكشاف المشروع",
+    mediaStatus: "الوسائط المعروضة",
   },
 } as const;
 
-/** Derive category label from project-showcase mapping. */
-function getCategoryLabel(slug: string, locale: Locale): string | null {
-  const categoryMap: Record<string, { en: string; ar: string }> = {
-    buildsense: { en: "Web", ar: "ويب" },
-    bookify: { en: "Web", ar: "ويب" },
-    cinemaverse: { en: "Web", ar: "ويب" },
-    "blood-bank-desktop": { en: "Desktop", ar: "مكتبي" },
-    "blood-bank-mobile": { en: "Mobile", ar: "موبايل" },
-    dvld: { en: "Desktop", ar: "مكتبي" },
-  };
-  return categoryMap[slug]?.[locale] ?? null;
+const categoryMap: Record<string, Record<Locale, string>> = {
+  buildsense: { en: "Web product", ar: "منتج ويب" },
+  bookify: { en: "Hotel reservation", ar: "حجز الفنادق" },
+  "blood-bank-desktop": { en: "Desktop operations", ar: "عمليات مكتبية" },
+  "blood-bank-mobile": { en: "Mobile experience", ar: "تجربة موبايل" },
+  dvld: { en: "Desktop system", ar: "نظام مكتبي" },
+  cinemaverse: { en: "Cinema booking", ar: "حجز السينما" },
+};
+
+function ProjectVisual({
+  media,
+  locale,
+  priority = false,
+  sizes = "100vw",
+}: {
+  media: ProjectMedia;
+  locale: Locale;
+  priority?: boolean;
+  sizes?: string;
+}) {
+  const style = { objectPosition: media.focalPosition } as CSSProperties;
+
+  if (media.type === "video") {
+    return (
+      <video
+        className={styles.visualAsset}
+        controls
+        muted
+        playsInline
+        preload="metadata"
+        poster={media.poster}
+        aria-label={media.alt[locale]}
+      >
+        <source src={media.src} />
+      </video>
+    );
+  }
+
+  return (
+    <Image
+      src={media.src}
+      alt={media.alt[locale]}
+      fill
+      priority={priority}
+      loading={priority ? undefined : "lazy"}
+      sizes={sizes}
+      className={styles.visualAsset}
+      style={style}
+    />
+  );
 }
 
 export function ProjectExperience({
@@ -77,293 +178,726 @@ export function ProjectExperience({
   locale: Locale;
   project: Project;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const pointerStart = useRef<number | null>(null);
+  const media = getProjectMedia(project);
+  const [activeSection, setActiveSection] = useState("overview");
+  const [activeExperience, setActiveExperience] = useState(0);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [activeGroup, setActiveGroup] = useState("all");
   const c = copy[locale];
-
   const projectIndex = projects.findIndex((item) => item.slug === project.slug);
-  const prevProject =
-    projects[(projectIndex - 1 + projects.length) % projects.length] ??
-    projects[projects.length - 1];
-  const nextProject =
-    projects[(projectIndex + 1) % projects.length] ?? projects[0];
+  const previous =
+    projects[(projectIndex - 1 + projects.length) % projects.length]!;
+  const next = projects[(projectIndex + 1) % projects.length]!;
+  const heroMedia = media[0]!;
+  const activeMedia = media[activeExperience]!;
+  const contributionMedia = media[Math.min(1, media.length - 1)]!;
+  const supportingMedia = media.slice(1, 3);
+  const mediaGroups = Array.from(
+    new Set(media.map((mediaItem) => mediaItem.group).filter(Boolean)),
+  ) as string[];
+  const galleryMedia =
+    activeGroup === "all"
+      ? media
+      : media.filter((mediaItem) => mediaItem.group === activeGroup);
+  const sections = [
+    ["overview", c.overview],
+    ["experience", c.experience],
+    ["highlights", c.highlights],
+    ["work", c.work],
+    ["gallery", c.gallery],
+    ["behind", c.behind],
+  ] as const;
 
-  const category = getCategoryLabel(project.slug, locale);
-
-  /* ── GSAP entrance motion ── */
   useLayoutEffect(() => {
-    if (!containerRef.current) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
-
+    const root = rootRef.current;
+    if (!root) return;
+    let context: { revert: () => void } | undefined;
     let cancelled = false;
-    void import("gsap").then(({ gsap }) => {
-      if (cancelled) return;
-      const ctx = gsap.context(() => {
-        const sections = containerRef.current!.querySelectorAll<HTMLElement>(
-          `.${styles.animateIn}`,
-        );
-        gsap.from(sections, {
-          y: 30,
-          autoAlpha: 0,
-          duration: 0.7,
-          stagger: 0.08,
-          ease: "power3.out",
-        });
-      }, containerRef);
 
-      return () => ctx.revert();
-    });
+    void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
+      ([{ gsap }, { ScrollTrigger }]) => {
+        if (cancelled) return;
+        gsap.registerPlugin(ScrollTrigger);
+        context = gsap.context(() => {
+          gsap.fromTo(
+            `.${styles.scrollProgressBar}`,
+            { scaleX: 0 },
+            {
+              scaleX: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: root,
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 0.15,
+              },
+            },
+          );
+
+          root
+            .querySelectorAll<HTMLElement>("[data-reveal]")
+            .forEach((element) => {
+              gsap.from(element, {
+                y: 76,
+                autoAlpha: 0,
+                filter: "blur(8px)",
+                clipPath: "inset(0 0 14% 0)",
+                duration: 1.05,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: element,
+                  start: "top 86%",
+                  once: true,
+                },
+              });
+            });
+
+          root
+            .querySelectorAll<HTMLElement>(`.${styles.highlightScene}`)
+            .forEach((scene, index) => {
+              const mediaElement = scene.querySelector(
+                `.${styles.highlightMedia}`,
+              );
+              const copyElement = scene.querySelector(
+                `.${styles.highlightCopy}`,
+              );
+              const direction = index % 2 === 0 ? -1 : 1;
+              gsap.from(mediaElement, {
+                x: direction * 110,
+                clipPath:
+                  direction < 0 ? "inset(0 0 0 22%)" : "inset(0 22% 0 0)",
+                duration: 1.15,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: scene,
+                  start: "top 82%",
+                  once: true,
+                },
+              });
+              gsap.from(copyElement, {
+                x: direction * -54,
+                autoAlpha: 0,
+                duration: 0.9,
+                delay: 0.12,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: scene,
+                  start: "top 82%",
+                  once: true,
+                },
+              });
+            });
+
+          root
+            .querySelectorAll<HTMLElement>(
+              `.${styles.highlightMedia} .${styles.visualAsset}, .${styles.contributionMedia} .${styles.visualAsset}, .${styles.galleryImage} .${styles.visualAsset}`,
+            )
+            .forEach((asset) => {
+              gsap.fromTo(
+                asset,
+                { scale: 1.075 },
+                {
+                  scale: 1,
+                  ease: "none",
+                  scrollTrigger: {
+                    trigger: asset,
+                    start: "top bottom",
+                    end: "bottom 35%",
+                    scrub: 0.7,
+                  },
+                },
+              );
+            });
+
+          gsap.from(`.${styles.gallerySlide}`, {
+            y: 90,
+            autoAlpha: 0,
+            stagger: 0.12,
+            duration: 0.95,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: `.${styles.galleryRail}`,
+              start: "top 84%",
+              once: true,
+            },
+          });
+
+          root
+            .querySelectorAll<HTMLElement>("[data-parallax]")
+            .forEach((element) => {
+              gsap.fromTo(
+                element,
+                { yPercent: -5 },
+                {
+                  yPercent: 7,
+                  ease: "none",
+                  scrollTrigger: {
+                    trigger: element,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: 0.6,
+                  },
+                },
+              );
+            });
+        }, root);
+      },
+    );
 
     return () => {
       cancelled = true;
+      context?.revert();
     };
   }, []);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target.id) setActiveSection(visible.target.id);
+      },
+      { rootMargin: "-20% 0px -62%", threshold: [0.01, 0.2, 0.5] },
+    );
+    root
+      .querySelectorAll("section[id]")
+      .forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (viewerIndex === null) {
+      if (dialog?.open) dialog.close();
+      return;
+    }
+    if (dialog && !dialog.open) dialog.showModal();
+  }, [viewerIndex]);
+
+  const showMedia = (index: number) =>
+    setViewerIndex((index + media.length) % media.length);
+  const handleViewerKey = (event: KeyboardEvent<HTMLDialogElement>) => {
+    if (event.key === "ArrowRight")
+      showMedia((viewerIndex ?? 0) + (locale === "ar" ? -1 : 1));
+    if (event.key === "ArrowLeft")
+      showMedia((viewerIndex ?? 0) + (locale === "ar" ? 1 : -1));
+  };
+  const handleTilt = (event: PointerEvent<HTMLElement>) => {
+    if (event.pointerType !== "mouse") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    event.currentTarget.style.setProperty("--tilt-x", `${-y * 2.2}deg`);
+    event.currentTarget.style.setProperty("--tilt-y", `${x * 2.8}deg`);
+    event.currentTarget.style.setProperty("--light-x", `${(x + 0.5) * 100}%`);
+  };
+
   return (
-    <main ref={containerRef} className={styles.experience}>
-      {/* ── Sticky Navigation ── */}
-      <header className={styles.header}>
-        <nav className={styles.headerNav} aria-label="Navigation">
+    <main ref={rootRef} className={styles.experience}>
+      <div className={styles.scrollProgress} aria-hidden="true">
+        <span className={styles.scrollProgressBar} />
+      </div>
+      <div className={styles.ambientLight} aria-hidden="true" />
+
+      <section
+        id="overview"
+        className={styles.hero}
+        aria-labelledby="project-title"
+      >
+        <div className={styles.heroTopbar}>
           <Link
             href={`/${locale}?focus=exploration`}
-            className={styles.roomLink}
+            className={styles.backLink}
           >
-            {c.returnToRoom}
+            <span aria-hidden="true">{locale === "ar" ? "→" : "←"}</span>{" "}
+            {c.back}
           </Link>
-          <Link href={`/${locale}/watch`} className={styles.watchLink}>
-            {c.allProjects}
-          </Link>
-        </nav>
-      </header>
+          <span>{categoryMap[project.slug]?.[locale] ?? c.category}</span>
+        </div>
 
-      {/* ── Cinematic Hero ── */}
-      <section className={styles.hero} aria-labelledby="project-title">
-        <div className={styles.heroMedia}>
-          <Image
-            src={project.image}
-            alt={project.imageAlt[locale]}
-            fill
-            priority
-            sizes="(max-width: 900px) 100vw, 60vw"
-            className={styles.heroImage}
-          />
-          <div className={styles.heroOverlay} aria-hidden="true" />
-        </div>
-        <div className={styles.heroCopy}>
-          {category && <span className={styles.kicker}>{category}</span>}
-          <h1 id="project-title">{project.title}</h1>
-          <p className={styles.heroSummary}>{project.summary[locale]}</p>
-          <ul className={styles.stackList} aria-label={c.technologies}>
-            {project.stack.map((tech) => (
-              <li key={tech} className={styles.stackItem}>
-                {tech}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── Facts Rail ── */}
-      <section
-        className={`${styles.factsRail} ${styles.animateIn}`}
-        aria-label="Project facts"
-      >
-        <div className={styles.fact}>
-          <span className={styles.factLabel}>{c.contribution}</span>
-          <span className={styles.factValue}>
-            {project.contribution[locale].split(".")[0]}
-          </span>
-        </div>
-        <div className={styles.factDivider} aria-hidden="true" />
-        <div className={styles.fact}>
-          <span className={styles.factLabel}>{c.timeline}</span>
-          <span className={`${styles.factValue} ${styles.factMuted}`}>
-            {c.notPublished}
-          </span>
-        </div>
-        {category && (
-          <>
-            <div className={styles.factDivider} aria-hidden="true" />
-            <div className={styles.fact}>
-              <span className={styles.factLabel}>{c.platform}</span>
-              <span className={styles.factValue}>{category}</span>
+        <div className={styles.heroComposition}>
+          <div
+            className={styles.monitorAperture}
+            data-device={heroMedia.device}
+            onPointerMove={handleTilt}
+            onPointerLeave={(event) => {
+              event.currentTarget.style.removeProperty("--tilt-x");
+              event.currentTarget.style.removeProperty("--tilt-y");
+            }}
+          >
+            <div className={styles.monitorChrome} aria-hidden="true">
+              <span />
+              <span />
             </div>
-          </>
-        )}
-      </section>
+            <div className={styles.heroVisual} data-parallax>
+              <ProjectVisual
+                media={heroMedia}
+                locale={locale}
+                priority
+                sizes="(max-width: 800px) 94vw, 76vw"
+              />
+            </div>
+            <div className={styles.screenReflection} aria-hidden="true" />
+          </div>
 
-      {/* ── Problem & Context ── */}
-      <section className={`${styles.section} ${styles.animateIn}`}>
-        <div className={styles.sectionInner}>
-          <span className={styles.sectionIndex}>01</span>
-          <h2>{c.problemContext}</h2>
-          <p>{project.context[locale]}</p>
+          {supportingMedia.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              className={styles.supportingFrame}
+              data-position={index}
+              onClick={() => showMedia(index + 1)}
+              aria-label={`${c.view}: ${item.alt[locale]}`}
+            >
+              <ProjectVisual
+                media={item}
+                locale={locale}
+                sizes="(max-width: 800px) 38vw, 22vw"
+              />
+            </button>
+          ))}
+
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}>
+              {categoryMap[project.slug]?.[locale]}
+            </p>
+            <h1 id="project-title">{project.title}</h1>
+            <p className={styles.heroSummary}>{project.summary[locale]}</p>
+            <div className={styles.heroFacts}>
+              <div>
+                <span>{c.context}</span>
+                <p>{project.context[locale]}</p>
+              </div>
+              <div>
+                <span>{c.role}</span>
+                <p>{project.contribution[locale]}</p>
+              </div>
+            </div>
+            <div className={styles.heroActions}>
+              <a href={project.repository} target="_blank" rel="noreferrer">
+                {c.repository} <span aria-hidden="true">↗</span>
+              </a>
+              {project.demo && (
+                <a href={project.demo} target="_blank" rel="noreferrer">
+                  {c.demo} <span aria-hidden="true">↗</span>
+                </a>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Solution & Contribution ── */}
-      <section className={`${styles.section} ${styles.animateIn}`}>
-        <div className={styles.sectionInner}>
-          <span className={styles.sectionIndex}>02</span>
-          <h2>{c.solutionContribution}</h2>
+      <nav className={styles.zoneNav} aria-label={c.navLabel}>
+        <div className={styles.zoneNavInner}>
+          {sections.map(([id, label]) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              aria-current={activeSection === id ? "location" : undefined}
+            >
+              <span aria-hidden="true" />
+              {label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      <section
+        className={styles.story}
+        data-reveal
+        aria-labelledby="story-title"
+      >
+        <div className={styles.sectionHeading}>
+          <p className={styles.eyebrow}>{c.storyEyebrow}</p>
+          <h2 id="story-title">{c.storyTitle}</h2>
+        </div>
+        <p className={styles.storyLead}>{project.summary[locale]}</p>
+        <div className={styles.storyLine} aria-hidden="true">
+          <span />
+        </div>
+        <p className={styles.storyContext}>{project.context[locale]}</p>
+      </section>
+
+      <section
+        id="experience"
+        className={styles.productExplorer}
+        aria-labelledby="experience-title"
+      >
+        <div className={styles.explorerHeading} data-reveal>
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>{c.experienceEyebrow}</p>
+            <h2 id="experience-title">{c.experienceTitle}</h2>
+          </div>
+          <span>{c.experienceHint}</span>
+        </div>
+        <div className={styles.explorerLayout}>
+          <div
+            className={styles.experienceTabs}
+            role="tablist"
+            aria-label={c.experienceTitle}
+          >
+            {media.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                id={`experience-tab-${index}`}
+                aria-selected={activeExperience === index}
+                aria-controls="experience-panel"
+                tabIndex={activeExperience === index ? 0 : -1}
+                onClick={() => setActiveExperience(index)}
+                onKeyDown={(event) => {
+                  if (event.key !== "ArrowRight" && event.key !== "ArrowLeft")
+                    return;
+                  event.preventDefault();
+                  const direction = event.key === "ArrowRight" ? 1 : -1;
+                  const target =
+                    (index + direction + media.length) % media.length;
+                  setActiveExperience(target);
+                  document.getElementById(`experience-tab-${target}`)?.focus();
+                }}
+              >
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item.caption?.[locale] ?? item.alt[locale]}</strong>
+              </button>
+            ))}
+          </div>
+          <div
+            id="experience-panel"
+            role="tabpanel"
+            aria-labelledby={`experience-tab-${activeExperience}`}
+            className={styles.experienceStage}
+            data-device={activeMedia.device}
+            onClick={() => showMedia(activeExperience)}
+          >
+            <div className={styles.stageMedia} key={activeMedia.id}>
+              <ProjectVisual
+                media={activeMedia}
+                locale={locale}
+                sizes="(max-width: 900px) 94vw, 72vw"
+              />
+            </div>
+            <div className={styles.stageCaption}>
+              <span>
+                {String(activeExperience + 1).padStart(2, "0")} /{" "}
+                {String(media.length).padStart(2, "0")}
+              </span>
+              <p>{activeMedia.caption?.[locale] ?? project.summary[locale]}</p>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  showMedia(activeExperience);
+                }}
+              >
+                {c.view} <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {project.highlights?.length ? (
+        <section
+          id="highlights"
+          className={styles.highlights}
+          aria-labelledby="highlights-title"
+        >
+          <div className={styles.sectionHeading} data-reveal>
+            <p className={styles.eyebrow}>{c.featureEyebrow}</p>
+            <h2 id="highlights-title">{c.featureTitle}</h2>
+          </div>
+          <div className={styles.highlightScenes}>
+            {project.highlights.map((highlight, index) => {
+              const item = media[index % media.length]!;
+              return (
+                <article
+                  key={highlight}
+                  className={styles.highlightScene}
+                  data-layout={index % 2}
+                  data-reveal
+                >
+                  <button
+                    type="button"
+                    className={styles.highlightMedia}
+                    onClick={() => showMedia(index % media.length)}
+                    aria-label={`${c.view}: ${item.alt[locale]}`}
+                  >
+                    <span data-parallax>
+                      <ProjectVisual
+                        media={item}
+                        locale={locale}
+                        sizes="(max-width: 900px) 94vw, 62vw"
+                      />
+                    </span>
+                    <i aria-hidden="true">↗</i>
+                  </button>
+                  <div className={styles.highlightCopy}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <h3>{item.caption?.[locale] ?? item.alt[locale]}</h3>
+                    <p>
+                      {locale === "ar"
+                        ? [
+                            project.summary.ar,
+                            project.context.ar,
+                            project.evidence.ar,
+                            project.engineering.ar,
+                          ][index]
+                        : highlight}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      <section
+        id="work"
+        className={styles.contribution}
+        aria-labelledby="contribution-title"
+      >
+        <div className={styles.contributionCopy} data-reveal>
+          <p className={styles.eyebrow}>{c.contributionEyebrow}</p>
+          <h2 id="contribution-title">{c.contributionTitle}</h2>
           <p>{project.contribution[locale]}</p>
+          <small>{c.teamNote}</small>
+        </div>
+        <button
+          type="button"
+          className={styles.contributionMedia}
+          onClick={() => showMedia(Math.min(1, media.length - 1))}
+          aria-label={`${c.view}: ${contributionMedia.alt[locale]}`}
+          data-reveal
+        >
+          <ProjectVisual
+            media={contributionMedia}
+            locale={locale}
+            sizes="(max-width: 900px) 94vw, 54vw"
+          />
+          <span>
+            {c.view} <i aria-hidden="true">↗</i>
+          </span>
+        </button>
+      </section>
+
+      <section
+        id="gallery"
+        className={styles.gallery}
+        aria-labelledby="gallery-title"
+      >
+        <div className={styles.galleryHeader} data-reveal>
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>{c.galleryEyebrow}</p>
+            <h2 id="gallery-title">{c.galleryTitle}</h2>
+          </div>
+          <p>{c.galleryDescription}</p>
+        </div>
+        {mediaGroups.length > 1 && (
+          <div className={styles.galleryFilters} aria-label={c.galleryTitle}>
+            {["all", ...mediaGroups].map((group) => (
+              <button
+                key={group}
+                type="button"
+                aria-pressed={activeGroup === group}
+                onClick={() => setActiveGroup(group)}
+              >
+                {group === "all"
+                  ? c.allMedia
+                  : (c.mediaGroups[group as keyof typeof c.mediaGroups] ??
+                    group)}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className={styles.galleryRail} aria-label={c.galleryTitle}>
+          {galleryMedia.map((item) => {
+            const index = media.findIndex(
+              (mediaItem) => mediaItem.id === item.id,
+            );
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={styles.gallerySlide}
+                data-orientation={item.orientation}
+                onClick={() => showMedia(index)}
+                aria-label={`${c.item} ${index + 1}: ${item.alt[locale]}`}
+              >
+                <span className={styles.galleryImage}>
+                  <ProjectVisual
+                    media={item}
+                    locale={locale}
+                    sizes="(max-width: 700px) 82vw, 64vw"
+                  />
+                </span>
+                <span className={styles.galleryMeta}>
+                  <b>
+                    {String(index + 1).padStart(2, "0")} /{" "}
+                    {String(media.length).padStart(2, "0")}
+                  </b>
+                  <span>{item.caption?.[locale] ?? item.alt[locale]}</span>
+                  <i aria-hidden="true">↗</i>
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      {/* ── Key Features (conditional) ── */}
-      {project.highlights && project.highlights.length > 0 && (
-        <section className={`${styles.section} ${styles.animateIn}`}>
-          <div className={styles.sectionInner}>
-            <span className={styles.sectionIndex}>03</span>
-            <h2>{c.keyFeatures}</h2>
-            <ul className={styles.highlightsList}>
-              {project.highlights.map((item, index) => (
-                <li key={index}>
-                  <span className={styles.highlightIndex}>0{index + 1}</span>
-                  <p>{item}</p>
-                </li>
+      <section
+        id="behind"
+        className={styles.technical}
+        aria-labelledby="technical-title"
+      >
+        <div className={styles.technicalIntro} data-reveal>
+          <p className={styles.eyebrow}>{c.behind}</p>
+          <h2 id="technical-title">{c.technicalTitle}</h2>
+          <p>{c.technicalIntro}</p>
+        </div>
+        <details className={styles.technicalDetails} data-reveal>
+          <summary>
+            {c.engineering}
+            <span aria-hidden="true">+</span>
+          </summary>
+          <div className={styles.technicalBody}>
+            <p>{project.engineering[locale]}</p>
+            <ul aria-label={c.stack}>
+              {project.stack.map((tech) => (
+                <li key={tech}>{tech}</li>
               ))}
             </ul>
           </div>
-        </section>
-      )}
-
-      {/* ── Development Process ── */}
-      <section className={`${styles.section} ${styles.animateIn}`}>
-        <div className={styles.sectionInner}>
-          <span className={styles.sectionIndex}>
-            {project.highlights ? "04" : "03"}
-          </span>
-          <h2>{c.devProcess}</h2>
-          <p className={styles.processNote}>{c.processNote}</p>
-        </div>
-      </section>
-
-      {/* ── Technical Implementation ── */}
-      <section className={`${styles.section} ${styles.animateIn}`}>
-        <div className={styles.sectionInner}>
-          <span className={styles.sectionIndex}>
-            {project.highlights ? "05" : "04"}
-          </span>
-          <h2>{c.technicalImplementation}</h2>
-          <p>{project.engineering[locale]}</p>
-        </div>
-      </section>
-
-      {/* ── Gallery ── */}
-      {project.gallery && project.gallery.length > 0 && (
-        <section
-          className={`${styles.gallery} ${styles.animateIn}`}
-          aria-labelledby="gallery-heading"
-        >
-          <h2 id="gallery-heading" className={styles.galleryTitle}>
-            {c.gallery}
-          </h2>
-          <div className={styles.galleryGrid}>
-            {project.gallery.map((item, index) => (
-              <figure key={index} className={styles.galleryItem}>
-                <Image
-                  src={item.src}
-                  alt={item.alt[locale]}
-                  fill
-                  sizes="(max-width: 900px) 100vw, 45vw"
-                  loading="lazy"
-                />
-              </figure>
-            ))}
+        </details>
+        <details className={styles.technicalDetails} data-reveal>
+          <summary>
+            {c.evidence}
+            <span aria-hidden="true">+</span>
+          </summary>
+          <div className={styles.technicalBody}>
+            <p>{project.evidence[locale]}</p>
           </div>
-        </section>
-      )}
+        </details>
+        <details className={styles.technicalDetails} data-reveal>
+          <summary>
+            {c.boundaries}
+            <span aria-hidden="true">+</span>
+          </summary>
+          <div className={styles.technicalBody}>
+            <p>{project.limitation[locale]}</p>
+          </div>
+        </details>
+      </section>
 
-      {/* ── Evidence & Outcomes ── */}
-      <section className={`${styles.section} ${styles.animateIn}`}>
-        <div className={styles.sectionInner}>
-          <span className={styles.sectionIndex}>
-            {project.highlights ? "06" : "05"}
-          </span>
-          <h2>{c.evidence}</h2>
-          <p>{project.evidence[locale]}</p>
+      <section className={styles.ending} aria-labelledby="ending-title">
+        <div className={styles.endingMedia} aria-hidden="true">
+          {media.slice(0, 3).map((item, index) => (
+            <span key={item.id} data-ending-position={index}>
+              <ProjectVisual media={item} locale={locale} sizes="40vw" />
+            </span>
+          ))}
+        </div>
+        <div className={styles.endingCopy} data-reveal>
+          <p className={styles.eyebrow}>{c.endingEyebrow}</p>
+          <h2 id="ending-title">{c.endingTitle}</h2>
+          <p>{project.summary[locale]}</p>
+          <ul aria-label={c.stack}>
+            {project.stack.map((tech) => (
+              <li key={tech}>{tech}</li>
+            ))}
+          </ul>
+          <div className={styles.endingActions}>
+            <a href={project.repository} target="_blank" rel="noreferrer">
+              {c.repository} <span aria-hidden="true">↗</span>
+            </a>
+            <Link href={`/${locale}?focus=exploration`}>
+              {c.return}{" "}
+              <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ── Honest Boundaries ── */}
-      <section
-        className={`${styles.section} ${styles.boundary} ${styles.animateIn}`}
-      >
-        <div className={styles.sectionInner}>
-          <span className={styles.sectionIndex}>
-            {project.highlights ? "07" : "06"}
-          </span>
-          <h2>{c.honestBoundaries}</h2>
-          <p>{project.limitation[locale]}</p>
-        </div>
-      </section>
-
-      {/* ── Actions ── */}
-      <section
-        className={`${styles.actions} ${styles.animateIn}`}
-        aria-label="Actions"
-      >
-        <a
-          className={styles.actionBtn}
-          href={project.repository}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {c.repository} <span aria-hidden="true">&#x2197;</span>
-        </a>
-        {project.demo && (
-          <a
-            className={styles.actionBtn}
-            href={project.demo}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {c.demo} <span aria-hidden="true">&#x2197;</span>
-          </a>
-        )}
-      </section>
-
-      {/* ── Previous / Next Project ── */}
-      <nav
-        className={`${styles.projectNav} ${styles.animateIn}`}
-        aria-label="Project navigation"
-      >
-        {prevProject && (
-          <Link
-            href={`/${locale}/projects/${prevProject.slug}`}
-            className={styles.projectNavLink}
-          >
-            <span className={styles.projectNavLabel}>{c.previousProject}</span>
-            <span className={styles.projectNavTitle}>
-              {prevProject.shortTitle}
-            </span>
-          </Link>
-        )}
-        {nextProject && (
-          <Link
-            href={`/${locale}/projects/${nextProject.slug}`}
-            className={`${styles.projectNavLink} ${styles.projectNavLinkNext}`}
-          >
-            <span className={styles.projectNavLabel}>{c.nextProject}</span>
-            <span className={styles.projectNavTitle}>
-              {nextProject.shortTitle}
-            </span>
-          </Link>
-        )}
+      <nav className={styles.projectNav} aria-label="Project navigation">
+        <Link href={`/${locale}/projects/${previous.slug}`}>
+          <span>{c.previousProject}</span>
+          <strong>{previous.shortTitle}</strong>
+        </Link>
+        <Link href={`/${locale}/projects/${next.slug}`}>
+          <span>{c.nextProject}</span>
+          <strong>{next.shortTitle}</strong>
+        </Link>
       </nav>
 
-      {/* ── Final Return ── */}
-      <footer className={styles.footer}>
-        <Link
-          href={`/${locale}?focus=exploration`}
-          className={styles.finalReturn}
-        >
-          {c.finalReturn}
-        </Link>
-      </footer>
+      <dialog
+        ref={dialogRef}
+        className={styles.viewer}
+        aria-label={c.galleryTitle}
+        onClose={() => setViewerIndex(null)}
+        onCancel={() => setViewerIndex(null)}
+        onKeyDown={handleViewerKey}
+        onPointerDown={(event) => {
+          pointerStart.current = event.clientX;
+        }}
+        onPointerUp={(event) => {
+          if (pointerStart.current === null || viewerIndex === null) return;
+          const distance = event.clientX - pointerStart.current;
+          if (Math.abs(distance) > 55)
+            showMedia(viewerIndex + (distance < 0 ? 1 : -1));
+          pointerStart.current = null;
+        }}
+      >
+        {viewerIndex !== null && (
+          <div className={styles.viewerInner}>
+            <div className={styles.viewerTopbar}>
+              <span aria-live="polite">
+                {c.mediaStatus} {viewerIndex + 1} / {media.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => dialogRef.current?.close()}
+                aria-label={c.closeViewer}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.viewerMedia}>
+              <ProjectVisual
+                media={media[viewerIndex]!}
+                locale={locale}
+                sizes="96vw"
+              />
+            </div>
+            <div className={styles.viewerFooter}>
+              <button
+                type="button"
+                onClick={() => showMedia(viewerIndex - 1)}
+                aria-label={c.previousMedia}
+              >
+                {locale === "ar" ? "→" : "←"}
+              </button>
+              <p>
+                {media[viewerIndex]!.caption?.[locale] ??
+                  media[viewerIndex]!.alt[locale]}
+              </p>
+              <button
+                type="button"
+                onClick={() => showMedia(viewerIndex + 1)}
+                aria-label={c.nextMedia}
+              >
+                {locale === "ar" ? "←" : "→"}
+              </button>
+            </div>
+          </div>
+        )}
+      </dialog>
     </main>
   );
 }

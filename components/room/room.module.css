@@ -81,7 +81,7 @@
 .introLights > span {
   position: absolute;
   inset: 0;
-  background: url("/engineering-room-balanced-4k.webp") center 48% / cover
+  background: url("/engineering-room-balanced-final-v2.webp") center 48% / cover
     no-repeat;
   opacity: 0;
 }

@@ -175,7 +175,7 @@ test("room selection focuses a section without leaving the hub", async ({
 test("failed room poster keeps static navigation available", async ({
   page,
 }) => {
-  await page.route("**/engineering-room-balanced-4k.webp", (route) =>
+  await page.route("**/engineering-room-balanced-final-v2.webp", (route) =>
     route.abort(),
   );
   await page.goto("/en");

@@ -22,7 +22,7 @@ import styles from "./room.module.css";
 const roomAreas = ["projects", "exploration", "lab"] as const;
 const focusStills = {
   projects: "/engineering-room-hire-straight.webp",
-  exploration: "/engineering-room-watch-contained-v2.webp",
+  exploration: "/engineering-room-explore-focus-final.webp",
   lab: "/engineering-room-learn-straight.webp",
 } as const;
 type RoomArea = (typeof roomAreas)[number];
@@ -372,7 +372,7 @@ export function RoomExperience({
           <Image
             ref={roomImageRef}
             className={styles.roomImage}
-            src="/engineering-room-balanced-4k.webp"
+            src="/engineering-room-balanced-final-v2.webp"
             alt=""
             fill
             priority
@@ -386,7 +386,7 @@ export function RoomExperience({
           />
           <Image
             className={styles.focusedRoomImage}
-            src="/engineering-room-balanced-4k.webp"
+            src="/engineering-room-balanced-final-v2.webp"
             alt=""
             fill
             unoptimized

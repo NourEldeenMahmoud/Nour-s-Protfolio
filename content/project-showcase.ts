@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/routing";
+import { getProjectMedia, type Project } from "@/content/portfolio";
 
 export type CategoryId =
   "web" | "game-development" | "desktop" | "mobile-applications" | "bots";
@@ -59,18 +60,11 @@ export const categories: ShowcaseCategory[] = [
  * Build media items from a portfolio project's primary image + gallery.
  * Returns a non-empty array: at minimum the primary image.
  */
-export function buildMediaItems(project: {
-  image: string;
-  imageAlt: Record<Locale, string>;
-  gallery?: Array<{ src: string; alt: Record<Locale, string> }>;
-}): MediaItem[] {
-  const items: MediaItem[] = [
-    { type: "image", src: project.image, alt: project.imageAlt },
-  ];
-  if (project.gallery) {
-    for (const g of project.gallery) {
-      items.push({ type: "image", src: g.src, alt: g.alt });
-    }
-  }
-  return items;
+export function buildMediaItems(project: Project): MediaItem[] {
+  return getProjectMedia(project).map(({ type, src, alt, poster }) => ({
+    type,
+    src,
+    alt,
+    poster,
+  }));
 }

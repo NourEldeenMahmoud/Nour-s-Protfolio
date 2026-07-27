@@ -13,6 +13,24 @@ export type ProjectSlug = (typeof projectSlugs)[number];
 
 type LocalizedText = Record<Locale, string>;
 
+export type ProjectMedia = {
+  id: string;
+  type: "image" | "video";
+  src: string;
+  alt: LocalizedText;
+  caption?: LocalizedText;
+  poster?: string;
+  thumbnail?: string;
+  group?: string;
+  purpose?: "product" | "architecture" | "workflow" | "evidence";
+  featured?: boolean;
+  orientation?: "landscape" | "portrait" | "square";
+  device?: "browser" | "desktop" | "mobile" | "diagram" | "none";
+  treatment?: "stage" | "full" | "pair" | "sequence";
+  theme?: "amber" | "cyan" | "neutral";
+  focalPosition?: string;
+};
+
 export type Project = {
   slug: ProjectSlug;
   title: string;
@@ -20,6 +38,8 @@ export type Project = {
   image: string;
   imageAlt: LocalizedText;
   gallery?: Array<{ src: string; alt: LocalizedText }>;
+  /** Rich media takes precedence over image/gallery in Project Exploration. */
+  media?: ProjectMedia[];
   summary: LocalizedText;
   context: LocalizedText;
   contribution: LocalizedText;
@@ -368,4 +388,51 @@ export const projects: Project[] = [
 
 export function getProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
+}
+
+/** Normalizes legacy project imagery into the reusable rich-media contract. */
+export function getProjectMedia(project: Project): ProjectMedia[] {
+  if (project.media?.length) return project.media;
+
+  return [
+    {
+      id: `${project.slug}-hero`,
+      type: "image" as const,
+      src: project.image,
+      alt: project.imageAlt,
+      caption: project.summary,
+      group: "overview",
+      purpose: "product" as const,
+      featured: true,
+      orientation: "landscape" as const,
+      device:
+        project.slug === "blood-bank-mobile"
+          ? ("mobile" as const)
+          : ("browser" as const),
+      treatment: "stage" as const,
+      theme: "amber" as const,
+      focalPosition: "50% 50%",
+    },
+    ...(project.gallery ?? []).map((item, index) => ({
+      id: `${project.slug}-gallery-${index + 1}`,
+      type: "image" as const,
+      src: item.src,
+      alt: item.alt,
+      caption: item.alt,
+      group: "product",
+      purpose: "product" as const,
+      featured: index === 0,
+      orientation:
+        project.slug === "blood-bank-mobile"
+          ? ("portrait" as const)
+          : ("landscape" as const),
+      device:
+        project.slug === "blood-bank-mobile"
+          ? ("mobile" as const)
+          : ("browser" as const),
+      treatment: "full" as const,
+      theme: "cyan" as const,
+      focalPosition: "50% 50%",
+    })),
+  ];
 }
