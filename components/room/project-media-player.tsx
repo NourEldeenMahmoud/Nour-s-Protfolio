@@ -18,6 +18,7 @@ import {
   type ProjectMedia,
 } from "@/content/portfolio";
 import type { Locale } from "@/i18n/routing";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import {
   buildMediaTimeline,
   clampTimelineTime,
@@ -70,19 +71,7 @@ function PlayIcon({ paused }: { paused: boolean }) {
   );
 }
 
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
 
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-
-  return reduced;
-}
 
 function useSaveData() {
   const [saveData, setSaveData] = useState(() => {

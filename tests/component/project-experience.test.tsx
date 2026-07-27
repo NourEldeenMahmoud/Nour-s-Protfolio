@@ -4,14 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProjectExperience } from "@/components/projects/project-experience";
 import { getProject, getProjectDetailMedia } from "@/content/portfolio";
 
-vi.mock("gsap", () => ({
-  gsap: {
+vi.mock("gsap", () => {
+  const gsapObj = {
     registerPlugin: vi.fn(),
     context: vi.fn(() => ({ revert: vi.fn() })),
-  },
-}));
+    fromTo: vi.fn(),
+  };
+  return {
+    gsap: gsapObj,
+    default: gsapObj,
+  };
+});
 
-vi.mock("gsap/ScrollTrigger", () => ({ ScrollTrigger: {} }));
+vi.mock("gsap/ScrollTrigger", () => ({ ScrollTrigger: {}, default: {} }));
 
 const buildsense = getProject("buildsense")!;
 const httyai = getProject("how-to-train-your-ai")!;
@@ -107,5 +112,24 @@ describe("ProjectExperience", () => {
     const closeButton = screen.getByRole("button", { name: "Close media viewer" });
     await user.click(closeButton);
     expect(dialog).not.toHaveAttribute("open");
+  });
+
+  it("renders Case Study link in both relevant action areas for projects with case study (BuildSense)", () => {
+    render(<ProjectExperience locale="en" project={buildsense} />);
+    const links = screen.getAllByRole("link", { name: /View Technical Case Study/i });
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute("href", "/en/case-studies/buildsense");
+    }
+  });
+
+  it("does not render any Case Study link for projects without case study", () => {
+    render(<ProjectExperience locale="en" project={httyai} />);
+    expect(screen.queryByRole("link", { name: /View Technical Case Study/i })).not.toBeInTheDocument();
+    expect(document.querySelector('a[href*="/case-studies/how-to-train-your-ai"]')).not.toBeInTheDocument();
+
+    render(<ProjectExperience locale="en" project={metSummaries} />);
+    expect(screen.queryByRole("link", { name: /View Technical Case Study/i })).not.toBeInTheDocument();
+    expect(document.querySelector('a[href*="/case-studies/met-summaries"]')).not.toBeInTheDocument();
   });
 });

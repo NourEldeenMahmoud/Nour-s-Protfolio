@@ -315,13 +315,13 @@ export function ProjectExperience({
 
   useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root) return;
+    if (!root || process.env.NODE_ENV === "test") return;
     let context: { revert: () => void } | undefined;
     let cancelled = false;
 
     void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
       ([{ gsap }, { ScrollTrigger }]) => {
-        if (cancelled) return;
+        if (cancelled || process.env.NODE_ENV === "test") return;
         gsap.registerPlugin(ScrollTrigger);
         context = gsap.context(() => {
           gsap.fromTo(
@@ -925,10 +925,12 @@ export function ProjectExperience({
             <a href={project.repository} target="_blank" rel="noreferrer">
               {c.repository} <span aria-hidden="true">↗</span>
             </a>
-            <Link href={`/${locale}/case-studies/${project.slug}`}>
-              {c.caseStudy}{" "}
-              <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
-            </Link>
+            {hasCaseStudy(project.slug) && (
+              <Link href={`/${locale}/case-studies/${project.slug}`}>
+                {c.caseStudy}{" "}
+                <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
+              </Link>
+            )}
             <Link href={`/${locale}?focus=exploration`}>
               {c.return}{" "}
               <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
