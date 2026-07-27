@@ -98,7 +98,7 @@ export function CaseStudyPaperMap({
           <a
             key={paper.slug}
             className={styles.paper}
-            href={`/${locale}/projects/${paper.slug}`}
+            href={`/${locale}/case-studies/${paper.slug}`}
             aria-label={`${copy[locale].action}: ${project.title}`}
             tabIndex={active ? 0 : -1}
             onClick={(event) => {

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProjectExperience } from "@/components/projects/project-experience";
-import { getProject } from "@/content/portfolio";
+import { getProject, getProjectMedia } from "@/content/portfolio";
 
 vi.mock("gsap", () => ({
   gsap: {
@@ -88,7 +88,7 @@ describe("ProjectExperience", () => {
     render(<ProjectExperience locale="en" project={buildsense} />);
 
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(2);
+    expect(tabs).toHaveLength(getProjectMedia(buildsense).length);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tabpanel")).toHaveAttribute(
       "aria-labelledby",
@@ -142,6 +142,16 @@ describe("ProjectExperience", () => {
     expect(
       screen.queryByRole("link", { name: /Open live product/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it("keeps technical case studies separate from visual exploration", () => {
+    render(<ProjectExperience locale="en" project={buildsense} />);
+
+    for (const link of screen.getAllByRole("link", {
+      name: /View Technical Case Study/,
+    })) {
+      expect(link).toHaveAttribute("href", "/en/case-studies/buildsense");
+    }
   });
 
   it("retains previous, next, and Engineering Room return routes", () => {

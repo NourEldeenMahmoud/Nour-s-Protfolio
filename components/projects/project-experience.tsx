@@ -25,6 +25,7 @@ const copy = {
     back: "Back to Explore",
     repository: "View repository",
     demo: "Open live product",
+    caseStudy: "View Technical Case Study",
     category: "Product world",
     role: "Nour's role",
     context: "Project context",
@@ -74,6 +75,7 @@ const copy = {
     back: "العودة إلى الاستكشاف",
     repository: "عرض المستودع",
     demo: "فتح المنتج المنشور",
+    caseStudy: "عرض دراسة الحالة التقنية",
     category: "عالم المنتج",
     role: "دور نور",
     context: "سياق المشروع",
@@ -488,6 +490,10 @@ export function ProjectExperience({
                   {c.demo} <span aria-hidden="true">↗</span>
                 </a>
               )}
+              <Link href={`/${locale}/case-studies/${project.slug}`}>
+                {c.caseStudy}{" "}
+                <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
+              </Link>
             </div>
           </div>
         </div>
@@ -817,6 +823,10 @@ export function ProjectExperience({
             <a href={project.repository} target="_blank" rel="noreferrer">
               {c.repository} <span aria-hidden="true">↗</span>
             </a>
+            <Link href={`/${locale}/case-studies/${project.slug}`}>
+              {c.caseStudy}{" "}
+              <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
+            </Link>
             <Link href={`/${locale}?focus=exploration`}>
               {c.return}{" "}
               <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>

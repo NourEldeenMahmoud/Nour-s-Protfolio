@@ -19,7 +19,7 @@ const copy = {
     stack: "Technology",
     repository: "Repository",
     demo: "Verified demo",
-    full: "Open full case-study page",
+    details: "Project Details",
     gallery: "Repository image index",
     highlights: "Repository field notes",
   },
@@ -34,7 +34,7 @@ const copy = {
     stack: "التقنيات",
     repository: "المستودع",
     demo: "النسخة المؤكدة",
-    full: "افتح صفحة دراسة الحالة الكاملة",
+    details: "تفاصيل المشروع",
     gallery: "فهرس صور المستودع",
     highlights: "ملاحظات موثقة من المستودع",
   },
@@ -112,8 +112,9 @@ export function CaseStudyModal({
                   {c.demo} <span aria-hidden="true">↗</span>
                 </a>
               )}
-              <Link href={`/${locale}/projects/${project.slug}`}>
-                {c.full} <span aria-hidden="true">→</span>
+              <Link href={`/${locale}/case-studies/${project.slug}`}>
+                {c.details}{" "}
+                <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
               </Link>
             </div>
           </div>
