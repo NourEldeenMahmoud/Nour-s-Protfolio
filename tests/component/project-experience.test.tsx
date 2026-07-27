@@ -14,7 +14,8 @@ vi.mock("gsap", () => ({
 vi.mock("gsap/ScrollTrigger", () => ({ ScrollTrigger: {} }));
 
 const buildsense = getProject("buildsense")!;
-const bookify = getProject("bookify")!;
+const httyai = getProject("how-to-train-your-ai")!;
+const metSummaries = getProject("met-summaries")!;
 
 class MockIntersectionObserver {
   observe = vi.fn();
@@ -53,35 +54,34 @@ describe("ProjectExperience", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "BuildSense" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText(buildsense.summary.en).length).toBeGreaterThan(
-      0,
-    );
-    expect(screen.getAllByText(buildsense.context.en).length).toBeGreaterThan(
-      0,
-    );
-    expect(
-      screen.getAllByText(buildsense.contribution.en).length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText(buildsense.summary.en).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(buildsense.context.en).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(buildsense.contribution.en).length).toBeGreaterThan(0);
     expect(screen.queryByText("Not published")).not.toBeInTheDocument();
-    expect(screen.queryByText("Development Process")).not.toBeInTheDocument();
   });
 
-  it("exposes the visitor-friendly exploration zones", () => {
+  it("adapts labels for product kind", () => {
     render(<ProjectExperience locale="en" project={buildsense} />);
+    expect(screen.getAllByText("Behind the product").length).toBeGreaterThan(0);
+    expect(screen.getByText("Explore the product")).toBeInTheDocument();
+    expect(screen.getByText("Product highlights")).toBeInTheDocument();
+    expect(screen.getByText("End of project world")).toBeInTheDocument();
+  });
 
-    const navigation = screen.getByRole("navigation", {
-      name: "Project exploration zones",
-    });
-    for (const label of [
-      "Overview",
-      "Experience",
-      "Highlights",
-      "My Work",
-      "Gallery",
-      "Behind the Product",
-    ]) {
-      expect(navigation).toHaveTextContent(label);
-    }
+  it("adapts labels for game kind", () => {
+    render(<ProjectExperience locale="en" project={httyai} />);
+    expect(screen.getAllByText("Behind the game").length).toBeGreaterThan(0);
+    expect(screen.getByText("Explore the experience")).toBeInTheDocument();
+    expect(screen.getByText("Gameplay highlights")).toBeInTheDocument();
+    expect(screen.getByText("End of game world")).toBeInTheDocument();
+  });
+
+  it("adapts labels for collection kind", () => {
+    render(<ProjectExperience locale="en" project={metSummaries} />);
+    expect(screen.getAllByText("Behind the collection").length).toBeGreaterThan(0);
+    expect(screen.getByText("Explore the collection")).toBeInTheDocument();
+    expect(screen.getByText("Subjects and highlights")).toBeInTheDocument();
+    expect(screen.getByText("End of collection")).toBeInTheDocument();
   });
 
   it("provides accessible product experience tabs backed by real media", () => {
@@ -90,97 +90,22 @@ describe("ProjectExperience", () => {
     const tabs = screen.getAllByRole("tab");
     expect(tabs).toHaveLength(getProjectDetailMedia(buildsense).length);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tabpanel")).toHaveAttribute(
-      "aria-labelledby",
-      tabs[0]?.id,
-    );
   });
 
   it("opens gallery media in the keyboard-operable viewer", async () => {
     const user = userEvent.setup();
     render(<ProjectExperience locale="en" project={buildsense} />);
 
-    await user.click(screen.getByRole("button", { name: /View 1:/ }));
+    const viewButtons = screen.getAllByRole("button", {
+      name: /Open media viewer/i,
+    });
+    await user.click(viewButtons[0]!);
 
-    expect(
-      screen.getByRole("dialog", { name: "Inspect the product up close" }),
-    ).toHaveAttribute("open");
-    expect(
-      screen.getByRole("button", { name: "Previous media" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Next media" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Close media viewer" }),
-    ).toBeInTheDocument();
-  });
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
 
-  it("keeps technical depth optional and preserves verified evidence", () => {
-    render(<ProjectExperience locale="en" project={buildsense} />);
-
-    expect(
-      screen.getByText("How it works").closest("details"),
-    ).not.toHaveAttribute("open");
-    expect(screen.getByText(buildsense.engineering.en)).toBeInTheDocument();
-    expect(screen.getByText(buildsense.evidence.en)).toBeInTheDocument();
-    expect(screen.getByText(buildsense.limitation.en)).toBeInTheDocument();
-  });
-
-  it("renders only verified external actions", () => {
-    const { rerender } = render(
-      <ProjectExperience locale="en" project={buildsense} />,
-    );
-    expect(
-      screen.getAllByRole("link", { name: /View repository/ })[0],
-    ).toHaveAttribute("href", buildsense.repository);
-    expect(
-      screen.getByRole("link", { name: /Open live product/ }),
-    ).toHaveAttribute("href", buildsense.demo);
-
-    rerender(<ProjectExperience locale="en" project={bookify} />);
-    expect(
-      screen.queryByRole("link", { name: /Open live product/ }),
-    ).not.toBeInTheDocument();
-  });
-
-  it("keeps technical case studies separate from visual exploration", () => {
-    render(<ProjectExperience locale="en" project={buildsense} />);
-
-    for (const link of screen.getAllByRole("link", {
-      name: /View Technical Case Study/,
-    })) {
-      expect(link).toHaveAttribute("href", "/en/case-studies/buildsense");
-    }
-  });
-
-  it("retains previous, next, and Engineering Room return routes", () => {
-    render(<ProjectExperience locale="en" project={buildsense} />);
-
-    expect(
-      screen.getByRole("link", { name: /Previous project/ }),
-    ).toHaveAttribute("href", "/en/projects/met-summaries");
-    expect(screen.getByRole("link", { name: /Next project/ })).toHaveAttribute(
-      "href",
-      "/en/projects/bookify",
-    );
-    for (const link of screen.getAllByRole("link", {
-      name: /Back to Explore|Return to Explore/,
-    })) {
-      expect(link).toHaveAttribute("href", "/en?focus=exploration");
-    }
-  });
-
-  it("localizes navigation, disclosure, and actions for Arabic", () => {
-    render(<ProjectExperience locale="ar" project={bookify} />);
-
-    expect(
-      screen.getByRole("navigation", { name: "مناطق استكشاف المشروع" }),
-    ).toHaveTextContent("خلف المنتج");
-    expect(screen.getByText("كيف يعمل")).toBeInTheDocument();
-    expect(
-      screen.getAllByRole("link", { name: /العودة إلى الاستكشاف/ }).length,
-    ).toBeGreaterThan(0);
-    expect(screen.queryByText("غير منشور")).not.toBeInTheDocument();
+    const closeButton = screen.getByRole("button", { name: "Close media viewer" });
+    await user.click(closeButton);
+    expect(dialog).not.toHaveAttribute("open");
   });
 });

@@ -23,6 +23,9 @@
     "lighthouse": "lhci autorun",
     "media:scan": "node scripts/media/scan-projects.mjs",
     "media:inspect": "node scripts/media/inspect-video.mjs",
+    "media:prepare": "node scripts/media/prepare-media.mjs",
+    "media:poster": "node scripts/media/poster-media.mjs",
+    "media:frames": "node scripts/media/frames-media.mjs",
     "media:validate": "node scripts/media/validate-media.mjs"
   },
   "dependencies": {

@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Locale } from "@/i18n/routing";
-import { projects } from "@/content/portfolio";
+import { projects, type Project } from "@/content/portfolio";
+import { caseStudySlugs } from "@/content/case-studies";
 import styles from "./path.module.css";
 
 export type PortfolioPath = "hire" | "watch" | "learn" | "general";
@@ -281,6 +282,10 @@ function PathHeader({
 
 function WatchPath({ locale }: { locale: Locale }) {
   const c = copy[locale].watch;
+  const caseStudyProjects = caseStudySlugs
+    .map((slug) => projects.find((p) => p.slug === slug))
+    .filter((p): p is Project => p !== undefined);
+
   return (
     <>
       <section className={styles.pathHero}>
@@ -289,7 +294,7 @@ function WatchPath({ locale }: { locale: Locale }) {
         <p>{c.intro}</p>
       </section>
       <section className={styles.projectGrid} aria-label={c.title}>
-        {projects.map((project, index) => (
+        {caseStudyProjects.map((project, index) => (
           <article
             key={project.slug}
             className={styles.projectCard}
@@ -297,7 +302,7 @@ function WatchPath({ locale }: { locale: Locale }) {
           >
             <Link
               className={styles.projectImage}
-              href={`/${locale}/projects/${project.slug}`}
+              href={`/${locale}/case-studies/${project.slug}`}
               aria-label={`${c.open}: ${project.title}`}
             >
               <Image
@@ -324,7 +329,7 @@ function WatchPath({ locale }: { locale: Locale }) {
                 ))}
               </ul>
               <div className={styles.projectActions}>
-                <Link href={`/${locale}/projects/${project.slug}`}>
+                <Link href={`/${locale}/case-studies/${project.slug}`}>
                   {c.open}
                 </Link>
                 <a href={project.repository} target="_blank" rel="noreferrer">

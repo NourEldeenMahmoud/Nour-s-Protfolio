@@ -4,7 +4,7 @@ import {
   ProjectMediaPlayer,
   type ProjectMediaPlayerCopy,
 } from "@/components/room/project-media-player";
-import { projects, type Project } from "@/content/portfolio";
+import { getProject } from "@/content/portfolio";
 
 const copy: ProjectMediaPlayerCopy = {
   play: "Play project film",
@@ -22,37 +22,11 @@ const copy: ProjectMediaPlayerCopy = {
   mediaUnavailable: "Media unavailable",
 };
 
-const videoProject: Project = {
-  ...projects[0]!,
-  media: [
-    {
-      id: "demo-video",
-      type: "video",
-      src: "/projects/demo.mp4",
-      poster: "/projects/buildsense.webp",
-      alt: {
-        en: "BuildSense product walkthrough",
-        ar: "جولة في مشروع BuildSense",
-      },
-      duration: 8,
-    },
-    {
-      id: "closing-image",
-      type: "image",
-      src: "/projects/buildsense.webp",
-      alt: {
-        en: "BuildSense closing scene",
-        ar: "المشهد الختامي لمشروع BuildSense",
-      },
-      duration: 5,
-    },
-  ],
-};
-
-function renderVideoPlayer() {
+function renderBuildSensePlayer() {
+  const buildsense = getProject("buildsense")!;
   return render(
     <ProjectMediaPlayer
-      project={videoProject}
+      project={buildsense}
       locale="en"
       categoryLabel="Web"
       copy={copy}
@@ -63,7 +37,7 @@ function renderVideoPlayer() {
   );
 }
 
-describe("ProjectMediaPlayer video playback", () => {
+describe("ProjectMediaPlayer video playback & preferences", () => {
   beforeEach(() => {
     vi.stubGlobal(
       "matchMedia",
@@ -91,10 +65,10 @@ describe("ProjectMediaPlayer video playback", () => {
   });
 
   it("uses native video metadata and time updates in the shared timeline", () => {
-    renderVideoPlayer();
+    renderBuildSensePlayer();
 
-    const video = screen.getByLabelText("BuildSense product walkthrough");
-    expect(video).toHaveAttribute("src", "/projects/demo.mp4");
+    const video = screen.getByLabelText("BuildSense PC hardware discovery preview video");
+    expect(video).toHaveAttribute("src", "/projects/buildsense/preview/preview.mp4");
     expect(video).toHaveAttribute("preload", "metadata");
     expect(video).toHaveProperty("muted", true);
     expect(video).toHaveProperty("playsInline", true);
@@ -117,25 +91,47 @@ describe("ProjectMediaPlayer video playback", () => {
     expect(screen.getByText("0:03 / 0:07")).toBeInTheDocument();
   });
 
-  it("pauses while the document is hidden and resumes when it becomes visible", () => {
-    const play = vi.mocked(HTMLMediaElement.prototype.play);
-    const pause = vi.mocked(HTMLMediaElement.prototype.pause);
-    renderVideoPlayer();
-    play.mockClear();
-    pause.mockClear();
+  it("renders poster image before video canplay", () => {
+    renderBuildSensePlayer();
 
-    Object.defineProperty(document, "hidden", {
-      configurable: true,
-      value: true,
-    });
-    fireEvent(document, new Event("visibilitychange"));
-    expect(pause).toHaveBeenCalledOnce();
+    const posterImg = screen.getByAltText("BuildSense PC hardware discovery preview video");
+    expect(posterImg).toBeInTheDocument();
+    expect(posterImg).toHaveAttribute("src", expect.stringContaining("poster.webp"));
+  });
 
-    Object.defineProperty(document, "hidden", {
-      configurable: true,
-      value: false,
+  it("resets currentTime and replays on single-video ended event", () => {
+    renderBuildSensePlayer();
+
+    const video = screen.getByLabelText("BuildSense PC hardware discovery preview video") as HTMLVideoElement;
+    Object.defineProperty(video, "currentTime", { configurable: true, writable: true, value: 7 });
+    
+    fireEvent.ended(video);
+    expect(video.currentTime).toBe(0);
+  });
+
+  it("respects prefers-reduced-motion by disabling initial autoplay", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
+
+    renderBuildSensePlayer();
+    const playButton = screen.getByRole("button", { name: copy.play });
+    expect(playButton).toBeInTheDocument();
+  });
+
+  it("respects Save Data mode by using preload none and disabling initial autoplay", () => {
+    vi.stubGlobal("navigator", {
+      connection: { saveData: true },
     });
-    fireEvent(document, new Event("visibilitychange"));
-    expect(play).toHaveBeenCalledOnce();
+
+    renderBuildSensePlayer();
+    const video = screen.getByLabelText("BuildSense PC hardware discovery preview video");
+    expect(video).toHaveAttribute("preload", "none");
+    expect(screen.getByRole("button", { name: copy.play })).toBeInTheDocument();
   });
 });

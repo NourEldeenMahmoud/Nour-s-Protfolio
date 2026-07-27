@@ -465,8 +465,10 @@ describe("CenterShowcase", () => {
     const { container } = render(<CenterShowcase locale="en" copy={copy} />);
 
     const { fireEvent } = await import("@testing-library/react");
-    const mediaEl = container.querySelector("video, img")!;
-    fireEvent.error(mediaEl);
+    const video = container.querySelector("video");
+    const poster = container.querySelector("img");
+    if (video) fireEvent.error(video);
+    if (poster) fireEvent.error(poster);
 
     expect(screen.getByText("Media unavailable")).toBeInTheDocument();
     // Title and summary should still be visible

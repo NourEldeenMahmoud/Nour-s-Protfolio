@@ -1,10 +1,10 @@
 import type { Locale } from "@/i18n/routing";
-import { projectMediaPlaylists } from "@/content/project-media";
+import { projectMediaSets } from "@/content/project-media";
 
 export const projectSlugs = [
   "buildsense",
-  "bookify",
   "cinemaverse",
+  "bookify",
   "frontend-mini-projects",
   "how-to-train-your-ai",
   "sharp-shooter",
@@ -18,6 +18,13 @@ export const projectSlugs = [
 ] as const;
 
 export type ProjectSlug = (typeof projectSlugs)[number];
+
+export type CategoryId =
+  | "web"
+  | "game-development"
+  | "desktop"
+  | "mobile-applications"
+  | "summaries";
 
 /**
  * Product — a system, application, or service with a defined problem and users.
@@ -51,6 +58,7 @@ export type ProjectMedia = {
 
 export type Project = {
   slug: ProjectSlug;
+  category: CategoryId;
   kind: ProjectKind;
   title: string;
   shortTitle: string;
@@ -76,15 +84,15 @@ export const projects: Project[] = [
   // ──────────────────────────── WEB ────────────────────────────
   {
     slug: "buildsense",
+    category: "web",
     kind: "product",
     title: "BuildSense",
     shortTitle: "BuildSense",
-    image: "/projects/buildsense/home.webp",
+    image: "/projects/buildsense/details/home.webp",
     imageAlt: {
       en: "BuildSense hardware discovery home page",
       ar: "الصفحة الرئيسية لمنصة BuildSense لاكتشاف مكونات الحاسوب",
     },
-    media: projectMediaPlaylists.buildsense,
     summary: {
       en: "PC hardware discovery and compatibility for the Egyptian market.",
       ar: "منصة لاكتشاف مكونات الحاسوب والتحقق من توافقها للسوق المصري.",
@@ -121,67 +129,16 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    slug: "bookify",
-    kind: "product",
-    title: "Bookify Hotel Reservation System",
-    shortTitle: "Bookify",
-    image: "/projects/bookify/04-home.webp",
-    imageAlt: {
-      en: "Bookify hotel reservation home page",
-      ar: "الصفحة الرئيسية لنظام حجز الفنادق Bookify",
-    },
-    media: projectMediaPlaylists.bookify,
-    summary: {
-      en: "A hotel reservation application covering availability, booking, payment, identity, and administration.",
-      ar: "تطبيق لحجز الفنادق يغطي التوفر والحجز والدفع والهوية والإدارة.",
-    },
-    context: {
-      en: "A team project and the clearest flagship evidence for Nour's .NET full-stack work.",
-      ar: "مشروع جماعي وأوضح دليل رئيسي على عمل نور المتكامل باستخدام .NET.",
-    },
-    contribution: {
-      en: "Nour states that he owned the backend work, booking and payment flows, identity and security, backend architecture, and frontend leadership.",
-      ar: "يوضح نور أنه تولى أعمال الباك إند وتدفقات الحجز والدفع والهوية والأمان وهندسة الباك إند وقيادة الواجهة الأمامية.",
-    },
-    engineering: {
-      en: "The application uses an N-tier structure with presentation, service, and data-access layers, plus Repository and Unit of Work patterns around EF Core and SQL Server.",
-      ar: "يستخدم التطبيق بنية متعددة الطبقات تشمل العرض والخدمات والوصول إلى البيانات، مع نمطي Repository وUnit of Work حول EF Core وSQL Server.",
-    },
-    evidence: {
-      en: "The repository documents customer and admin workflows, Stripe payment intents, SendGrid email, role-based access, health checks, and concurrency controls.",
-      ar: "يوثق المستودع تدفقات العملاء والإدارة وStripe Payment Intents والبريد عبر SendGrid والصلاحيات والفحوصات الصحية والتحكم في التزامن.",
-    },
-    limitation: {
-      en: "The previously listed deployment was unreachable during review, so this portfolio links to the repository rather than presenting an unverified live demo.",
-      ar: "تعذر الوصول إلى النسخة المنشورة المذكورة سابقاً أثناء المراجعة، لذلك يرتبط المعرض بالمستودع بدلاً من عرض نسخة حية غير مؤكدة.",
-    },
-    stack: [
-      ".NET 9",
-      "ASP.NET Core MVC",
-      "EF Core",
-      "SQL Server",
-      "Stripe",
-      "Identity",
-    ],
-    highlights: [
-      "Date-range room search, availability checks, room details, booking history, and customer profiles.",
-      "Admin dashboard for rooms, room types, bookings, refunds, users, occupancy, and revenue views.",
-      "Stripe Payment Intents, SendGrid transactional email, ASP.NET Identity, RBAC, lockout, and CSRF protection.",
-      "N-tier structure with Repository, Unit of Work, ViewModel, service layer, migrations, and health checks.",
-    ],
-    repository: "https://github.com/NourEldeenMahmoud/Bookify",
-  },
-  {
     slug: "cinemaverse",
+    category: "web",
     kind: "product",
     title: "CinemaVerse",
     shortTitle: "CinemaVerse",
-    image: "/projects/cinemaverse/home.webp",
+    image: "/projects/cinemaverse/details/home.webp",
     imageAlt: {
       en: "CinemaVerse movie booking home page",
       ar: "الصفحة الرئيسية لمنصة حجز السينما CinemaVerse",
     },
-    media: projectMediaPlaylists.cinemaverse,
     summary: {
       en: "A cinema ticket platform covering discovery, seats, bookings, payments, tickets, and administration.",
       ar: "منصة لتذاكر السينما تشمل الاستكشاف والمقاعد والحجوزات والمدفوعات والتذاكر والإدارة.",
@@ -224,7 +181,59 @@ export const projects: Project[] = [
     repository: "https://github.com/NourEldeenMahmoud/CinemaVerse",
   },
   {
+    slug: "bookify",
+    category: "web",
+    kind: "product",
+    title: "Bookify Hotel Reservation System",
+    shortTitle: "Bookify",
+    image: "/projects/bookify/details/04-home.webp",
+    imageAlt: {
+      en: "Bookify hotel reservation home page",
+      ar: "الصفحة الرئيسية لنظام حجز الفنادق Bookify",
+    },
+    summary: {
+      en: "A hotel reservation application covering availability, booking, payment, identity, and administration.",
+      ar: "تطبيق لحجز الفنادق يغطي التوفر والحجز والدفع والهوية والإدارة.",
+    },
+    context: {
+      en: "A team project and the clearest flagship evidence for Nour's .NET full-stack work.",
+      ar: "مشروع جماعي وأوضح دليل رئيسي على عمل نور المتكامل باستخدام .NET.",
+    },
+    contribution: {
+      en: "Nour states that he owned the backend work, booking and payment flows, identity and security, backend architecture, and frontend leadership.",
+      ar: "يوضح نور أنه تولى أعمال الباك إند وتدفقات الحجز والدفع والهوية والأمان وهندسة الباك إند وقيادة الواجهة الأمامية.",
+    },
+    engineering: {
+      en: "The application uses an N-tier structure with presentation, service, and data-access layers, plus Repository and Unit of Work patterns around EF Core and SQL Server.",
+      ar: "يستخدم التطبيق بنية متعددة الطبقات تشمل العرض والخدمات والوصول إلى البيانات، مع نمطي Repository وUnit of Work حول EF Core وSQL Server.",
+    },
+    evidence: {
+      en: "The repository documents customer and admin workflows, Stripe payment intents, SendGrid email, role-based access, health checks, and concurrency controls.",
+      ar: "يوثق المستودع تدفقات العملاء والإدارة وStripe Payment Intents والبريد عبر SendGrid والصلاحيات والفحوصات الصحية والتحكم في التزامن.",
+    },
+    limitation: {
+      en: "The previously listed deployment was unreachable during review, so this portfolio links to the repository rather than presenting an unverified live demo.",
+      ar: "تعذر الوصول إلى النسخة المنشورة المذكورة سابقاً أثناء المراجعة، لذلك يرتبط المعرض بالمستودع بدلاً من عرض نسخة حية غير مؤكدة.",
+    },
+    stack: [
+      ".NET 9",
+      "ASP.NET Core MVC",
+      "EF Core",
+      "SQL Server",
+      "Stripe",
+      "Identity",
+    ],
+    highlights: [
+      "Date-range room search, availability checks, room details, booking history, and customer profiles.",
+      "Admin dashboard for rooms, room types, bookings, refunds, users, occupancy, and revenue views.",
+      "Stripe Payment Intents, SendGrid transactional email, ASP.NET Identity, RBAC, lockout, and CSRF protection.",
+      "N-tier structure with Repository, Unit of Work, ViewModel, service layer, migrations, and health checks.",
+    ],
+    repository: "https://github.com/NourEldeenMahmoud/Bookify",
+  },
+  {
     slug: "frontend-mini-projects",
+    category: "web",
     kind: "collection",
     title: "Frontend Mini Projects",
     shortTitle: "Frontend Mini",
@@ -233,267 +242,278 @@ export const projects: Project[] = [
       en: "Frontend Mini Projects landing pages collection index",
       ar: "فهرس مجموعة مشاريع الواجهات الأمامية المصغّرة",
     },
-    media: projectMediaPlaylists["frontend-mini-projects"],
     summary: {
-      en: "Six responsive landing-page challenges from Frontend Mentor, built with HTML, CSS, and vanilla JavaScript.",
-      ar: "ستة تحديات لصفحات هبوط متجاوبة من Frontend Mentor، مبنية بـHTML وCSS وJavaScript خالص.",
+      en: "Six responsive landing-page challenges built with HTML and Tailwind CSS.",
+      ar: "ستة تحديات لصفحات هبوط متجاوبة مبنية بـHTML وTailwind CSS.",
     },
     context: {
-      en: "Practice projects completed to sharpen responsive layout, CSS architecture, and component thinking before framework work.",
-      ar: "مشاريع تدريبية أُنجزت لتعزيز التخطيط المتجاوب وهندسة CSS والتفكير بالمكونات قبل العمل بالأطر.",
+      en: "Practice challenges from Frontend Mentor completed to sharpen responsive layout and modern component structure.",
+      ar: "تحديات تدريبية من Frontend Mentor أُنجزت لتعزيز التخطيط المتجاوب وهيكل المكونات الحديث.",
     },
     contribution: {
-      en: "Nour completed all six challenges individually, from design interpretation through pixel-accurate implementation and deployment.",
-      ar: "أنجز نور التحديات الستة بمفرده، من تفسير التصميم إلى التنفيذ الدقيق والنشر.",
+      en: "Nour completed all six challenges individually, from design interpretation through pixel-accurate layout implementation and GitHub Pages deployment.",
+      ar: "أنجز نور التحديات الستة بمفرده، من تفسير التصميم إلى التنفيذ الدقيق والنشر على GitHub Pages.",
     },
     engineering: {
-      en: "Each project uses semantic HTML5, modern CSS (custom properties, Flexbox, Grid), and minimal JavaScript for interactive elements. Deployed as a single GitHub Pages repository.",
-      ar: "يستخدم كل مشروع HTML5 دلالياً وCSS حديثاً (متغيرات مخصصة، Flexbox، Grid) وجافا سكريبت محدوداً للعناصر التفاعلية. يُنشر كمستودع GitHub Pages واحد.",
+      en: "Each project uses semantic HTML5, utility-first Tailwind CSS, and minimal JavaScript where needed for mobile overlays, accordions, and tabs.",
+      ar: "يستخدم كل مشروع HTML5 دلالياً وTailwind CSS قائماً على المرافق وجافا سكريبت محدوداً للقوائم المنبثقة والتبويبات.",
     },
     evidence: {
-      en: "All six pages are live on GitHub Pages, and the repository contains the source for each challenge.",
-      ar: "الصفحات الست منشورة على GitHub Pages والمستودع يحتوي على مصدر كل تحدٍّ.",
+      en: "All six landing pages are live on GitHub Pages, and the repository contains the source code for each challenge.",
+      ar: "الصفحات الست منشورة على GitHub Pages والمستودع يحتوي على كود المصدر لكل تحدٍّ.",
     },
     limitation: {
-      en: "These are pixel-accuracy exercises, not original product designs. Cross-browser automated test coverage is not included.",
-      ar: "هذه تمارين دقة بكسل وليست تصاميم منتج أصلية. لا تتضمن تغطية اختبارات آلية عبر المتصفحات.",
+      en: "These are design implementation exercises based on Frontend Mentor challenges, not original product designs.",
+      ar: "هذه تمارين تنفيذ تصاميم استناداً إلى تحديات Frontend Mentor وليست تصاميم منتج أصلية.",
     },
-    stack: ["HTML5", "CSS3", "JavaScript", "GitHub Pages"],
+    stack: ["HTML5", "Tailwind CSS", "JavaScript", "GitHub Pages"],
     highlights: [
-      "Bookmark Manager — tab-based landing page with animated indicator.",
-      "Shortly URL Shortener — API-connected link shortener with copy and validation.",
-      "Fylo — two-column landing with curved SVG section dividers.",
-      "Loopstudios — CSS Grid hero with hover-overlay gallery.",
-      "Testimonials Grid — CSS Grid two-column responsive testimonial layout.",
-      "Clipboard — macOS-themed download landing page.",
+      "Bookmark Manager — tabbed features section with accordion FAQ.",
+      "Shortly — responsive URL shortener landing page layout.",
+      "Fylo — dark/light theme landing page with feature cards.",
+      "Loopstudios — responsive VR landing page with CSS Grid gallery.",
+      "Testimonials Grid — multi-column responsive grid layout.",
+      "Clipboard — feature showcase landing page.",
     ],
     repository: "https://github.com/NourEldeenMahmoud/frontend-mini-projects",
     demo: "https://noureldeenmahmoud.github.io/frontend-mini-projects/",
   },
+
   // ──────────────────────────── GAME DEVELOPMENT ────────────────────────────
   {
     slug: "how-to-train-your-ai",
+    category: "game-development",
     kind: "game",
     title: "How To Train Your AI",
     shortTitle: "How To Train Your AI",
-    image: "/projects/how-to-train-your-ai/preview/poster.webp",
+    image: "/projects/how-to-train-your-ai/details/01-gameplay.webp",
     imageAlt: {
-      en: "How To Train Your AI gameplay — ML-Agents trained bot combat",
-      ar: "طريقة لعب How To Train Your AI — قتال بوت مدرّب بـML-Agents",
+      en: "How To Train Your AI gameplay — narrative introduction",
+      ar: "طريقة لعب How To Train Your AI — المقدمة السردية",
     },
-    media: projectMediaPlaylists["how-to-train-your-ai"],
     summary: {
-      en: "A Unity game featuring a bot trained with ML-Agents reinforcement learning to navigate an arena and eliminate the player.",
-      ar: "لعبة Unity تضم بوتاً مدرَّباً بتعلم التعزيز عبر ML-Agents للتنقل داخل ساحة والقضاء على اللاعب.",
+      en: "A narrative first-person Unity 6 experience where the player trains and repairs a robot across three interactive mini-games.",
+      ar: "تجربة سردية من منظور الشخص الأول بـUnity 6 يدرّب فيها اللاعب روبوتاً ويصلحه عبر ثلاث ألعاب مصغرة تفاعلية.",
     },
     context: {
-      en: "A university game project exploring ML-Agents training, arena design, and Unity game development.",
-      ar: "مشروع لعبة جامعي يستكشف تدريب ML-Agents وتصميم الساحات وتطوير ألعاب Unity.",
+      en: "A university game development project focusing on narrative integration, state switching, and interactive mini-game mechanics.",
+      ar: "مشروع تطوير ألعاب جامعي يركز على الدمج السردي والتبديل بين الحالات وميكانيكا الألعاب المصغرة التفاعلية.",
     },
     contribution: {
-      en: "Nour built the Unity environment, designed the training curriculum, implemented the ML-Agents reward function, and assembled the final game build.",
-      ar: "بنى نور بيئة Unity وصمّم منهج التدريب ونفّذ دالة المكافأة في ML-Agents وجمّع الإصدار النهائي من اللعبة.",
+      en: "Built in a team of four. Nour developed the core systems, Mini-Game 1 (calibration), and robot logic. Omar worked on Mini-Game 1, Oraby on Mini-Game 2 (energy & path efficiency), and Aya on Mini-Game 3 (spatial push puzzle) and post-credits.",
+      ar: "بُنيت ضمن فريق من أربعة. طور نور الأنظمة الأساسية واللعبة المصغرة 1 (المعايرة) ومنطق الروبوت، وعمل عمر على اللعبة 1، وعرابي على اللعبة 2 (الطاقة والكفاءة)، وآية على اللعبة 3 (لغز الدفع المكاني) وشاشة الخاتمة.",
     },
     engineering: {
-      en: "The agent observes raycasts, velocity, and relative target position, then learns to pursue and eliminate the player using a shaped reward signal. Training was run in Unity Editor with the ML-Agents toolkit.",
-      ar: "يرصد الوكيل أشعة الكشف والسرعة والموضع النسبي للهدف، ثم يتعلم ملاحقة اللاعب والقضاء عليه باستخدام إشارة مكافأة مُشكَّلة. جرى التدريب في Unity Editor بأدوات ML-Agents.",
+      en: "The project uses Unity 6 with URP, Cinemachine, AI Navigation, and Input System. Features player/robot control switching, persistent statistics, fault events based on trial results, and event-driven scene transitions.",
+      ar: "يستخدم المشروع Unity 6 مع URP وCinemachine وAI Navigation وInput System. يتضمن التبديل بين التحكم باللاعب والروبوت، وإحصائيات مستمرة، وأحداث أعطال استناداً لنتائج الاختبار، وانتقالات مشاهد قائمة على الأحداث.",
     },
     evidence: {
-      en: "The game trailer demonstrates the trained agent behavior. The repository contains the training configuration, reward function, and Unity project.",
-      ar: "يُظهر عرض اللعبة سلوك الوكيل المدرَّب. يحتوي المستودع على تكوين التدريب ودالة المكافأة ومشروع Unity.",
+      en: "The repository contains the complete Unity 6 project, README documentation, architectural notes, and full game scene setup.",
+      ar: "يحتوي المستودع على مشروع Unity 6 الكامل وتوثيق README والملاحظات الهندسية وإعداد المشاهد الكامل.",
     },
     limitation: {
-      en: "Training metrics and convergence curves are not published. The agent generalizes to the recorded scenarios but edge-case robustness is not formally evaluated.",
-      ar: "لا تُنشر مقاييس التدريب ومنحنيات التقارب. يُعمَّم الوكيل على السيناريوهات المسجّلة لكن متانة الحالات الطرفية لم تُقيَّم رسمياً.",
+      en: "This is a narrative training experience with custom puzzle scripts; it does not utilize autonomous agents or external machine learning toolkits.",
+      ar: "هذه تجربة تدريب سردية بسكريبتات ألغاز مخصصة؛ ولا تستخدم وكلاء ذاتية أو أدوات التعلم الآلي الخارجي.",
     },
-    stack: ["Unity", "C#", "ML-Agents", "Python"],
-    highlights: [
-      "Reinforcement-learning agent trained entirely within Unity ML-Agents.",
-      "Custom reward shaping for navigation, pursuit, and elimination objectives.",
-      "Arena environment with obstacles, spawn management, and game state tracking.",
-      "Full game build with HUD, health system, and win/loss conditions.",
+    stack: [
+      "Unity 6",
+      "C#",
+      "Universal Render Pipeline",
+      "Cinemachine",
+      "Input System",
+      "AI Navigation",
+      "TextMeshPro",
+      "Timeline",
     ],
-    repository: "https://github.com/NourEldeenMahmoud/How-To-Train-Your-AI",
+    highlights: [
+      "Narrative introduction with grandfather messages and story-driven progression.",
+      "Control switching between player interaction and robot operational view.",
+      "Three distinct training mini-games: control calibration, energy/path efficiency, and spatial push puzzle.",
+      "Persistent robot statistics, fault event system, and custom AI pathfinding.",
+    ],
+    repository: "https://github.com/NourEldeenMahmoud/HowToTrainYourAI-Game",
   },
   {
     slug: "sharp-shooter",
+    category: "game-development",
     kind: "game",
     title: "Sharp Shooter",
     shortTitle: "Sharp Shooter",
-    image: "/projects/sharp-shooter/preview/poster.webp",
+    image: "/projects/sharp-shooter/details/01-gameplay.webp",
     imageAlt: {
-      en: "Sharp Shooter first-person shooting gallery gameplay",
-      ar: "طريقة لعب Sharp Shooter — معرض الرماية من منظور الشخص الأول",
+      en: "Sharp Shooter precision aim-training gameplay",
+      ar: "طريقة لعب Sharp Shooter — تدريب الرماية الدقيقة",
     },
-    media: projectMediaPlaylists["sharp-shooter"],
     summary: {
-      en: "A first-person shooting-gallery game where the player eliminates targets across progressively harder waves.",
-      ar: "لعبة معرض رماية من منظور الشخص الأول يُزيل فيها اللاعب الأهداف عبر موجات متصاعدة الصعوبة.",
+      en: "A first-person precision aim-training game with raycast shooting, target spawning, and accuracy tracking.",
+      ar: "لعبة تدريب رماية دقيقة من منظور الشخص الأول تعتمد على إطلاق النار بـraycast وتوليد الأهداف وتتبع الدقة.",
     },
     context: {
-      en: "A university game project exploring FPS mechanics, wave systems, and Unity's physics and input pipeline.",
-      ar: "مشروع لعبة جامعي يستكشف ميكانيكا FPS وأنظمة الموجات وخط أنابيب الفيزياء والإدخال في Unity.",
+      en: "A Unity mechanics study exploring first-person aim, target lifecycles, and time-limited scoring.",
+      ar: "دراسة ميكانيكا في Unity تستكشف التصويب من منظور الشخص الأول ودورة حياة الأهداف والتسجيل الموقوت.",
     },
     contribution: {
-      en: "Nour implemented the shooting mechanics, target spawning system, scoring, and the full game loop.",
-      ar: "نفّذ نور ميكانيكا إطلاق النار ونظام توليد الأهداف والتسجيل وحلقة اللعبة الكاملة.",
+      en: "Developed as part of the Unity Projects repository.",
+      ar: "طُوِّرت كجزء من مستودع مشاريع Unity.",
     },
     engineering: {
-      en: "The game uses Unity's physics raycast for hitscan shooting, a wave manager for progressive difficulty, and a score and health system with UI feedback.",
-      ar: "تستخدم اللعبة raycast في الفيزياء بـUnity لإطلاق النار، ومدير موجات لتصعيد الصعوبة التدريجي، ونظاماً للنقاط والصحة مع تغذية راجعة في الواجهة.",
+      en: "Uses Unity physics raycasts for hit detection, target spawning and lifetime management, hit/miss UI feedback, and end-of-round score summaries.",
+      ar: "تستخدم raycasts في فيزياء Unity لكشف الإصابة، وإدارة توليد الأهداف وعمرها، وتغذية راجعة في الواجهة للإصابة والخطأ، وموجز النقاط بنهاية الجولة.",
     },
     evidence: {
-      en: "The gameplay recording demonstrates wave progression, target behavior, shooting mechanics, and scoring. The repository contains the Unity project.",
-      ar: "يُظهر تسجيل اللعب تقدم الموجات وسلوك الأهداف وميكانيكا إطلاق النار والتسجيل. يحتوي المستودع على مشروع Unity.",
+      en: "Verified source code and scene files are available in the shared Unity-Projects repository.",
+      ar: "كود المصدر وملفات المشاهد المتحقق منها متاحة في مستودع Unity-Projects المشترك.",
     },
     limitation: {
-      en: "The game is a university exercise in mechanics, not a published product. Performance profiling and mobile compatibility are not evaluated.",
-      ar: "اللعبة تمرين جامعي في الميكانيكا وليست منتجاً منشوراً. لم يُقيَّم أداء اللعبة أو توافقها مع الجوّال.",
+      en: "Focused aim-training prototype without health bars, ammunition management, or progressive enemy waves.",
+      ar: "نموذج أولي لتدريب التصويب بدون شريط صحة أو إدارة ذخيرة أو موجات أعداء متصاعدة.",
     },
     stack: ["Unity", "C#"],
     highlights: [
-      "Hitscan raycast shooting with hit detection, miss feedback, and scoring.",
-      "Progressive wave system with increasing target speed and spawn rate.",
-      "Target spawn manager with random position sampling and lifetime control.",
-      "Health, ammo, score, and wave-completion HUD with end-screen results.",
+      "Raycast-based instant hit detection.",
+      "Time-limited rounds with target lifecycle management.",
+      "Accuracy tracking and hit/miss visual feedback.",
+      "End-of-round performance summary UI.",
     ],
-    repository: "https://github.com/NourEldeenMahmoud/SharpShooter",
+    repository: "https://github.com/NourEldeenMahmoud/Unity-Projects",
   },
   {
     slug: "royal-run",
+    category: "game-development",
     kind: "game",
     title: "Royal Run",
     shortTitle: "Royal Run",
-    image: "/projects/royal-run/preview/poster.webp",
+    image: "/projects/royal-run/details/01-gameplay.webp",
     imageAlt: {
       en: "Royal Run endless runner gameplay",
       ar: "طريقة لعب Royal Run — لعبة الركض اللانهائي",
     },
-    media: projectMediaPlaylists["royal-run"],
     summary: {
-      en: "An endless runner game where the player avoids obstacles, collects coins, and progresses through increasing speed.",
-      ar: "لعبة ركض لانهائي يتجنب فيها اللاعب العقبات ويجمع العملات ويتقدم مع تزايد السرعة.",
+      en: "An endless runner featuring automatic forward movement, procedural obstacle generation, and high-score tracking.",
+      ar: "لعبة ركض لانهائي تتميز بالحركة الأمامية التلقائية وتوليد العقبات الإجرائي وتتبع أعلى النقاط.",
     },
     context: {
-      en: "A university game project built to practice procedural level generation, player control, and game loop design.",
-      ar: "مشروع لعبة جامعي بُني لممارسة توليد المستويات الإجرائية والتحكم باللاعب وتصميم حلقة اللعبة.",
+      en: "A Unity project exploring continuous movement mechanics, obstacle spawner timing, and collision detection.",
+      ar: "مشروع Unity يستكشف ميكانيكا الحركة المستمرة وتوقيت توليد العقبات وكشف التصادم.",
     },
     contribution: {
-      en: "Nour designed and implemented the runner mechanics, obstacle spawning, coin system, and the full game loop.",
-      ar: "صمّم نور ونفّذ ميكانيكا الركض وتوليد العقبات ونظام العملات وحلقة اللعبة الكاملة.",
+      en: "Developed as part of the Unity Projects repository.",
+      ar: "طُوِّرت كجزء من مستودع مشاريع Unity.",
     },
     engineering: {
-      en: "The game uses object pooling for obstacle and coin spawning, a speed curve for progressive difficulty, and Unity's input system for responsive controls.",
-      ar: "تستخدم اللعبة object pooling لتوليد العقبات والعملات، ومنحنى سرعة لتصعيد الصعوبة التدريجي، ونظام إدخال Unity للتحكم السريع الاستجابة.",
+      en: "Implements automatic character forward momentum, obstacle spawning ahead of the player, speed scaling over distance, animations for running, jumping, and death, and game-over state resetting.",
+      ar: "تنفّذ الزخم الأمامي التلقائي للشخصية، وتوليد العقبات أمام اللاعب، وتدرج السرعة مع المسافة، وتحريك الركض والقفز والموت، وإعادة ضبط حالة نهاية اللعبة.",
     },
     evidence: {
-      en: "The gameplay recording shows obstacle variety, coin collection, speed scaling, and end-state transitions. The repository contains the Unity project.",
-      ar: "يُظهر تسجيل اللعب تنوع العقبات وجمع العملات وتدرج السرعة وانتقالات حالة النهاية. يحتوي المستودع على مشروع Unity.",
+      en: "Verified source code and scene files are available in the shared Unity-Projects repository.",
+      ar: "كود المصدر وملفات المشاهد المتحقق منها متاحة في مستودع Unity-Projects المشترك.",
     },
     limitation: {
-      en: "The game is a university exercise. Level content is procedurally generated from a fixed asset pool and is not hand-authored.",
-      ar: "اللعبة تمرين جامعي. يُولَّد محتوى المستوى إجرائياً من مجموعة أصول ثابتة وليس منشأً يدوياً.",
+      en: "Single-lane runner prototype without coin collection, lane switching, or object pooling optimization.",
+      ar: "نموذج أولي لركض في مسار واحد بدون جمع عملات أو تبديل مسارات أو تحسين تجميع الأجسام.",
     },
     stack: ["Unity", "C#"],
     highlights: [
-      "Procedural obstacle lane system with increasing density and speed.",
-      "Object pooling for obstacles and coins to minimize garbage collection.",
-      "Character controller with jump, slide, and lane-switch mechanics.",
-      "Score, distance, and coin HUD with high-score persistence.",
+      "Automatic forward movement and speed acceleration.",
+      "Procedural obstacle spawning based on distance.",
+      "Running, jumping, and obstacle collision animations.",
+      "Distance-based score tracking and high-score saving.",
     ],
-    repository: "https://github.com/NourEldeenMahmoud/RoyalRun",
+    repository: "https://github.com/NourEldeenMahmoud/Unity-Projects",
   },
   {
     slug: "galaxy-strike",
+    category: "game-development",
     kind: "game",
     title: "Galaxy Strike",
     shortTitle: "Galaxy Strike",
-    image: "/projects/galaxy-strike/preview/poster.webp",
+    image: "/projects/galaxy-strike/details/01-gameplay.webp",
     imageAlt: {
-      en: "Galaxy Strike space shooter gameplay",
-      ar: "طريقة لعب Galaxy Strike — لعبة إطلاق النار الفضائي",
+      en: "Galaxy Strike 2D space shooter gameplay",
+      ar: "طريقة لعب Galaxy Strike — إطلاق النار الفضائي ثنائي الأبعاد",
     },
-    media: projectMediaPlaylists["galaxy-strike"],
     summary: {
-      en: "A vertical space shooter where the player battles waves of enemy ships and bosses across a scrolling space environment.",
-      ar: "لعبة إطلاق نار فضائية عمودية يقاتل فيها اللاعب موجات من سفن العدو والرؤساء في بيئة فضائية متحركة.",
+      en: "A 2D top-down space shooter featuring free movement, continuous projectile fire, and wave spawning.",
+      ar: "لعبة إطلاق نار فضائية ثنائية الأبعاد من الأعلى تتميز بالحركة الحرة وإطلاق المقذوفات المستمر وتوليد الموجات.",
     },
     context: {
-      en: "A university game project exploring the classic shoot-em-up genre with enemy AI, bullet patterns, and boss encounters.",
-      ar: "مشروع لعبة جامعي يستكشف نوع ألعاب إطلاق النار الكلاسيكية مع ذكاء اصطناعي للعدو وأنماط الرصاص ومواجهات الرؤساء.",
+      en: "A 2D arcade shooter project focusing on projectile pooling, enemy wave mechanics, and scrolling visual effects.",
+      ar: "مشروع لعبة أركيد ثنائية الأبعاد يركز على تجميع المقذوفات وميكانيكا موجات الأعداء وتأثيرات التمرير البصري.",
     },
     contribution: {
-      en: "Nour built the player ship, enemy wave manager, bullet pooling, power-up drops, and boss behavior state machine.",
-      ar: "بنى نور سفينة اللاعب ومدير موجات العدو وتجميع الرصاص وإسقاط الطاقة وآلة حالة سلوك الرئيس.",
+      en: "Developed as part of the Unity Projects repository.",
+      ar: "طُوِّرت كجزء من مستودع مشاريع Unity.",
     },
     engineering: {
-      en: "The game uses coroutine-based enemy formation patterns, object pooling for bullets and effects, and a simple finite-state machine for boss phases.",
-      ar: "تستخدم اللعبة أنماط تشكيل العدو المستندة إلى coroutine، وtooling pooling للرصاص والتأثيرات، وآلة حالة محدودة بسيطة لمراحل الرئيس.",
+      en: "Features 2D ship physics movement, projectile object pooling, continuous weapon firing, player and enemy health management, scrolling space background shaders, and ShaderLab custom visual work.",
+      ar: "تتضمن حركة فيزياء السفن ثنائية الأبعاد، وتجميع مقذوفات الأسلحة، وإطلاق النار المستمر، وإدارة صحة اللاعب والأعداء، ومظلات الخلفية الفضائية المتحركة، وتأثيرات ShaderLab المخصصة.",
     },
     evidence: {
-      en: "The gameplay recording shows enemy formations, bullet patterns, power-ups, and the boss encounter. The repository contains the Unity project.",
-      ar: "يُظهر تسجيل اللعب تشكيلات العدو وأنماط الرصاص ومكوّنات الطاقة ومواجهة الرئيس. يحتوي المستودع على مشروع Unity.",
+      en: "Verified source code, shaders, and scene files are available in the shared Unity-Projects repository.",
+      ar: "كود المصدر والمظلات وملفات المشاهد المتحقق منها متاحة في مستودع Unity-Projects المشترك.",
     },
     limitation: {
-      en: "The game is a university exercise. Difficulty balancing and sound design are minimal. No leaderboard or save system.",
-      ar: "اللعبة تمرين جامعي. توازن الصعوبة وتصميم الصوت محدودان. لا يوجد نظام قائمة متصدرين أو حفظ.",
+      en: "2D wave shooter prototype without multi-phase bosses, power-up items, or complex state-machine bosses.",
+      ar: "نموذج أولي لموجات إطلاق النار ثنائي الأبعاد بدون رؤساء متعددين المراحل أو عناصر طاقة أو آلات حالة معقدة للرؤساء.",
     },
-    stack: ["Unity", "C#"],
+    stack: ["Unity", "C#", "ShaderLab"],
     highlights: [
-      "Vertical scroll with parallax star fields and multi-layer backgrounds.",
-      "Wave manager spawning enemy formations with coroutine-timed attack patterns.",
-      "Object pooling for player and enemy bullets, explosions, and pickups.",
-      "Multi-phase boss with health gates, pattern switches, and defeat sequence.",
+      "Free 2D top-down player ship movement.",
+      "Projectile object pooling for laser weaponry.",
+      "Enemy wave spawner and health system.",
+      "Scrolling background shader with HLSL visual work.",
     ],
-    repository: "https://github.com/NourEldeenMahmoud/GalaxyStrike",
+    repository: "https://github.com/NourEldeenMahmoud/Unity-Projects",
   },
   {
     slug: "rocket-boost",
+    category: "game-development",
     kind: "game",
     title: "Rocket Boost",
     shortTitle: "Rocket Boost",
-    image: "/projects/rocket-boost/preview/poster.webp",
+    image: "/projects/rocket-boost/details/01-gameplay.webp",
     imageAlt: {
-      en: "Rocket Boost physics platformer gameplay",
-      ar: "طريقة لعب Rocket Boost — منصة فيزياء الصاروخ",
+      en: "Rocket Boost 3D physics flight gameplay",
+      ar: "طريقة لعب Rocket Boost — الطيران الفيزيائي ثلاثي الأبعاد",
     },
-    media: projectMediaPlaylists["rocket-boost"],
     summary: {
-      en: "A physics-based rocket platformer where the player navigates through obstacle courses using thrust and rotation.",
-      ar: "لعبة منصات صاروخية قائمة على الفيزياء يتنقل فيها اللاعب عبر مسارات عقبات باستخدام الدفع والدوران.",
+      en: "A 3D physics-based rocket flight game where players navigate obstacle courses using thrust and rotational control.",
+      ar: "لعبة طيران صاروخي ثلاثية الأبعاد قائمة على الفيزياء يتنقل فيها اللاعبون عبر مسارات العقبات باستخدام الدفع والدوران.",
     },
     context: {
-      en: "A university game project exploring Unity's physics-based character movement, level design, and spatial challenge construction.",
-      ar: "مشروع لعبة جامعي يستكشف حركة الشخصية المستندة إلى الفيزياء في Unity وتصميم المستويات وبناء التحديات المكانية.",
+      en: "Internal project name: Astro Rocket. A 3D physics challenge built to study Rigidbody forces, torque, and collision detection.",
+      ar: "اسم المشروع الداخلي: Astro Rocket. تحدي فيزياء ثلاثي الأبعاد بُني لدراسة قوى Rigidbody والعزم وكشف التصادم.",
     },
     contribution: {
-      en: "Nour implemented the rocket physics controller, thrust and rotation handling, level layouts, and the checkpoint and respawn system.",
-      ar: "نفّذ نور وحدة تحكم فيزياء الصاروخ ومعالجة الدفع والدوران وتخطيط المستويات ونظام نقاط التفتيش وإعادة التشغيل.",
+      en: "Developed as part of the Unity Projects repository under the name Astro Rocket.",
+      ar: "طُوِّرت كجزء من مستودع مشاريع Unity تحت اسم Astro Rocket.",
     },
     engineering: {
-      en: "Movement uses Rigidbody physics with applied thrust forces and torque. Levels are built from modular obstacle prefabs with collider-based hazard and landing-pad detection.",
-      ar: "تستخدم الحركة فيزياء Rigidbody مع قوى الدفع والعزم المطبّق. تُبنى المستويات من قوالب عقبات معيارية مع كشف المخاطر ومناطق الهبوط القائم على المصادم.",
+      en: "Uses Rigidbody thrust vectors and torque rotation, collision detection for landing pads versus hazard obstacles, particle systems for rocket engine trails, audio feedback, and multi-level scene progression.",
+      ar: "تستخدم متجهات دفع Rigidbody ودوران العزم، وكشف التصادم لمنصات الهبوط مقابل عقبات المخاطر، وأنظمة الجسيمات لشرار محرك الصاروخ، والتغذية الراجعة الصوتية، والتقدم عبر مستويات متعددة.",
     },
     evidence: {
-      en: "The gameplay recording shows multi-level navigation, physics response, hazard collisions, and checkpoint progression. The repository contains the Unity project.",
-      ar: "يُظهر تسجيل اللعب التنقل متعدد المستويات واستجابة الفيزياء وتصادمات المخاطر وتقدم نقاط التفتيش. يحتوي المستودع على مشروع Unity.",
+      en: "Verified source code and level scenes exist under Astro Rocket in the shared Unity-Projects repository.",
+      ar: "كود المصدر ومشاهد المستويات المتحقق منها موجودة تحت اسم Astro Rocket في مستودع Unity-Projects المشترك.",
     },
     limitation: {
-      en: "The game is a university exercise. Level count and visual polish are minimal. No save or leaderboard system.",
-      ar: "اللعبة تمرين جامعي. عدد المستويات والإتقان البصري محدودان. لا يوجد نظام حفظ أو قائمة متصدرين.",
+      en: "Physics flight prototype without mid-level checkpoints, save systems, or persistent progress saving.",
+      ar: "نموذج أولي للطيران الفيزيائي بدون نقاط تفتيش منتصف المستوى أو نظام حفظ أو تقدم مستمر.",
     },
     stack: ["Unity", "C#"],
     highlights: [
-      "Physics-based rocket movement with Rigidbody thrust, torque, and drag.",
-      "Modular level layout with obstacle, hazard, and landing-pad prefabs.",
-      "Collider-based crash detection with particle effects and respawn.",
-      "Checkpoint system with persistent progress across level restarts.",
+      "Rigidbody physics thrust and rotational torque controls.",
+      "Landing pad vs hazard collision detection.",
+      "Engine particle trails and sound effects.",
+      "Multi-stage obstacle level progression.",
     ],
-    repository: "https://github.com/NourEldeenMahmoud/RocketBoost",
+    repository: "https://github.com/NourEldeenMahmoud/Unity-Projects",
   },
+
   // ──────────────────────────── DESKTOP ────────────────────────────
   {
     slug: "blood-bank-desktop",
+    category: "desktop",
     kind: "product",
     title: "Blood Bank Management System",
     shortTitle: "BBMS Desktop",
@@ -502,7 +522,6 @@ export const projects: Project[] = [
       en: "Blood Bank desktop operations dashboard",
       ar: "لوحة عمليات نظام بنك الدم المكتبي",
     },
-    media: projectMediaPlaylists["blood-bank-desktop"],
     summary: {
       en: "A Windows desktop system for donations, inventory, transfusions, patients, and employee access.",
       ar: "نظام مكتبي لويندوز لإدارة التبرعات والمخزون ونقل الدم والمرضى وصلاحيات الموظفين.",
@@ -538,6 +557,7 @@ export const projects: Project[] = [
   },
   {
     slug: "dvld",
+    category: "desktop",
     kind: "product",
     title: "Driving and Vehicle License Department",
     shortTitle: "DVLD",
@@ -546,7 +566,6 @@ export const projects: Project[] = [
       en: "DVLD local driving license applications screen",
       ar: "شاشة طلبات رخص القيادة المحلية في نظام DVLD",
     },
-    media: projectMediaPlaylists.dvld,
     summary: {
       en: "A Windows Forms application for driving licenses, applications, tests, people, and users.",
       ar: "تطبيق Windows Forms لإدارة رخص القيادة والطلبات والاختبارات والأشخاص والمستخدمين.",
@@ -580,9 +599,11 @@ export const projects: Project[] = [
     ],
     repository: "https://github.com/NourEldeenMahmoud/DVLD",
   },
+
   // ──────────────────────────── MOBILE ────────────────────────────
   {
     slug: "blood-bank-mobile",
+    category: "mobile-applications",
     kind: "product",
     title: "Blood Bank Mobile App",
     shortTitle: "BBMS Mobile",
@@ -591,7 +612,6 @@ export const projects: Project[] = [
       en: "Blood Bank donor mobile application home screen",
       ar: "الشاشة الرئيسية لتطبيق المتبرعين في منصة بنك الدم",
     },
-    media: projectMediaPlaylists["blood-bank-mobile"],
     summary: {
       en: "A Flutter donor experience connected to a .NET API and the wider blood-bank platform.",
       ar: "تجربة للمتبرعين مبنية بـFlutter ومتصلة بواجهة .NET وبمنصة بنك الدم الأوسع.",
@@ -632,9 +652,11 @@ export const projects: Project[] = [
     ],
     repository: "https://github.com/NourEldeenMahmoud/Blood-Bank-mobile-App",
   },
+
   // ──────────────────────────── SUMMARIES ────────────────────────────
   {
     slug: "met-summaries",
+    category: "summaries",
     kind: "collection",
     title: "MET Summaries",
     shortTitle: "MET Summaries",
@@ -643,37 +665,36 @@ export const projects: Project[] = [
       en: "MET Summaries academic notes collection index",
       ar: "فهرس مجموعة ملاحظات MET الأكاديمية",
     },
-    media: projectMediaPlaylists["met-summaries"],
     summary: {
-      en: "A structured set of academic lecture summaries covering GIS, Computer Graphics, Networks, and Prolog, published as an interactive GitHub Pages site.",
-      ar: "مجموعة منظمة من ملخصات المحاضرات الأكاديمية تغطي GIS والرسومات الحاسوبية والشبكات وProlog، منشورة كموقع GitHub Pages تفاعلي.",
+      en: "A structured set of academic lecture summaries in Egyptian Arabic covering GIS, Computer Graphics, Networks, and Prolog.",
+      ar: "مجموعة منظمة من ملخصات المحاضرات الأكاديمية باللهجة المصرية تغطي نظم المعلومات الجغرافية والرسومات والشبكات وProlog.",
     },
     context: {
-      en: "Written during university coursework at MET to consolidate understanding of four technical subjects. Published so classmates and future students can benefit.",
-      ar: "كُتبت أثناء دراسة جامعية في MET لتعزيز فهم أربع مواد تقنية. نُشرت لكي يستفيد منها الزملاء والطلاب المستقبليون.",
+      en: "Written during university coursework at MET to consolidate key concepts across four subjects and published on GitHub Pages.",
+      ar: "كُتبت أثناء الدراسة الجامعية في MET لترسيخ المفاهيم الأساسية عبر أربع مواد ونُشرت على GitHub Pages.",
     },
     contribution: {
-      en: "Nour authored all summaries individually, organized the GitHub Pages site structure, and maintained it across four subject areas.",
-      ar: "أعدّ نور جميع الملخصات بمفرده ونظّم هيكل موقع GitHub Pages وصانه عبر أربع مجالات موضوعية.",
+      en: "Nour authored and organized the study summaries and structured the public GitHub Pages documentation site.",
+      ar: "أعدّ نور ونظّم الملخصات الدراسية وهيكل موقع التوثيق العام على GitHub Pages.",
     },
     engineering: {
-      en: "The site is a static GitHub Pages collection using HTML with consistent navigation, subject indexes, and per-lecture summary pages built from hand-written notes.",
-      ar: "الموقع مجموعة GitHub Pages ثابتة تستخدم HTML مع تنقل متسق وفهارس للمواضيع وصفحات ملخص لكل محاضرة مبنية من ملاحظات مكتوبة بخط اليد.",
+      en: "Static GitHub Pages collection built with HTML and CSS, featuring structured subject navigation indexes and per-topic summary pages.",
+      ar: "مجموعة GitHub Pages ثابتة مبنية بـHTML وCSS، تتميز بفهارس تنقل موضوعية منظمة وصفحات ملخصات تفصيلية لكل موضوع.",
     },
     evidence: {
-      en: "The site is live on GitHub Pages. All four subject indexes and their lecture pages are publicly accessible.",
-      ar: "الموقع منشور على GitHub Pages. جميع فهارس المواضيع الأربعة وصفحات محاضراتها متاحة للعموم.",
+      en: "The repository and live GitHub Pages website contain the full study notes across all four subject indexes.",
+      ar: "يحتوي المستودع وموقع GitHub Pages المنشور على ملاحظات الدراسة الكاملة عبر فهارس المواد الأربع.",
     },
     limitation: {
-      en: "These are personal study notes and not a peer-reviewed academic publication. Coverage is limited to the specific lectures studied.",
-      ar: "هذه ملاحظات دراسة شخصية وليست منشوراً أكاديمياً محكّماً. يقتصر التغطية على المحاضرات المحددة التي دُرست.",
+      en: "Personal academic study notes; scope is limited to the specific subjects covered during MET coursework.",
+      ar: "ملاحظات دراسية أكاديمية شخصية؛ يقتصر النطاق على المواد المحددة التي دُرست في MET.",
     },
     stack: ["HTML", "CSS", "GitHub Pages"],
     highlights: [
-      "GIS summaries: 7 lectures covering Fundamentals, Data Models, Coordinate Systems, Vector/Raster, and Spatial Structures.",
-      "Computer Graphics: 8 chapters on Foundations, Mathematical Bases, Primitives, and Drawing Algorithms.",
-      "Networks: 9 lectures covering OSI, TCP/IP, Subnetting, Wireless, and Security/Cryptography.",
-      "Prolog: 7 chapters with summaries and practice examples on Rules, Lists, Backtracking, and I/O.",
+      "GIS summaries covering Fundamentals, Vector/Raster models, Coordinate Systems, and Spatial Data.",
+      "Computer Graphics chapter summaries on Mathematical Foundations, Primitives, and Rendering.",
+      "Computer Networks guides covering OSI model, TCP/IP, Subnetting, and Security fundamentals.",
+      "Prolog programming notes covering Rules, Recursion, List processing, and Backtracking.",
     ],
     repository: "https://github.com/NourEldeenMahmoud/MET-Summaries",
     demo: "https://noureldeenmahmoud.github.io/MET-Summaries/",
@@ -686,8 +707,10 @@ export function getProject(slug: string): Project | undefined {
 
 /** Returns the full media playlist for a project (used by project details / gallery). */
 export function getProjectMedia(project: Project): ProjectMedia[] {
-  if (project.media?.length) return project.media;
-
+  const set = projectMediaSets[project.slug];
+  if (set) {
+    return [...set.preview, ...set.details];
+  }
   return [
     {
       id: `${project.slug}-hero`,
@@ -700,7 +723,7 @@ export function getProjectMedia(project: Project): ProjectMedia[] {
       featured: true,
       orientation: "landscape" as const,
       device:
-        project.slug === "blood-bank-mobile"
+        project.category === "mobile-applications"
           ? ("mobile" as const)
           : ("browser" as const),
       treatment: "stage" as const,
@@ -717,11 +740,11 @@ export function getProjectMedia(project: Project): ProjectMedia[] {
       purpose: "product" as const,
       featured: index === 0,
       orientation:
-        project.slug === "blood-bank-mobile"
+        project.category === "mobile-applications"
           ? ("portrait" as const)
           : ("landscape" as const),
       device:
-        project.slug === "blood-bank-mobile"
+        project.category === "mobile-applications"
           ? ("mobile" as const)
           : ("browser" as const),
       treatment: "full" as const,
@@ -733,23 +756,24 @@ export function getProjectMedia(project: Project): ProjectMedia[] {
 
 /**
  * Returns the preview media for the Project Exploration (Center Showcase) player.
- * For video projects: returns the optimized preview video + poster.
- * For image-only projects: returns the first 5–7 media items from the full playlist.
+ * Reads directly from projectMediaSets[project.slug].preview.
  */
 export function getProjectPreviewMedia(project: Project): ProjectMedia[] {
-  const all = getProjectMedia(project);
-  // If the playlist already contains a video, use only the video as preview
-  const videoItem = all.find((m) => m.type === "video");
-  if (videoItem) return [videoItem];
-  // Otherwise use up to 7 images
-  return all.slice(0, 7);
+  const set = projectMediaSets[project.slug];
+  if (set?.preview?.length) {
+    return set.preview;
+  }
+  return getProjectMedia(project).slice(0, 7);
 }
 
 /**
  * Returns the detail media for Project Details / Case Study Modal.
- * Always returns only images (never the preview video).
- * Falls back to the full image playlist.
+ * Reads directly from projectMediaSets[project.slug].details (images only).
  */
 export function getProjectDetailMedia(project: Project): ProjectMedia[] {
+  const set = projectMediaSets[project.slug];
+  if (set?.details?.length) {
+    return set.details;
+  }
   return getProjectMedia(project).filter((m) => m.type === "image");
 }

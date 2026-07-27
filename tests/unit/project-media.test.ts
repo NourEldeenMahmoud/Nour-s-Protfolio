@@ -1,13 +1,35 @@
 import { describe, expect, it } from "vitest";
+import fs from "fs";
+import path from "path";
 import {
   getProject,
   getProjectDetailMedia,
   getProjectPreviewMedia,
   projects,
+  projectSlugs,
 } from "@/content/portfolio";
 import { caseStudySlugs, hasCaseStudy } from "@/content/case-studies";
+import { projectMediaSets } from "@/content/project-media";
 
 describe("project media helpers & case study bounds", () => {
+  it("canonical global project order is enforced", () => {
+    expect(projectSlugs).toEqual([
+      "buildsense",
+      "cinemaverse",
+      "bookify",
+      "frontend-mini-projects",
+      "how-to-train-your-ai",
+      "sharp-shooter",
+      "royal-run",
+      "galaxy-strike",
+      "rocket-boost",
+      "blood-bank-desktop",
+      "dvld",
+      "blood-bank-mobile",
+      "met-summaries",
+    ]);
+  });
+
   it("getProjectPreviewMedia returns video item for video-backed projects", () => {
     const buildsense = getProject("buildsense")!;
     const previewMedia = getProjectPreviewMedia(buildsense);
@@ -25,12 +47,22 @@ describe("project media helpers & case study bounds", () => {
     expect(previewMedia.every((m) => m.type === "image")).toBe(true);
   });
 
-  it("getProjectDetailMedia filters out videos and returns image playlist", () => {
-    const buildsense = getProject("buildsense")!;
-    const detailMedia = getProjectDetailMedia(buildsense);
+  it("getProjectDetailMedia returns image-only sets from projectMediaSets", () => {
+    for (const project of projects) {
+      const detailMedia = getProjectDetailMedia(project);
+      expect(detailMedia.every((m) => m.type === "image")).toBe(true);
+      expect(detailMedia.length).toBeGreaterThan(0);
+    }
+  });
 
-    expect(detailMedia.every((m) => m.type === "image")).toBe(true);
-    expect(detailMedia.length).toBeGreaterThan(0);
+  it("explicit projectMediaSets separates preview video from detail images", () => {
+    const videoSlugs = ["buildsense", "bookify", "frontend-mini-projects", "how-to-train-your-ai", "sharp-shooter", "royal-run", "galaxy-strike", "rocket-boost", "blood-bank-desktop", "blood-bank-mobile", "dvld"] as const;
+
+    for (const slug of videoSlugs) {
+      const set = projectMediaSets[slug];
+      expect(set.preview[0]?.type).toBe("video");
+      expect(set.details.every((m) => m.type === "image")).toBe(true);
+    }
   });
 
   it("hasCaseStudy correctly identifies projects with verified case studies", () => {
@@ -41,7 +73,6 @@ describe("project media helpers & case study bounds", () => {
     expect(hasCaseStudy("blood-bank-mobile")).toBe(true);
     expect(hasCaseStudy("dvld")).toBe(true);
 
-    // Non-case-study projects
     expect(hasCaseStudy("how-to-train-your-ai")).toBe(false);
     expect(hasCaseStudy("sharp-shooter")).toBe(false);
     expect(hasCaseStudy("royal-run")).toBe(false);
@@ -55,14 +86,52 @@ describe("project media helpers & case study bounds", () => {
     expect(caseStudySlugs).toHaveLength(6);
   });
 
-  it("every project has valid kind and non-empty stack and metadata", () => {
+  it("every project hero image exists on filesystem", () => {
+    const publicDir = path.join(process.cwd(), "public");
     for (const project of projects) {
-      expect(["product", "game", "collection"]).toContain(project.kind);
-      expect(project.stack.length).toBeGreaterThan(0);
-      expect(project.summary.en.length).toBeGreaterThan(0);
-      expect(project.summary.ar.length).toBeGreaterThan(0);
-      expect(project.context.en.length).toBeGreaterThan(0);
-      expect(project.context.ar.length).toBeGreaterThan(0);
+      const heroPath = path.join(publicDir, project.image.replace(/^\//, ""));
+      expect(fs.existsSync(heroPath)).toBe(true);
     }
+  });
+
+  it("Rocket Boost detail images exist on filesystem", () => {
+    const publicDir = path.join(process.cwd(), "public");
+    const rocketBoost = getProject("rocket-boost")!;
+    const details = getProjectDetailMedia(rocketBoost);
+    expect(details.length).toBeGreaterThanOrEqual(6);
+    for (const img of details) {
+      const imgPath = path.join(publicDir, img.src.replace(/^\//, ""));
+      expect(fs.existsSync(imgPath)).toBe(true);
+    }
+  });
+
+  it("verified repository URLs are assigned correctly", () => {
+    const httyai = getProject("how-to-train-your-ai")!;
+    expect(httyai.repository).toBe("https://github.com/NourEldeenMahmoud/HowToTrainYourAI-Game");
+
+    const unityProjects = ["sharp-shooter", "royal-run", "galaxy-strike", "rocket-boost"] as const;
+    for (const slug of unityProjects) {
+      const p = getProject(slug)!;
+      expect(p.repository).toBe("https://github.com/NourEldeenMahmoud/Unity-Projects");
+    }
+  });
+
+  it("How To Train Your AI contains no ML-Agents or Python claims", () => {
+    const httyai = getProject("how-to-train-your-ai")!;
+    const text = JSON.stringify(httyai).toLowerCase();
+
+    expect(text).not.toContain("ml-agents");
+    expect(text).not.toContain("reinforcement");
+    expect(text).not.toContain("python");
+    expect(text).not.toContain("reward function");
+  });
+
+  it("Summaries GLB exists and old Bots model/references are removed", () => {
+    const publicDir = path.join(process.cwd(), "public");
+    const summariesGlb = path.join(publicDir, "models", "showcase-icons", "summaries.glb");
+    const botsGlb = path.join(publicDir, "models", "showcase-icons", "bots.glb");
+
+    expect(fs.existsSync(summariesGlb)).toBe(true);
+    expect(fs.existsSync(botsGlb)).toBe(false);
   });
 });

@@ -1,0 +1,282 @@
+{
+  "$schema": "Media provenance manifest recording assets, source repos, and generation details.",
+  "projects": [
+    {
+      "slug": "buildsense",
+      "repository": "https://github.com/NourEldeenMahmoud/BuildSense",
+      "demo": "https://buildsense.pages.dev/",
+      "sourceFile": "media-source/projects/buildsense/BuildSense-full-demo.mp4",
+      "preview": "/projects/buildsense/preview/preview.mp4",
+      "poster": "/projects/buildsense/preview/poster.webp",
+      "details": [
+        "/projects/buildsense/details/home.webp",
+        "/projects/buildsense/details/catalog.webp",
+        "/projects/buildsense/details/product-details.webp",
+        "/projects/buildsense/details/comparison.webp",
+        "/projects/buildsense/details/pc-builder.webp",
+        "/projects/buildsense/details/purchase-plan.webp",
+        "/projects/buildsense/details/admin-overview.webp",
+        "/projects/buildsense/details/admin-compatibility.webp",
+        "/projects/buildsense/details/mobile-home.webp",
+        "/projects/buildsense/details/mobile-builder.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "live_capture"
+      }
+    },
+    {
+      "slug": "cinemaverse",
+      "repository": "https://github.com/NourEldeenMahmoud/CinemaVerse",
+      "sourceFile": null,
+      "preview": null,
+      "poster": null,
+      "details": [
+        "/projects/cinemaverse/details/home.webp",
+        "/projects/cinemaverse/details/movie-catalog.webp",
+        "/projects/cinemaverse/details/movie-details.webp",
+        "/projects/cinemaverse/details/seat-selection.webp",
+        "/projects/cinemaverse/details/admin-dashboard.webp",
+        "/projects/cinemaverse/details/branch-management.webp",
+        "/projects/cinemaverse/details/hall-editor.webp",
+        "/projects/cinemaverse/details/movie-management.webp",
+        "/projects/cinemaverse/details/showtime-management.webp"
+      ],
+      "provenance": {
+        "preview": "image_playlist",
+        "poster": null,
+        "details": "repository"
+      }
+    },
+    {
+      "slug": "bookify",
+      "repository": "https://github.com/NourEldeenMahmoud/Bookify",
+      "sourceFile": "media-source/projects/bookify/Bookify-full-demo.mp4",
+      "preview": "/projects/bookify/preview/preview.mp4",
+      "poster": "/projects/bookify/preview/poster.webp",
+      "details": [
+        "/projects/bookify/details/04-home.webp",
+        "/projects/bookify/details/13-rooms.webp",
+        "/projects/bookify/details/12-roomdetails.webp",
+        "/projects/bookify/details/01-booking.webp",
+        "/projects/bookify/details/03-email.webp",
+        "/projects/bookify/details/02-dashboard.webp",
+        "/projects/bookify/details/07-managerooms.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "repository"
+      }
+    },
+    {
+      "slug": "frontend-mini-projects",
+      "repository": "https://github.com/NourEldeenMahmoud/frontend-mini-projects",
+      "demo": "https://noureldeenmahmoud.github.io/frontend-mini-projects/",
+      "sourceFile": "media-source/projects/frontend-mini-projects/Frontend-Mini-Projects-Recording.mp4",
+      "preview": "/projects/frontend-mini-projects/preview/preview.mp4",
+      "poster": "/projects/frontend-mini-projects/preview/poster.webp",
+      "details": [
+        "/projects/frontend-mini-projects/details/01-index.webp",
+        "/projects/frontend-mini-projects/details/02-bookmark.webp",
+        "/projects/frontend-mini-projects/details/03-shortly.webp",
+        "/projects/frontend-mini-projects/details/04-fylo.webp",
+        "/projects/frontend-mini-projects/details/05-loopstudios.webp",
+        "/projects/frontend-mini-projects/details/06-testimonials-grid.webp",
+        "/projects/frontend-mini-projects/details/07-clipboard.webp",
+        "/projects/frontend-mini-projects/details/08-mobile-index.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "live_capture"
+      }
+    },
+    {
+      "slug": "how-to-train-your-ai",
+      "repository": "https://github.com/NourEldeenMahmoud/HowToTrainYourAI-Game",
+      "sourceFile": "media-source/projects/how-to-train-your-ai/Game Trailer final version.mp4",
+      "preview": "/projects/how-to-train-your-ai/preview/preview.mp4",
+      "poster": "/projects/how-to-train-your-ai/preview/poster.webp",
+      "details": [
+        "/projects/how-to-train-your-ai/details/01-gameplay.webp",
+        "/projects/how-to-train-your-ai/details/02-gameplay.webp",
+        "/projects/how-to-train-your-ai/details/03-gameplay.webp",
+        "/projects/how-to-train-your-ai/details/04-gameplay.webp",
+        "/projects/how-to-train-your-ai/details/05-gameplay.webp",
+        "/projects/how-to-train-your-ai/details/06-gameplay.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "extracted_frame"
+      }
+    },
+    {
+      "slug": "sharp-shooter",
+      "repository": "https://github.com/NourEldeenMahmoud/Unity-Projects",
+      "sourceFile": "media-source/projects/sharp-shooter/Sharp Shooter final.mp4",
+      "preview": "/projects/sharp-shooter/preview/preview.mp4",
+      "poster": "/projects/sharp-shooter/preview/poster.webp",
+      "details": [
+        "/projects/sharp-shooter/details/01-gameplay.webp",
+        "/projects/sharp-shooter/details/02-gameplay.webp",
+        "/projects/sharp-shooter/details/03-gameplay.webp",
+        "/projects/sharp-shooter/details/04-gameplay.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "extracted_frame"
+      }
+    },
+    {
+      "slug": "royal-run",
+      "repository": "https://github.com/NourEldeenMahmoud/Unity-Projects",
+      "sourceFile": "media-source/projects/royal-run/Royal Run final.mp4",
+      "preview": "/projects/royal-run/preview/preview.mp4",
+      "poster": "/projects/royal-run/preview/poster.webp",
+      "details": [
+        "/projects/royal-run/details/01-gameplay.webp",
+        "/projects/royal-run/details/02-gameplay.webp",
+        "/projects/royal-run/details/03-gameplay.webp",
+        "/projects/royal-run/details/04-gameplay.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "extracted_frame"
+      }
+    },
+    {
+      "slug": "galaxy-strike",
+      "repository": "https://github.com/NourEldeenMahmoud/Unity-Projects",
+      "sourceFile": "media-source/projects/galaxy-strike/Galaxy Strike final.mp4",
+      "preview": "/projects/galaxy-strike/preview/preview.mp4",
+      "poster": "/projects/galaxy-strike/preview/poster.webp",
+      "details": [
+        "/projects/galaxy-strike/details/01-gameplay.webp",
+        "/projects/galaxy-strike/details/02-gameplay.webp",
+        "/projects/galaxy-strike/details/03-gameplay.webp",
+        "/projects/galaxy-strike/details/04-gameplay.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "extracted_frame"
+      }
+    },
+    {
+      "slug": "rocket-boost",
+      "repository": "https://github.com/NourEldeenMahmoud/Unity-Projects",
+      "sourceFile": "media-source/projects/rocket-boost/Rocket boost final.mp4",
+      "preview": "/projects/rocket-boost/preview/preview.mp4",
+      "poster": "/projects/rocket-boost/preview/poster.webp",
+      "details": [
+        "/projects/rocket-boost/details/01-gameplay.webp",
+        "/projects/rocket-boost/details/02-gameplay.webp",
+        "/projects/rocket-boost/details/03-gameplay.webp",
+        "/projects/rocket-boost/details/04-gameplay.webp",
+        "/projects/rocket-boost/details/05-gameplay.webp",
+        "/projects/rocket-boost/details/06-gameplay.webp",
+        "/projects/rocket-boost/details/07-gameplay.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "extracted_frame"
+      }
+    },
+    {
+      "slug": "blood-bank-desktop",
+      "repository": "https://github.com/NourEldeenMahmoud/BBMS-Project",
+      "sourceFile": "media-source/projects/blood-bank-desktop/BBMS-Desktop-recording.mp4",
+      "preview": "/projects/blood-bank-desktop/preview/preview.mp4",
+      "poster": "/projects/blood-bank-desktop/preview/poster.webp",
+      "details": [
+        "/projects/blood-bank-desktop/details/01-bloodunitcard.webp",
+        "/projects/blood-bank-desktop/details/02-dashboard.webp",
+        "/projects/blood-bank-desktop/details/03-donate.webp",
+        "/projects/blood-bank-desktop/details/04-donate2.webp",
+        "/projects/blood-bank-desktop/details/05-findamatch.webp",
+        "/projects/blood-bank-desktop/details/06-login.webp",
+        "/projects/blood-bank-desktop/details/07-managedonors.webp",
+        "/projects/blood-bank-desktop/details/08-matchfound.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "repository"
+      }
+    },
+    {
+      "slug": "dvld",
+      "repository": "https://github.com/NourEldeenMahmoud/DVLD",
+      "sourceFile": "media-source/projects/dvld/DVLD-recording.mp4",
+      "preview": "/projects/dvld/preview/preview.mp4",
+      "poster": "/projects/dvld/preview/poster.webp",
+      "details": [
+        "/projects/dvld/details/detain.webp",
+        "/projects/dvld/details/drivers.webp",
+        "/projects/dvld/details/intlicense.webp",
+        "/projects/dvld/details/licenseinfo.webp",
+        "/projects/dvld/details/localdrivinglicense.webp",
+        "/projects/dvld/details/login.webp",
+        "/projects/dvld/details/main.webp",
+        "/projects/dvld/details/newlicense.webp",
+        "/projects/dvld/details/people.webp",
+        "/projects/dvld/details/replacement.webp",
+        "/projects/dvld/details/test.webp",
+        "/projects/dvld/details/user.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "repository"
+      }
+    },
+    {
+      "slug": "blood-bank-mobile",
+      "repository": "https://github.com/NourEldeenMahmoud/Blood-Bank-mobile-App",
+      "sourceFile": "media-source/projects/blood-bank-mobile/BBMS-Mobile-recording.mp4",
+      "preview": "/projects/blood-bank-mobile/preview/preview.mp4",
+      "poster": "/projects/blood-bank-mobile/preview/poster.webp",
+      "details": [
+        "/projects/blood-bank-mobile/details/01-home.webp",
+        "/projects/blood-bank-mobile/details/02-login.webp",
+        "/projects/blood-bank-mobile/details/03-register.webp",
+        "/projects/blood-bank-mobile/details/04-schedule.webp",
+        "/projects/blood-bank-mobile/details/05-notifications.webp",
+        "/projects/blood-bank-mobile/details/06-profile.webp"
+      ],
+      "provenance": {
+        "preview": "extracted_optimized_video",
+        "poster": "extracted_frame",
+        "details": "repository"
+      }
+    },
+    {
+      "slug": "met-summaries",
+      "repository": "https://github.com/NourEldeenMahmoud/MET-Summaries",
+      "demo": "https://noureldeenmahmoud.github.io/MET-Summaries/",
+      "sourceFile": null,
+      "preview": null,
+      "poster": null,
+      "details": [
+        "/projects/met-summaries/details/01-index.webp",
+        "/projects/met-summaries/details/02-gis-index.webp",
+        "/projects/met-summaries/details/03-computer-graphics-index.webp",
+        "/projects/met-summaries/details/04-networks-index.webp",
+        "/projects/met-summaries/details/05-prolog-index.webp",
+        "/projects/met-summaries/details/06-prolog-lecture.webp",
+        "/projects/met-summaries/details/07-mobile.webp"
+      ],
+      "provenance": {
+        "preview": "image_playlist",
+        "poster": null,
+        "details": "live_capture"
+      }
+    }
+  ]
+}

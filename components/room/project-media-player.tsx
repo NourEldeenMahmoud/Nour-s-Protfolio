@@ -84,6 +84,23 @@ function useReducedMotion() {
   return reduced;
 }
 
+function useSaveData() {
+  const [saveData, setSaveData] = useState(() => {
+    if (typeof navigator === "undefined") return false;
+    return (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData === true;
+  });
+
+  useEffect(() => {
+    if (typeof navigator === "undefined") return;
+    const conn = (navigator as unknown as { connection?: { saveData?: boolean; addEventListener?: (type: string, listener: () => void) => void } }).connection;
+    if (!conn) return;
+    const update = () => setSaveData(conn.saveData === true);
+    conn.addEventListener?.("change", update);
+  }, []);
+
+  return saveData;
+}
+
 function mediaTransform(
   index: number,
   progress: number,
@@ -178,26 +195,31 @@ export function ProjectMediaPlayer({
     [durationOverrides, playlist],
   );
   const totalDuration = segments.at(-1)?.end ?? 0;
+
+  const reducedMotion = useReducedMotion();
+  const saveData = useSaveData();
+
   const [timelineTime, setTimelineTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(() => !reducedMotion && !saveData);
   const [isInteracting, setIsInteracting] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(true);
   const [documentVisible, setDocumentVisible] = useState(true);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [bufferedTime, setBufferedTime] = useState(0);
   const [failedMedia, setFailedMedia] = useState<Set<string>>(() => new Set());
+  const [videoCanPlay, setVideoCanPlay] = useState(false);
+
   const playerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   const pendingVideoTimeRef = useRef<number | null>(null);
-  const reducedMotion = useReducedMotion();
+
   const position = locateTimelineTime(timelineTime, segments);
   const currentMedia = playlist[position.index] ?? null;
   const currentSegment = segments[position.index];
   const nextMedia = playlist[(position.index + 1) % playlist.length];
   const isRtl = locale === "ar";
-  const canAdvance =
-    isPlaying && !isInteracting && isIntersecting && documentVisible;
+
   const progress = totalDuration > 0 ? (timelineTime / totalDuration) * 100 : 0;
   const bufferedProgress =
     totalDuration > 0 ? (bufferedTime / totalDuration) * 100 : 0;
@@ -223,9 +245,13 @@ export function ProjectMediaPlayer({
     return () => observer.disconnect();
   }, []);
 
+  // Image sequence timeline advancement
   useEffect(() => {
     if (
-      !canAdvance ||
+      !isPlaying ||
+      !documentVisible ||
+      !isIntersecting ||
+      isInteracting ||
       !currentMedia ||
       currentMedia.type === "video" ||
       totalDuration <= 0
@@ -256,21 +282,24 @@ export function ProjectMediaPlayer({
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [canAdvance, currentMedia, totalDuration]);
+  }, [isPlaying, documentVisible, isIntersecting, isInteracting, currentMedia, totalDuration]);
 
+  // Video element play/pause state synchronization
   useEffect(() => {
     const video = videoRef.current;
     if (!video || currentMedia?.type !== "video") return;
+
     if (pendingVideoTimeRef.current !== null) {
       video.currentTime = pendingVideoTimeRef.current;
       pendingVideoTimeRef.current = null;
     }
-    if (canAdvance) {
+
+    if (isPlaying && documentVisible && isIntersecting && !isInteracting) {
       void Promise.resolve(video.play()).catch(() => setIsPlaying(false));
     } else {
       video.pause();
     }
-  }, [canAdvance, currentMedia]);
+  }, [isPlaying, documentVisible, isIntersecting, isInteracting, currentMedia]);
 
   const seekTo = useCallback(
     (requestedTime: number) => {
@@ -300,6 +329,24 @@ export function ProjectMediaPlayer({
     },
     [position.index, position.itemTime, seekTo, segments],
   );
+
+  const handleVideoEnded = useCallback(() => {
+    if (playlist.length === 1 && currentMedia?.type === "video") {
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+      }
+      setTimelineTime(0);
+      if (isPlaying && documentVisible && isIntersecting && !isInteracting) {
+        if (videoRef.current) {
+          void Promise.resolve(videoRef.current.play()).catch(() => setIsPlaying(false));
+        }
+      } else {
+        setIsPlaying(false);
+      }
+    } else {
+      goToMedia("next");
+    }
+  }, [playlist.length, currentMedia?.type, isPlaying, documentVisible, isIntersecting, isInteracting, goToMedia]);
 
   function handlePlayerKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget) return;
@@ -365,11 +412,14 @@ export function ProjectMediaPlayer({
     "--timeline-buffered": `${Math.max(bufferedProgress, progress)}%`,
   } as CSSProperties;
 
+  const isVideoFailed = currentMedia?.type === "video" && failedMedia.has(currentMedia.id);
+  const isPosterFailed = currentMedia?.type === "video" && currentMedia.poster && failedMedia.has(`${currentMedia.id}-poster`);
+
   return (
     <div
       ref={playerRef}
       className={styles.player}
-      data-playing={canAdvance ? "true" : "false"}
+      data-playing={isPlaying ? "true" : "false"}
       data-project={project.slug}
       tabIndex={0}
       aria-label={project.title}
@@ -409,39 +459,72 @@ export function ProjectMediaPlayer({
         onPointerUp={handleSwipeEnd}
         onPointerCancel={() => (swipeStartRef.current = null)}
       >
-        {currentMedia && !failedMedia.has(currentMedia.id) ? (
+        {currentMedia ? (
           currentMedia.type === "image" ? (
-            <ImageSequenceFrame
-              key={currentMedia.id}
-              media={currentMedia}
-              locale={locale}
-              index={position.index}
-              progress={position.itemProgress}
-              reducedMotion={reducedMotion}
-              onError={() => markMediaFailed(currentMedia.id)}
-            />
+            !failedMedia.has(currentMedia.id) ? (
+              <ImageSequenceFrame
+                key={currentMedia.id}
+                media={currentMedia}
+                locale={locale}
+                index={position.index}
+                progress={position.itemProgress}
+                reducedMotion={reducedMotion}
+                onError={() => markMediaFailed(currentMedia.id)}
+              />
+            ) : (
+              <div className={styles.mediaFallback}>{copy.mediaUnavailable}</div>
+            )
           ) : (
-            <video
-              key={currentMedia.id}
-              ref={videoRef}
-              className={styles.mediaVideo}
-              src={currentMedia.src}
-              poster={currentMedia.poster}
-              muted
-              playsInline
-              preload="metadata"
-              aria-label={currentMedia.alt[locale]}
-              onLoadedMetadata={handleVideoMetadata}
-              onTimeUpdate={(event) => {
-                if (!currentSegment) return;
-                setTimelineTime(
-                  currentSegment.start + event.currentTarget.currentTime,
-                );
-              }}
-              onProgress={handleVideoProgress}
-              onEnded={() => goToMedia("next")}
-              onError={() => markMediaFailed(currentMedia.id)}
-            />
+            /* Video Media Frame with Poster Fallback / Crossfade */
+            <div className={styles.imageFrame}>
+              {/* Show poster before canplay or if video failed (unless poster also failed) */}
+              {(currentMedia.poster && (!videoCanPlay || isVideoFailed) && !isPosterFailed) && (
+                <Image
+                  className={styles.mediaImage}
+                  src={currentMedia.poster}
+                  alt={currentMedia.alt[locale]}
+                  fill
+                  sizes="(max-width: 780px) 100vw, 50vw"
+                  priority
+                  style={{ objectFit: "cover" }}
+                  onError={() => markMediaFailed(`${currentMedia.id}-poster`)}
+                />
+              )}
+
+              {!isVideoFailed && (
+                <video
+                  key={currentMedia.id}
+                  ref={videoRef}
+                  className={styles.mediaVideo}
+                  src={currentMedia.src}
+                  poster={currentMedia.poster}
+                  muted
+                  playsInline
+                  preload={saveData ? "none" : "metadata"}
+                  aria-label={currentMedia.alt[locale]}
+                  style={{
+                    opacity: videoCanPlay ? 1 : 0,
+                    transition: "opacity 0.4s ease",
+                  }}
+                  onLoadedMetadata={handleVideoMetadata}
+                  onCanPlay={() => setVideoCanPlay(true)}
+                  onPlaying={() => setVideoCanPlay(true)}
+                  onTimeUpdate={(event) => {
+                    if (!currentSegment) return;
+                    setTimelineTime(
+                      currentSegment.start + event.currentTarget.currentTime,
+                    );
+                  }}
+                  onProgress={handleVideoProgress}
+                  onEnded={handleVideoEnded}
+                  onError={() => markMediaFailed(currentMedia.id)}
+                />
+              )}
+
+              {isVideoFailed && (!currentMedia.poster || isPosterFailed) && (
+                <div className={styles.mediaFallback}>{copy.mediaUnavailable}</div>
+              )}
+            </div>
           )
         ) : (
           <div className={styles.mediaFallback}>{copy.mediaUnavailable}</div>

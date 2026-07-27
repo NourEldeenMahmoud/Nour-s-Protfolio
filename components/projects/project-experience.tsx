@@ -127,7 +127,7 @@ const categoryMap: Record<string, Record<Locale, string>> = {
   bookify: { en: "Hotel reservation", ar: "حجز الفنادق" },
   cinemaverse: { en: "Cinema booking", ar: "حجز السينما" },
   "frontend-mini-projects": { en: "Landing pages collection", ar: "مجموعة صفحات هبوط" },
-  "how-to-train-your-ai": { en: "Unity ML-Agents game", ar: "لعبة Unity ML-Agents" },
+  "how-to-train-your-ai": { en: "Unity narrative game", ar: "لعبة Unity سردية" },
   "sharp-shooter": { en: "Unity FPS game", ar: "لعبة تصويب Unity" },
   "royal-run": { en: "Unity endless runner", ar: "لعبة ركض لانهائي Unity" },
   "galaxy-strike": { en: "Unity space shooter", ar: "لعبة إطلاق نار فضائية Unity" },
@@ -137,6 +137,96 @@ const categoryMap: Record<string, Record<Locale, string>> = {
   "blood-bank-mobile": { en: "Mobile experience", ar: "تجربة موبايل" },
   "met-summaries": { en: "Academic notes collection", ar: "مجموعة ملاحظات أكاديمية" },
 };
+
+function getKindCopy(kind: "product" | "game" | "collection", locale: Locale) {
+  if (locale === "ar") {
+    switch (kind) {
+      case "game":
+        return {
+          category: "عالم اللعبة",
+          storyEyebrow: "اللعبة بلمحة",
+          storyTitle: "لعبة تفاعلية ممتعة تظهر كتجربة متكاملة.",
+          experienceEyebrow: "استكشف التجربة",
+          featureEyebrow: "أبرز أساليب اللعب",
+          behind: "خلف كواليس اللعبة",
+          technicalTitle: "كيف بُنيت اللعبة من الداخل",
+          endingEyebrow: "نهاية عالم اللعبة",
+          endingTitle: "لعبة واحدة، وعالم متكامل يمكن استكشافه.",
+          mediaGroups: { overview: "نظرة عامة", product: "طريقة اللعب" },
+        };
+      case "collection":
+        return {
+          category: "مجموعة معرفية",
+          storyEyebrow: "المجموعة بلمحة",
+          storyTitle: "مجموعة منظمة كمرجع تفاعلي متكامل.",
+          experienceEyebrow: "استكشف المجموعة",
+          featureEyebrow: "المواضيع وأبرز النقاط",
+          behind: "خلف كواليس المجموعة",
+          technicalTitle: "كيف هُيكلت المجموعة من الداخل",
+          endingEyebrow: "نهاية المجموعة",
+          endingTitle: "مجموعة واحدة، ومرجع متكامل يمكن استكشافه.",
+          mediaGroups: { overview: "نظرة عامة", product: "المحتوى" },
+        };
+      case "product":
+      default:
+        return {
+          category: "عالم المنتج",
+          storyEyebrow: "المنتج بلمحة",
+          storyTitle: "منتج مفيد يظهر كتجربة متكاملة.",
+          experienceEyebrow: "استكشف المنتج",
+          featureEyebrow: "أبرز مزايا المنتج",
+          behind: "خلف كواليس المنتج",
+          technicalTitle: "كيف يعمل المنتج من الداخل",
+          endingEyebrow: "نهاية عالم المشروع",
+          endingTitle: "منتج واحد، وعمل متكامل يمكن استكشافه.",
+          mediaGroups: { overview: "نظرة عامة", product: "المنتج" },
+        };
+    }
+  }
+
+  switch (kind) {
+    case "game":
+      return {
+        category: "Game world",
+        storyEyebrow: "The game, at a glance",
+        storyTitle: "An interactive game, experienced as a complete journey.",
+        experienceEyebrow: "Explore the experience",
+        featureEyebrow: "Gameplay highlights",
+        behind: "Behind the game",
+        technicalTitle: "How the game is put together",
+        endingEyebrow: "End of game world",
+        endingTitle: "One game. A complete, inspectable experience.",
+        mediaGroups: { overview: "Overview", product: "Gameplay" },
+      };
+    case "collection":
+      return {
+        category: "Knowledge collection",
+        storyEyebrow: "The collection, at a glance",
+        storyTitle: "A structured collection, presented as an interactive reference.",
+        experienceEyebrow: "Explore the collection",
+        featureEyebrow: "Subjects and highlights",
+        behind: "Behind the collection",
+        technicalTitle: "How the collection is structured",
+        endingEyebrow: "End of collection",
+        endingTitle: "One collection. A complete, inspectable reference.",
+        mediaGroups: { overview: "Overview", product: "Collection" },
+      };
+    case "product":
+    default:
+      return {
+        category: "Product world",
+        storyEyebrow: "The product, at a glance",
+        storyTitle: "A useful product, experienced as a complete journey.",
+        experienceEyebrow: "Explore the product",
+        featureEyebrow: "Product highlights",
+        behind: "Behind the product",
+        technicalTitle: "How the product is put together",
+        endingEyebrow: "End of project world",
+        endingTitle: "One product. A complete, inspectable body of work.",
+        mediaGroups: { overview: "Overview", product: "Product" },
+      };
+  }
+}
 
 function ProjectVisual({
   media,
@@ -196,7 +286,9 @@ export function ProjectExperience({
   const [activeExperience, setActiveExperience] = useState(0);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [activeGroup, setActiveGroup] = useState("all");
-  const c = copy[locale];
+  const baseCopy = copy[locale];
+  const kindCopy = getKindCopy(project.kind, locale);
+  const c = { ...baseCopy, ...kindCopy };
   const projectIndex = projects.findIndex((item) => item.slug === project.slug);
   const previous =
     projects[(projectIndex - 1 + projects.length) % projects.length]!;
