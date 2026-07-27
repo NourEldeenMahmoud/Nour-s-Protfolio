@@ -10,6 +10,11 @@ import {
   sourceToViewport,
   type ViewportAnchor,
 } from "./category-icon-projections";
+import {
+  CATEGORY_ICONS_DIAGNOSTICS_ENABLED,
+  resolveCategoryIconsFallbackReason,
+  resolveCategoryIconsMotionPolicy,
+} from "./category-icons-policy";
 import styles from "./category-icons-layer.module.css";
 
 /* ── Capability detection ── */
@@ -17,27 +22,12 @@ import styles from "./category-icons-layer.module.css";
 function hasWebGL(): boolean {
   try {
     const canvas = document.createElement("canvas");
-    return !!(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+    const context = canvas.getContext("webgl2") || canvas.getContext("webgl");
+    context?.getExtension("WEBGL_lose_context")?.loseContext();
+    return !!context;
   } catch {
     return false;
   }
-}
-
-function shouldUseFallback(): boolean {
-  if (typeof window === "undefined") return false; // don't decide on server
-  // prefers-reduced-motion does NOT select SVG fallback — canvas renders static
-  if (window.innerWidth < 780) return true;
-  const conn = (
-    navigator as Navigator & { connection?: { saveData?: boolean } }
-  ).connection;
-  if (conn?.saveData) return true;
-  if (!hasWebGL()) return true;
-  return false;
-}
-
-function detectReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /* ── SVG fallback sprite paths ── */
@@ -99,9 +89,10 @@ export function CategoryIconsLayer({
   hoveredCategoryId,
 }: CategoryIconsLayerProps) {
   const [capability, setCapability] = useState<CapabilityState>("pending");
-  const [canvasFailed, setCanvasFailed] = useState(false);
   const [viewportSize, setViewportSize] = useState({ w: 0, h: 0 });
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [motionPolicy, setMotionPolicy] = useState(() =>
+    resolveCategoryIconsMotionPolicy(false),
+  );
 
   /* ── Viewport measurement ── */
   useEffect(() => {
@@ -113,11 +104,39 @@ export function CategoryIconsLayer({
     return () => window.removeEventListener("resize", measure);
   }, []);
 
-  /* ── One-time capability decision + reduced-motion detection after mount ── */
+  /* ── Centralized capability and motion policy resolution after mount ── */
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    const reason = resolveCategoryIconsFallbackReason({
+      viewportWidth: window.innerWidth,
+      saveData: connection?.saveData === true,
+      webGLAvailable: hasWebGL(),
+    });
+
+    function updateMotionPolicy() {
+      const resolved = resolveCategoryIconsMotionPolicy(mediaQuery.matches);
+      setMotionPolicy(resolved);
+
+      if (CATEGORY_ICONS_DIAGNOSTICS_ENABLED) {
+        console.info("[CategoryIcons] motion policy", {
+          detectedReducedMotion: resolved.detectedReducedMotion,
+          developmentOverrideEnabled: resolved.developmentOverrideEnabled,
+          effectiveReducedMotion: resolved.effectiveReducedMotion,
+          renderingMode: reason ? "SVG fallback" : "Canvas",
+          fallbackReason: reason,
+          animationMode: resolved.effectiveReducedMotion ? "static" : "full",
+        });
+      }
+    }
+
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time mount detection
-    setCapability(shouldUseFallback() ? "fallback" : "canvas");
-    setReducedMotion(detectReducedMotion());
+    setCapability(reason ? "fallback" : "canvas");
+    updateMotionPolicy();
+    mediaQuery.addEventListener("change", updateMotionPolicy);
+    return () => mediaQuery.removeEventListener("change", updateMotionPolicy);
   }, []);
 
   /* ── Compute viewport anchors for both states ── */
@@ -155,18 +174,14 @@ export function CategoryIconsLayer({
   const focusTarget: 0 | 1 = focusedArea === "exploration" ? 1 : 0;
 
   /* ── Canvas error → fallback ── */
-  const handleCanvasError = useCallback(() => {
-    setCanvasFailed(true);
+  const handleCanvasError = useCallback((error: Error) => {
+    setCapability("fallback");
+    if (CATEGORY_ICONS_DIAGNOSTICS_ENABLED) {
+      console.warn("[CategoryIcons] SVG fallback: canvas-failure", error);
+    }
   }, []);
 
-  const effectiveFallback =
-    capability === "fallback" || (capability === "canvas" && canvasFailed);
-
-  /* ── Canvas error boundary fallback content ── */
-  const canvasFallback = useMemo(
-    () => <CanvasFallbackContent onCanvasError={handleCanvasError} />,
-    [handleCanvasError],
-  );
+  const effectiveFallback = capability === "fallback";
 
   if (!heroAnchors || !exploreAnchors) return null;
 
@@ -212,7 +227,7 @@ export function CategoryIconsLayer({
         </div>
       ) : capability === "canvas" ? (
         <div className={styles.canvasContainer}>
-          <CanvasErrorBoundary fallback={canvasFallback}>
+          <CanvasErrorBoundary fallback={null} onError={handleCanvasError}>
             <CategoryIconsCanvas
               viewportWidth={viewportSize.w}
               viewportHeight={viewportSize.h}
@@ -221,7 +236,7 @@ export function CategoryIconsLayer({
               focusTarget={focusTarget}
               activeCategoryId={activeCategoryId}
               hoveredCategoryId={hoveredCategoryId}
-              reducedMotion={reducedMotion}
+              reducedMotion={motionPolicy.effectiveReducedMotion}
             />
           </CanvasErrorBoundary>
         </div>
@@ -255,17 +270,4 @@ export function CategoryIconsLayer({
       )}
     </div>
   );
-}
-
-/* ── Fallback content rendered when error boundary catches ── */
-
-function CanvasFallbackContent({
-  onCanvasError,
-}: {
-  onCanvasError: () => void;
-}) {
-  useEffect(() => {
-    onCanvasError();
-  }, [onCanvasError]);
-  return null;
 }
