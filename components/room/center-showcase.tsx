@@ -1,78 +1,23 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import type { Locale } from "@/i18n/routing";
 import { getProject } from "@/content/portfolio";
+import { categories, type CategoryId } from "@/content/project-showcase";
+import type { Locale } from "@/i18n/routing";
 import {
-  buildMediaItems,
-  categories,
-  type CategoryId,
-  type MediaItem,
-} from "@/content/project-showcase";
+  ProjectMediaPlayer,
+  type ProjectMediaPlayerCopy,
+} from "./project-media-player";
 import styles from "./center-showcase.module.css";
 
-export type ShowcaseCopy = {
+export type ShowcaseCopy = ProjectMediaPlayerCopy & {
   categoriesLabel: string;
-  previousProject: string;
-  nextProject: string;
-  previousMedia: string;
-  nextMedia: string;
-  mediaSlides: string;
   projectCount: string;
-  viewDetails: string;
-  mediaUnavailable: string;
   emptyState: string;
 };
 
 type SlideDirection = "next" | "prev";
 
-/** Inline SVG chevron arrow — no external dependency. */
-function ChevronArrow({
-  direction,
-  "aria-hidden": ariaHidden = true,
-  focusable = false,
-}: {
-  direction: "left" | "right";
-  "aria-hidden"?: boolean;
-  focusable?: boolean;
-}) {
-  const d = direction === "left" ? "M15 4l-8 8 8 8" : "M9 4l8 8-8 8";
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      width="1em"
-      height="1em"
-      aria-hidden={ariaHidden}
-      focusable={focusable}
-      data-direction={direction}
-    >
-      <path d={d} />
-    </svg>
-  );
-}
-
-/**
- * Resolves the localized project count string.
- * Falls back to "X of Y" plain text if pattern contains no placeholders.
- */
-function resolveProjectCount(
-  pattern: string,
-  current: number,
-  total: number,
-): string {
-  return pattern
-    .replace("{current}", String(current))
-    .replace("{total}", String(total));
-}
-
-/** Stable panel ID shared by all category tabs. */
 const PANEL_ID = "showcase-panel";
 
 export function CenterShowcase({
@@ -85,9 +30,7 @@ export function CenterShowcase({
 }: {
   locale: Locale;
   copy: ShowcaseCopy;
-  /** Controlled category — if provided, overrides internal state. */
   activeCategoryId?: CategoryId;
-  /** Called when the user selects a different category tab. */
   onCategoryChange?: (id: CategoryId) => void;
   onCategoryHover?: (id: CategoryId | null) => void;
   onCategoryFocus?: (id: CategoryId | null) => void;
@@ -96,19 +39,16 @@ export function CenterShowcase({
     useState<CategoryId>("web");
   const activeCategoryId = controlledCategoryId ?? internalCategoryId;
   const [projectIndex, setProjectIndex] = useState(0);
-  const [mediaIndex, setMediaIndex] = useState(0);
-  const [slideDir, setSlideDir] = useState<SlideDirection>("next");
-  const liveRef = useRef<HTMLDivElement>(null);
+  const [slideDirection, setSlideDirection] = useState<SlideDirection>("next");
   const screenRef = useRef<HTMLDivElement>(null);
+  const tablistRef = useRef<HTMLDivElement>(null);
   const contextRef = useRef<gsap.Context | null>(null);
-
-  /* ── Derived state ── */
+  const isRtl = locale === "ar";
 
   const activeCategory = useMemo(
-    () => categories.find((c) => c.id === activeCategoryId)!,
+    () => categories.find((category) => category.id === activeCategoryId)!,
     [activeCategoryId],
   );
-
   const projects = useMemo(
     () =>
       activeCategory.projectSlugs
@@ -116,88 +56,32 @@ export function CenterShowcase({
         .filter(Boolean) as NonNullable<ReturnType<typeof getProject>>[],
     [activeCategory],
   );
-
   const currentProject = projects[projectIndex] ?? null;
-
-  const mediaItems: MediaItem[] = useMemo(() => {
-    if (!currentProject) return [];
-    return buildMediaItems(currentProject);
-  }, [currentProject]);
-
-  const currentMedia = mediaItems[mediaIndex] ?? null;
-
-  const hasProjects = projects.length > 0;
   const hasMultipleProjects = projects.length > 1;
-  const hasMultipleMedia = mediaItems.length > 1;
-
-  /* ── Media failure tracking ── */
-
-  const [failedMediaKeys, setFailedMediaKeys] = useState<Set<string>>(
-    () => new Set(),
-  );
-
-  const mediaKey = `${currentProject?.slug ?? ""}:${mediaIndex}`;
-  const isCurrentMediaFailed = failedMediaKeys.has(mediaKey);
-
-  const markMediaFailed = useCallback((key: string) => {
-    setFailedMediaKeys((prev) => {
-      if (prev.has(key)) return prev;
-      const next = new Set(prev);
-      next.add(key);
-      return next;
-    });
-  }, []);
-
-  /* ── Category switch ── */
 
   const switchCategory = useCallback(
     (id: CategoryId) => {
       if (id === activeCategoryId) return;
-      setSlideDir("next");
+      setSlideDirection("next");
       onCategoryChange?.(id);
-      if (!controlledCategoryId) {
-        setInternalCategoryId(id);
-      }
+      if (!controlledCategoryId) setInternalCategoryId(id);
       setProjectIndex(0);
-      setMediaIndex(0);
     },
     [activeCategoryId, controlledCategoryId, onCategoryChange],
   );
 
-  /* ── Project navigation ── */
-
   const goToProject = useCallback(
-    (dir: SlideDirection) => {
+    (direction: SlideDirection) => {
       if (!hasMultipleProjects) return;
-      setSlideDir(dir);
-      setMediaIndex(0);
-      setProjectIndex((prev) => {
-        if (dir === "next") return (prev + 1) % projects.length;
-        return (prev - 1 + projects.length) % projects.length;
-      });
+      setSlideDirection(direction);
+      setProjectIndex((index) =>
+        direction === "next"
+          ? (index + 1) % projects.length
+          : (index - 1 + projects.length) % projects.length,
+      );
     },
     [hasMultipleProjects, projects.length],
   );
-
-  /* ── Media navigation ── */
-
-  const goToMedia = useCallback(
-    (dir: SlideDirection) => {
-      if (!hasMultipleMedia) return;
-      setSlideDir(dir);
-      setMediaIndex((prev) => {
-        if (dir === "next") return (prev + 1) % mediaItems.length;
-        return (prev - 1 + mediaItems.length) % mediaItems.length;
-      });
-    },
-    [hasMultipleMedia, mediaItems.length],
-  );
-
-  /* ── Keyboard for category tabs (tablist pattern) ── */
-
-  const tablistRef = useRef<HTMLDivElement>(null);
-
-  const isRtl = locale === "ar";
 
   function handleTabKeyDown(
     event: React.KeyboardEvent<HTMLButtonElement>,
@@ -206,55 +90,42 @@ export function CenterShowcase({
     const tabs =
       tablistRef.current?.querySelectorAll<HTMLElement>('[role="tab"]');
     if (!tabs) return;
-    const count = tabs.length;
 
     let nextIndex = index;
     if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-      // LTR: Right moves forward. RTL: Right (visual) moves to previous logical.
       const forward = event.key === "ArrowRight" ? !isRtl : isRtl;
-      nextIndex = forward ? (index + 1) % count : (index - 1 + count) % count;
+      nextIndex = forward
+        ? (index + 1) % tabs.length
+        : (index - 1 + tabs.length) % tabs.length;
     } else if (event.key === "Home") {
       nextIndex = 0;
     } else if (event.key === "End") {
-      nextIndex = count - 1;
+      nextIndex = tabs.length - 1;
     } else {
       return;
     }
+
     event.preventDefault();
     tabs[nextIndex]?.focus();
     tabs[nextIndex]?.click();
   }
 
-  /* ── RTL arrow direction mapping ──
-   * English: previous=left chevron, next=right chevron
-   * Arabic:  previous=right chevron, next=left chevron
-   * Physical button positions remain fixed; only the chevron direction flips. */
-
-  const prevDir = isRtl ? "right" : "left";
-  const nextDir = isRtl ? "left" : "right";
-
-  /* ── GSAP screen transition ── */
-
   useLayoutEffect(() => {
     if (!screenRef.current) return;
-
     let cancelled = false;
+
     void import("gsap").then(({ gsap }) => {
       if (cancelled) return;
       contextRef.current = gsap.context(() => {
-        const prefersReduced = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        ).matches;
-        if (prefersReduced) return;
-
-        const slideX = slideDir === "next" ? 18 : -18;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
         gsap.fromTo(
           screenRef.current!,
-          { autoAlpha: 0.3, x: slideX },
+          { autoAlpha: 0.2, x: slideDirection === "next" ? 22 : -22 },
           {
             autoAlpha: 1,
             x: 0,
-            duration: 0.36,
+            duration: 0.48,
             ease: "power3.out",
             overwrite: true,
           },
@@ -267,52 +138,47 @@ export function CenterShowcase({
       contextRef.current?.revert();
       contextRef.current = null;
     };
-  }, [activeCategoryId, projectIndex, mediaIndex, slideDir]);
+  }, [activeCategoryId, projectIndex, slideDirection]);
 
-  /* ── Detail route ── */
-
-  const detailHref = currentProject
-    ? `/${locale}/projects/${currentProject.slug}`
+  const previousProject = hasMultipleProjects
+    ? projects[(projectIndex - 1 + projects.length) % projects.length]
+    : undefined;
+  const nextProject = hasMultipleProjects
+    ? projects[(projectIndex + 1) % projects.length]
     : undefined;
 
   return (
     <div className={styles.showcase} data-testid="center-showcase">
-      {/* Category tabs — aligned over the five physical pedestals */}
       <div
         ref={tablistRef}
         className={styles.tabs}
         role="tablist"
         aria-label={copy.categoriesLabel}
       >
-        {categories.map((cat) => {
-          const isActive = cat.id === activeCategoryId;
+        {categories.map((category, index) => {
+          const isActive = category.id === activeCategoryId;
           return (
             <button
-              key={cat.id}
+              key={category.id}
               role="tab"
               data-category-icon-control="true"
-              id={`tab-${cat.id}`}
+              id={`tab-${category.id}`}
               aria-selected={isActive}
               aria-controls={PANEL_ID}
-              tabIndex={0}
               className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}
-              onClick={() => switchCategory(cat.id)}
-              onPointerEnter={() => onCategoryHover?.(cat.id)}
+              onClick={() => switchCategory(category.id)}
+              onPointerEnter={() => onCategoryHover?.(category.id)}
               onPointerLeave={() => onCategoryHover?.(null)}
-              onFocus={() => onCategoryFocus?.(cat.id)}
+              onFocus={() => onCategoryFocus?.(category.id)}
               onBlur={() => onCategoryFocus?.(null)}
-              onKeyDown={(e) => {
-                const idx = categories.findIndex((c) => c.id === cat.id);
-                handleTabKeyDown(e, idx);
-              }}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
             >
-              <span className={styles.tabLabel}>{cat.label[locale]}</span>
+              <span className={styles.tabLabel}>{category.label[locale]}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Screen area — content panel */}
       <div
         ref={screenRef}
         id={PANEL_ID}
@@ -321,188 +187,26 @@ export function CenterShowcase({
         className={styles.screen}
         data-testid="showcase-screen"
       >
-        {hasProjects && currentProject ? (
-          <>
-            {/* Category badge — compact kicker linked to active tab */}
-            <div
-              className={styles.categoryBadge}
-              id={`badge-${activeCategoryId}`}
-              aria-hidden="true"
-            >
-              {activeCategory.label[locale]}
-            </div>
-
-            {/* Media */}
-            <div className={styles.mediaArea}>
-              {isCurrentMediaFailed ? (
-                <div className={styles.mediaFallback}>
-                  <span className={styles.mediaFallbackText}>
-                    {copy.mediaUnavailable}
-                  </span>
-                </div>
-              ) : currentMedia?.type === "image" ? (
-                <Image
-                  key={mediaKey}
-                  className={styles.mediaImage}
-                  src={currentMedia.src}
-                  alt={currentMedia.alt[locale]}
-                  fill
-                  sizes="(max-width: 780px) 100vw, 47vw"
-                  priority
-                  onError={() => markMediaFailed(mediaKey)}
-                />
-              ) : /* Video: required by user specification for future video media. */
-              currentMedia?.type === "video" ? (
-                <video
-                  key={mediaKey}
-                  className={styles.mediaVideo}
-                  src={currentMedia.src}
-                  poster={currentMedia.poster}
-                  controls
-                  muted
-                  playsInline
-                  preload="metadata"
-                  aria-label={currentMedia.alt[locale]}
-                  onError={() => markMediaFailed(mediaKey)}
-                />
-              ) : (
-                <div className={styles.mediaFallback} aria-hidden="true" />
-              )}
-
-              {/* Media dots */}
-              {hasMultipleMedia && (
-                <div
-                  className={styles.mediaDots}
-                  role="group"
-                  aria-label={copy.mediaSlides}
-                >
-                  {mediaItems.map((item, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      className={`${styles.dot} ${i === mediaIndex ? styles.dotActive : ""}`}
-                      aria-label={`${i + 1}`}
-                      aria-current={i === mediaIndex ? "true" : undefined}
-                      onClick={() => {
-                        setSlideDir(i > mediaIndex ? "next" : "prev");
-                        setMediaIndex(i);
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Media arrows (inside screen) */}
-              {hasMultipleMedia && (
-                <>
-                  <button
-                    type="button"
-                    className={`${styles.screenArrow} ${styles.screenArrowPrev}`}
-                    aria-label={copy.previousMedia}
-                    onClick={() => goToMedia("prev")}
-                  >
-                    <ChevronArrow direction={prevDir} />
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.screenArrow} ${styles.screenArrowNext}`}
-                    aria-label={copy.nextMedia}
-                    onClick={() => goToMedia("next")}
-                  >
-                    <ChevronArrow direction={nextDir} />
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Info bar at bottom of screen */}
-            <div className={styles.infoBar}>
-              <div className={styles.infoText}>
-                <h3 className={styles.projectTitle}>{currentProject.title}</h3>
-                <p className={styles.projectSummary}>
-                  {currentProject.summary[locale]}
-                </p>
-                <ul className={styles.tags} aria-label="Stack">
-                  {currentProject.stack.slice(0, 3).map((t) => (
-                    <li key={t} className={styles.tag}>
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {detailHref && (
-                <Link href={detailHref} className={styles.detailsLink}>
-                  {copy.viewDetails}
-                </Link>
-              )}
-            </div>
-
-            {/* Desktop project navigation arrows — inside screen as accessible DOM overlays */}
-            {hasMultipleProjects && (
-              <>
-                <button
-                  type="button"
-                  className={`${styles.projectArrow} ${styles.projectArrowPrev}`}
-                  aria-label={copy.previousProject}
-                  data-project-arrow="desktop"
-                  onClick={() => goToProject("prev")}
-                >
-                  <ChevronArrow direction={prevDir} />
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.projectArrow} ${styles.projectArrowNext}`}
-                  aria-label={copy.nextProject}
-                  data-project-arrow="desktop"
-                  onClick={() => goToProject("next")}
-                >
-                  <ChevronArrow direction={nextDir} />
-                </button>
-              </>
-            )}
-
-            {/* Mobile project navigation — visible only on small viewports */}
-            {hasMultipleProjects && (
-              <div className={styles.mobileProjectNav}>
-                <button
-                  type="button"
-                  className={styles.mobileProjectBtn}
-                  aria-label={copy.previousProject}
-                  onClick={() => goToProject("prev")}
-                >
-                  <ChevronArrow direction={prevDir} />
-                </button>
-                <p className={styles.mobileProjectCounter}>
-                  {resolveProjectCount(
-                    copy.projectCount,
-                    projectIndex + 1,
-                    projects.length,
-                  )}
-                </p>
-                <button
-                  type="button"
-                  className={styles.mobileProjectBtn}
-                  aria-label={copy.nextProject}
-                  onClick={() => goToProject("next")}
-                >
-                  <ChevronArrow direction={nextDir} />
-                </button>
-              </div>
-            )}
-
-            {/* Desktop project counter (inside screen, bottom-right) */}
-            {hasMultipleProjects && (
-              <p className={styles.projectCounterDesktop}>
-                {resolveProjectCount(
-                  copy.projectCount,
-                  projectIndex + 1,
-                  projects.length,
-                )}
-              </p>
-            )}
-          </>
+        {currentProject ? (
+          <ProjectMediaPlayer
+            key={currentProject.slug}
+            project={currentProject}
+            locale={locale}
+            categoryLabel={activeCategory.label[locale]}
+            copy={copy}
+            detailHref={`/${locale}/projects/${currentProject.slug}`}
+            projectCount={projects.length}
+            projectPosition={projectIndex + 1}
+            previousProjectTitle={previousProject?.shortTitle}
+            nextProjectTitle={nextProject?.shortTitle}
+            onPreviousProject={
+              hasMultipleProjects ? () => goToProject("prev") : undefined
+            }
+            onNextProject={
+              hasMultipleProjects ? () => goToProject("next") : undefined
+            }
+          />
         ) : (
-          /* Empty state for Game/Bots */
           <div className={styles.emptyState}>
             <p className={styles.emptyCategory}>
               {activeCategory.label[locale]}
@@ -512,19 +216,6 @@ export function CenterShowcase({
             </p>
           </div>
         )}
-      </div>
-
-      {/* Live region for screen reader status */}
-      <div
-        ref={liveRef}
-        className="sr-only"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {currentProject
-          ? `${activeCategory.label[locale]}: ${currentProject.title}`
-          : activeCategory.label[locale]}
       </div>
     </div>
   );

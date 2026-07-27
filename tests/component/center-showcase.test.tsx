@@ -21,9 +21,15 @@ const copy: ShowcaseCopy = {
   nextProject: "Next project",
   previousMedia: "Previous image",
   nextMedia: "Next image",
-  mediaSlides: "Media slides",
   projectCount: "{current} of {total}",
-  viewDetails: "View details",
+  play: "Play project film",
+  pause: "Pause project film",
+  timeline: "Project playback timeline",
+  elapsed: "Elapsed time",
+  mediaCount: "{current} of {total} scenes",
+  viewProject: "Explore project",
+  repository: "Repository",
+  currentScene: "Scene",
   mediaUnavailable: "Media unavailable",
   emptyState: "No published case study currently available.",
 };
@@ -31,18 +37,19 @@ const copy: ShowcaseCopy = {
 /** Return a desktop project arrow button (inside the screen panel, disambiguated by data-project-arrow). */
 function getDesktopProjectArrow(name: string) {
   const panel = screen.getByRole("tabpanel");
-  const candidates = within(panel).getAllByRole("button", { name });
-  return candidates.find(
-    (el) => el.getAttribute("data-project-arrow") === "desktop",
-  )!;
+  return within(panel)
+    .getAllByRole("button")
+    .find(
+      (element) =>
+        element.getAttribute("data-project-arrow") === "desktop" &&
+        element.getAttribute("aria-label")?.startsWith(name),
+    )!;
 }
 
 /** Return the desktop project counter (inside the screen panel). */
 function getDesktopProjectCounter() {
   const panel = screen.getByRole("tabpanel");
-  const all = within(panel).getAllByText(/^\d+ of \d+$/);
-  // The desktop counter is the last <p> with that text (mobile nav is before it).
-  return all[all.length - 1]!;
+  return within(panel).getByText(/^\d+ \/ \d+$/);
 }
 
 describe("CenterShowcase", () => {
@@ -67,17 +74,18 @@ describe("CenterShowcase", () => {
     const webTab = screen.getByRole("tab", { name: "Web" });
     expect(webTab).toHaveAttribute("aria-selected", "true");
 
-    expect(screen.getByText("BuildSense")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "BuildSense" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
         "PC hardware discovery and compatibility for the Egyptian market.",
       ),
     ).toBeInTheDocument();
 
-    expect(screen.getByRole("link", { name: "View details" })).toHaveAttribute(
-      "href",
-      "/en/projects/buildsense",
-    );
+    expect(
+      screen.getAllByRole("link", { name: "Explore project" })[0],
+    ).toHaveAttribute("href", "/en/projects/buildsense");
   });
 
   it("shows stack tags (max 3) for the current project", () => {
@@ -86,7 +94,8 @@ describe("CenterShowcase", () => {
     expect(screen.getByText("Angular 19")).toBeInTheDocument();
     expect(screen.getByText("TypeScript")).toBeInTheDocument();
     expect(screen.getByText("Node.js")).toBeInTheDocument();
-    expect(screen.queryByText("Express")).not.toBeInTheDocument();
+    expect(screen.getByText("Express")).toBeInTheDocument();
+    expect(screen.queryByText("MongoDB")).not.toBeInTheDocument();
   });
 
   it("switches category and resets project/media indices", async () => {
@@ -105,32 +114,37 @@ describe("CenterShowcase", () => {
     );
 
     expect(
-      screen.getByText("Blood Bank Management System"),
+      screen.getByRole("heading", { name: "Blood Bank Management System" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "View details" })).toHaveAttribute(
-      "href",
-      "/en/projects/blood-bank-desktop",
-    );
+    expect(
+      screen.getAllByRole("link", { name: "Explore project" })[0],
+    ).toHaveAttribute("href", "/en/projects/blood-bank-desktop");
   });
 
   it("cycles through projects within a category", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    expect(screen.getByText("BuildSense")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "BuildSense" }),
+    ).toBeInTheDocument();
 
     // Use desktop arrow to navigate
     await user.click(getDesktopProjectArrow("Next project"));
     expect(
-      screen.getByText("Bookify Hotel Reservation System"),
+      screen.getByRole("heading", { name: "Bookify Hotel Reservation System" }),
     ).toBeInTheDocument();
 
     await user.click(getDesktopProjectArrow("Next project"));
-    expect(screen.getByText("CinemaVerse")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "CinemaVerse" }),
+    ).toBeInTheDocument();
 
     // Wraps around
     await user.click(getDesktopProjectArrow("Next project"));
-    expect(screen.getByText("BuildSense")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "BuildSense" }),
+    ).toBeInTheDocument();
   });
 
   it("navigates backward through projects", async () => {
@@ -138,7 +152,9 @@ describe("CenterShowcase", () => {
     render(<CenterShowcase locale="en" copy={copy} />);
 
     await user.click(getDesktopProjectArrow("Previous project"));
-    expect(screen.getByText("CinemaVerse")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "CinemaVerse" }),
+    ).toBeInTheDocument();
   });
 
   it("does not show project arrows for a single-project category", async () => {
@@ -155,24 +171,34 @@ describe("CenterShowcase", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("shows media dots for multi-image projects", () => {
+  it("replaces media dots with one continuous playback timeline", () => {
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    const dots = screen.getAllByRole("button", { name: /^\d+$/ });
-    expect(dots).toHaveLength(2);
-    expect(dots[0]).toHaveAttribute("aria-current", "true");
+    const timeline = screen.getByRole("slider", {
+      name: "Project playback timeline",
+    });
+    expect(timeline).toHaveAttribute("min", "0");
+    expect(timeline).toHaveAttribute("max", "60");
+    expect(
+      screen.queryByRole("group", { name: /media slides/i }),
+    ).not.toBeInTheDocument();
   });
 
-  it("navigates between media items using dots", async () => {
+  it("seeks across image items using the virtual timeline", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    const dots = screen.getAllByRole("button", { name: /^\d+$/ });
-    const secondDot = dots[1]!;
-    await user.click(secondDot);
-
-    expect(secondDot).toHaveAttribute("aria-current", "true");
-    expect(dots[0]).not.toHaveAttribute("aria-current", "true");
+    await user.click(
+      screen.getByRole("button", { name: "Pause project film" }),
+    );
+    const timeline = screen.getByRole("slider", {
+      name: "Project playback timeline",
+    });
+    await user.click(timeline);
+    timeline.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(timeline).toHaveValue("5");
+    expect(screen.getByText("2 of 12 scenes")).toBeInTheDocument();
   });
 
   it("shows media arrows inside screen for multi-image projects", () => {
@@ -196,7 +222,7 @@ describe("CenterShowcase", () => {
       screen.getByText("No published case study currently available."),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: "View details" }),
+      screen.queryByRole("link", { name: "Explore project" }),
     ).not.toBeInTheDocument();
   });
 
@@ -248,12 +274,12 @@ describe("CenterShowcase", () => {
 
     await user.click(getDesktopProjectArrow("Next project"));
     expect(
-      screen.getByText("Bookify Hotel Reservation System"),
+      screen.getByRole("heading", { name: "Bookify Hotel Reservation System" }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: "Desktop" }));
     expect(
-      screen.getByText("Blood Bank Management System"),
+      screen.getByRole("heading", { name: "Blood Bank Management System" }),
     ).toBeInTheDocument();
   });
 
@@ -261,27 +287,32 @@ describe("CenterShowcase", () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    const dots = screen.getAllByRole("button", { name: /^\d+$/ });
-    const secondDot = dots[1]!;
-    await user.click(secondDot);
-    expect(secondDot).toHaveAttribute("aria-current", "true");
+    await user.click(
+      screen.getByRole("button", { name: "Pause project film" }),
+    );
+    const timeline = screen.getByRole("slider", {
+      name: "Project playback timeline",
+    });
+    timeline.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(timeline).toHaveValue("5");
 
     await user.click(getDesktopProjectArrow("Next project"));
 
-    const newDots = screen.getAllByRole("button", { name: /^\d+$/ });
-    expect(newDots[0]).toHaveAttribute("aria-current", "true");
+    expect(
+      screen.getByRole("slider", { name: "Project playback timeline" }),
+    ).toHaveValue("0");
   });
 
   it("localizes content for Arabic", () => {
     const arCopy: ShowcaseCopy = {
       ...copy,
       categoriesLabel: "فئات المشاريع",
-      viewDetails: "عرض التفاصيل",
+      viewProject: "استكشف المشروع",
       previousProject: "المشروع السابق",
       nextProject: "المشروع التالي",
       previousMedia: "الصورة السابقة",
       nextMedia: "الصورة التالية",
-      mediaSlides: "شرائح الوسائط",
       projectCount: "{current} من {total}",
       mediaUnavailable: "الوسائط غير متاحة",
       emptyState: "لا توجد دراسة حالة منشورة متاحة حالياً.",
@@ -293,10 +324,9 @@ describe("CenterShowcase", () => {
       "aria-selected",
       "true",
     );
-    expect(screen.getByRole("link", { name: "عرض التفاصيل" })).toHaveAttribute(
-      "href",
-      "/ar/projects/buildsense",
-    );
+    expect(
+      screen.getAllByRole("link", { name: "استكشف المشروع" })[0],
+    ).toHaveAttribute("href", "/ar/projects/buildsense");
   });
 
   /* ── Arrow SVG and direction tests ── */
@@ -353,17 +383,19 @@ describe("CenterShowcase", () => {
 
     const liveRegion = screen.getByRole("status");
     expect(liveRegion).toHaveAttribute("aria-live", "polite");
-    expect(liveRegion).toHaveTextContent("Web: BuildSense");
+    expect(liveRegion).toHaveTextContent(
+      "BuildSense: BuildSense hardware discovery home page, 1 of 12 scenes",
+    );
   });
 
   it("shows project counter for multi-project categories", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    expect(getDesktopProjectCounter()).toHaveTextContent("1 of 3");
+    expect(getDesktopProjectCounter()).toHaveTextContent("1 / 3");
 
     await user.click(getDesktopProjectArrow("Next project"));
-    expect(getDesktopProjectCounter()).toHaveTextContent("2 of 3");
+    expect(getDesktopProjectCounter()).toHaveTextContent("2 / 3");
   });
 
   it("desktop project arrows are inside role=tabpanel", () => {
@@ -404,11 +436,13 @@ describe("CenterShowcase", () => {
     expect(panel).toHaveAttribute("aria-labelledby", "tab-desktop");
   });
 
-  it("media dots group has correct localized aria-label", () => {
+  it("timeline exposes native slider semantics and elapsed time", () => {
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    const dotsGroup = screen.getByRole("group", { name: "Media slides" });
-    expect(dotsGroup).toBeInTheDocument();
+    expect(
+      screen.getByRole("slider", { name: "Project playback timeline" }),
+    ).toHaveAttribute("aria-valuetext", "0:00 / 1:00");
+    expect(screen.getByText("0:00 / 1:00")).toBeInTheDocument();
   });
 
   it("shows media unavailable fallback when image fails to load", async () => {
@@ -429,7 +463,9 @@ describe("CenterShowcase", () => {
 
     expect(screen.getByText("Media unavailable")).toBeInTheDocument();
     // Title and summary should still be visible
-    expect(screen.getByText("BuildSense")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "BuildSense" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
         "PC hardware discovery and compatibility for the Egyptian market.",
@@ -442,7 +478,6 @@ describe("CenterShowcase", () => {
     const user = userEvent.setup();
     const arCopy: ShowcaseCopy = {
       ...copy,
-      mediaSlides: "شرائح الوسائط",
     };
 
     render(<CenterShowcase locale="ar" copy={arCopy} />);

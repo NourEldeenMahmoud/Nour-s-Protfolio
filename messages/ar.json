@@ -82,8 +82,14 @@
       "previousMedia": "الصورة السابقة",
       "nextMedia": "الصورة التالية",
       "projectCount": "{current} من {total}",
-      "viewDetails": "عرض التفاصيل",
-      "mediaSlides": "شرائح الوسائط",
+      "play": "تشغيل عرض المشروع",
+      "pause": "إيقاف عرض المشروع مؤقتاً",
+      "timeline": "الخط الزمني لعرض المشروع",
+      "elapsed": "الوقت المنقضي",
+      "mediaCount": "المشهد {current} من {total}",
+      "viewProject": "استكشف المشروع",
+      "repository": "المستودع",
+      "currentScene": "المشهد",
       "mediaUnavailable": "الوسائط غير متاحة",
       "emptyState": "لا توجد دراسة حالة منشورة متاحة حالياً."
     }

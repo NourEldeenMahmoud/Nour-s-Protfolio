@@ -175,7 +175,8 @@ export function CategoryIconsLayer({
   }, [viewportSize]);
 
   /* ── Visibility ── */
-  const visible = !isIntro && (isIdle || focusedArea === "exploration");
+  const isIconView = focusedArea === null || focusedArea === "exploration";
+  const visible = !isIntro && isIdle;
   const opacity = visible ? 1 : 0;
 
   /* ── Focus target: 0 = hero, 1 = explore ── */
@@ -191,7 +192,7 @@ export function CategoryIconsLayer({
 
   const effectiveFallback = capability === "fallback";
 
-  if (!heroAnchors || !exploreAnchors) return null;
+  if (!heroAnchors || !exploreAnchors || !isIconView) return null;
 
   return (
     <div

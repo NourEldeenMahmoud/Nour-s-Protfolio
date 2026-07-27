@@ -82,8 +82,14 @@
       "previousMedia": "Previous image",
       "nextMedia": "Next image",
       "projectCount": "{current} of {total}",
-      "viewDetails": "View details",
-      "mediaSlides": "Media slides",
+      "play": "Play project film",
+      "pause": "Pause project film",
+      "timeline": "Project playback timeline",
+      "elapsed": "Elapsed time",
+      "mediaCount": "{current} of {total} scenes",
+      "viewProject": "Explore project",
+      "repository": "Repository",
+      "currentScene": "Scene",
       "mediaUnavailable": "Media unavailable",
       "emptyState": "No published case study currently available."
     }

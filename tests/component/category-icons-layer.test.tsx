@@ -328,27 +328,31 @@ describe("CategoryIconsLayer", () => {
     });
   });
 
-  it("hides DOM hit targets when an area is focused", async () => {
-    Object.defineProperty(window, "innerHeight", {
-      writable: true,
-      configurable: true,
-      value: 1080,
-    });
+  it.each(["projects", "lab"])(
+    "unmounts the icon layer when the %s area is focused",
+    async (focusedArea) => {
+      Object.defineProperty(window, "innerHeight", {
+        writable: true,
+        configurable: true,
+        value: 1080,
+      });
 
-    await act(async () => {
-      render(
-        <CategoryIconsLayer
-          activeCategoryId="web"
-          focusedArea="exploration"
-          isIdle={true}
-          isIntro={false}
-        />,
-      );
-    });
+      await act(async () => {
+        render(
+          <CategoryIconsLayer
+            activeCategoryId="web"
+            focusedArea={focusedArea}
+            isIdle={true}
+            isIntro={false}
+          />,
+        );
+      });
 
-    const hitTargets = document.querySelectorAll("button[class*='hitTarget']");
-    expect(hitTargets.length).toBe(0);
-  });
+      expect(
+        document.querySelector("[data-testid='category-icons-layer']"),
+      ).not.toBeInTheDocument();
+    },
+  );
 
   it("hides DOM hit targets during intro", async () => {
     Object.defineProperty(window, "innerHeight", {

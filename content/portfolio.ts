@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/routing";
+import { projectMediaPlaylists } from "@/content/project-media";
 
 export const projectSlugs = [
   "buildsense",
@@ -29,6 +30,9 @@ export type ProjectMedia = {
   treatment?: "stage" | "full" | "pair" | "sequence";
   theme?: "amber" | "cyan" | "neutral";
   focalPosition?: string;
+  /** Playback length in seconds. Required for image-sequence timing. */
+  duration?: number;
+  transition?: "crossfade" | "masked-reveal" | "scale";
 };
 
 export type Project = {
@@ -72,6 +76,7 @@ export const projects: Project[] = [
         },
       },
     ],
+    media: projectMediaPlaylists.buildsense,
     summary: {
       en: "PC hardware discovery and compatibility for the Egyptian market.",
       ar: "منصة لاكتشاف مكونات الحاسوب والتحقق من توافقها للسوق المصري.",
@@ -125,6 +130,7 @@ export const projects: Project[] = [
         },
       },
     ],
+    media: projectMediaPlaylists.bookify,
     summary: {
       en: "A hotel reservation application covering availability, booking, payment, identity, and administration.",
       ar: "تطبيق لحجز الفنادق يغطي التوفر والحجز والدفع والهوية والإدارة.",
@@ -183,6 +189,7 @@ export const projects: Project[] = [
         },
       },
     ],
+    media: projectMediaPlaylists["blood-bank-desktop"],
     summary: {
       en: "A Windows desktop system for donations, inventory, transfusions, patients, and employee access.",
       ar: "نظام مكتبي لويندوز لإدارة التبرعات والمخزون ونقل الدم والمرضى وصلاحيات الموظفين.",
@@ -234,6 +241,7 @@ export const projects: Project[] = [
         },
       },
     ],
+    media: projectMediaPlaylists["blood-bank-mobile"],
     summary: {
       en: "A Flutter donor experience connected to a .NET API and the wider blood-bank platform.",
       ar: "تجربة للمتبرعين مبنية بـFlutter ومتصلة بواجهة .NET وبمنصة بنك الدم الأوسع.",
@@ -292,6 +300,7 @@ export const projects: Project[] = [
         },
       },
     ],
+    media: projectMediaPlaylists.dvld,
     summary: {
       en: "A Windows Forms application for driving licenses, applications, tests, people, and users.",
       ar: "تطبيق Windows Forms لإدارة رخص القيادة والطلبات والاختبارات والأشخاص والمستخدمين.",
@@ -343,6 +352,7 @@ export const projects: Project[] = [
         },
       },
     ],
+    media: projectMediaPlaylists.cinemaverse,
     summary: {
       en: "A cinema ticket platform covering discovery, seats, bookings, payments, tickets, and administration.",
       ar: "منصة لتذاكر السينما تشمل الاستكشاف والمقاعد والحجوزات والمدفوعات والتذاكر والإدارة.",
