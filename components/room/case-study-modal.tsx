@@ -2,41 +2,44 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import type { Project } from "@/content/portfolio";
+import { useEffect, useRef, useState } from "react";
+import { getCaseStudy } from "@/content/case-studies";
+import { getProjectMedia, type Project } from "@/content/portfolio";
 import type { Locale } from "@/i18n/routing";
 import styles from "./case-study-modal.module.css";
 
 const copy = {
   en: {
-    eyebrow: "Room archive / Case study",
-    close: "Close case study",
-    context: "Context",
-    contribution: "Contribution",
-    engineering: "Engineering shape",
-    evidence: "Available evidence",
-    limitation: "Honest boundary",
-    stack: "Technology",
+    eyebrow: "Pinboard / Project overview",
+    close: "Close project overview",
+    file: "Project file",
+    problem: "Problem statement",
+    projectType: "Project type",
+    workingMode: "Role / working model",
+    technologies: "Core technologies",
     repository: "Repository",
-    demo: "Verified demo",
+    demo: "Live demo",
     details: "Project Details",
-    gallery: "Repository image index",
-    highlights: "Repository field notes",
+    preview: "Project preview",
+    previous: "Previous project image",
+    next: "Next project image",
+    imageStatus: "Project image",
   },
   ar: {
-    eyebrow: "أرشيف الغرفة / دراسة حالة",
-    close: "إغلاق دراسة الحالة",
-    context: "السياق",
-    contribution: "المساهمة",
-    engineering: "الشكل الهندسي",
-    evidence: "الأدلة المتاحة",
-    limitation: "الحدود الصريحة",
-    stack: "التقنيات",
+    eyebrow: "لوحة المشاريع / نظرة عامة",
+    close: "إغلاق نظرة المشروع",
+    file: "ملف المشروع",
+    problem: "بيان المشكلة",
+    projectType: "نوع المشروع",
+    workingMode: "الدور / أسلوب العمل",
+    technologies: "التقنيات الأساسية",
     repository: "المستودع",
-    demo: "النسخة المؤكدة",
+    demo: "النسخة المنشورة",
     details: "تفاصيل المشروع",
-    gallery: "فهرس صور المستودع",
-    highlights: "ملاحظات موثقة من المستودع",
+    preview: "معاينة المشروع",
+    previous: "صورة المشروع السابقة",
+    next: "صورة المشروع التالية",
+    imageStatus: "صورة المشروع",
   },
 } as const;
 
@@ -50,7 +53,13 @@ export function CaseStudyModal({
   onClose: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const c = copy[locale];
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const labels = copy[locale];
+  const study = getCaseStudy(project.slug)!;
+  const media = getProjectMedia(project)
+    .filter((mediaItem) => mediaItem.type === "image")
+    .slice(0, 4);
+  const activeMedia = media[activeMediaIndex]!;
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -58,11 +67,17 @@ export function CaseStudyModal({
     if (!dialog.open) dialog.showModal();
   }, []);
 
+  function showMedia(offset: number) {
+    setActiveMediaIndex(
+      (current) => (current + offset + media.length) % media.length,
+    );
+  }
+
   return (
     <dialog
       ref={dialogRef}
       className={styles.dialog}
-      aria-labelledby="case-study-modal-title"
+      aria-labelledby="project-overview-title"
       onCancel={(event) => {
         event.preventDefault();
         event.currentTarget.close();
@@ -79,13 +94,13 @@ export function CaseStudyModal({
           <span />
         </div>
         <header className={styles.header}>
-          <p>{c.eyebrow}</p>
+          <p>{labels.eyebrow}</p>
           <span className={styles.fileNumber}>
-            FILE / {project.slug.toUpperCase()}
+            {labels.file} / {project.slug.toUpperCase()}
           </span>
           <button
             type="button"
-            aria-label={c.close}
+            aria-label={labels.close}
             autoFocus
             onClick={() => dialogRef.current?.close()}
           >
@@ -93,100 +108,104 @@ export function CaseStudyModal({
           </button>
         </header>
 
-        <section className={styles.hero}>
-          <div className={styles.heroCopy}>
-            <span>CASE / {project.slug.toUpperCase()}</span>
-            <h2 id="case-study-modal-title">{project.title}</h2>
-            <p>{project.summary[locale]}</p>
-            <ul aria-label={c.stack}>
-              {project.stack.map((technology) => (
-                <li key={technology}>{technology}</li>
-              ))}
-            </ul>
-            <div className={styles.heroActions}>
-              <a href={project.repository} target="_blank" rel="noreferrer">
-                {c.repository} <span aria-hidden="true">↗</span>
-              </a>
-              {project.demo && (
-                <a href={project.demo} target="_blank" rel="noreferrer">
-                  {c.demo} <span aria-hidden="true">↗</span>
-                </a>
-              )}
-              <Link href={`/${locale}/case-studies/${project.slug}`}>
-                {c.details}{" "}
+        <div className={styles.overview}>
+          <section className={styles.mediaStage} aria-label={labels.preview}>
+            <figure>
+              <Image
+                key={activeMedia.id}
+                src={activeMedia.src}
+                alt={activeMedia.alt[locale]}
+                fill
+                preload={activeMediaIndex === 0}
+                sizes="(max-width: 760px) 94vw, 60vw"
+              />
+              <figcaption>
+                <span>
+                  {labels.imageStatus} {activeMediaIndex + 1} / {media.length}
+                </span>
+                {activeMedia.caption?.[locale] ?? activeMedia.alt[locale]}
+              </figcaption>
+            </figure>
+
+            {media.length > 1 && (
+              <div className={styles.mediaControls}>
+                <button
+                  type="button"
+                  aria-label={labels.previous}
+                  onClick={() => showMedia(-1)}
+                >
+                  <span aria-hidden="true">{locale === "ar" ? "→" : "←"}</span>
+                </button>
+                <div className={styles.mediaIndex} aria-hidden="true">
+                  {media.map((mediaItem, index) => (
+                    <span
+                      key={mediaItem.id}
+                      data-active={index === activeMediaIndex || undefined}
+                    />
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  aria-label={labels.next}
+                  onClick={() => showMedia(1)}
+                >
+                  <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
+                </button>
+              </div>
+            )}
+          </section>
+
+          <section className={styles.projectOverview}>
+            <div className={styles.actions}>
+              <Link
+                className={styles.primaryAction}
+                href={`/${locale}/case-studies/${project.slug}`}
+              >
+                {labels.details}
                 <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
               </Link>
+              <div className={styles.secondaryActions}>
+                <a href={project.repository} target="_blank" rel="noreferrer">
+                  {labels.repository} <span aria-hidden="true">↗</span>
+                </a>
+                {project.demo && (
+                  <a href={project.demo} target="_blank" rel="noreferrer">
+                    {labels.demo} <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
-          <div className={styles.heroMedia}>
-            <figure className={styles.primaryPhoto}>
-              <Image
-                src={project.image}
-                alt={project.imageAlt[locale]}
-                fill
-                sizes="(max-width: 760px) 88vw, 48vw"
-              />
-              <figcaption>{project.shortTitle} / PRIMARY EVIDENCE</figcaption>
-            </figure>
-            {project.gallery?.map((item) => (
-              <figure className={styles.secondaryPhoto} key={item.src}>
-                <Image
-                  src={item.src}
-                  alt={item.alt[locale]}
-                  fill
-                  sizes="(max-width: 760px) 70vw, 32vw"
-                />
-                <figcaption>{item.alt[locale]}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
 
-        {project.highlights && (
-          <section className={styles.highlights} aria-labelledby="case-highlights-title">
-            <div className={styles.highlightsHeading}>
-              <span>REPOSITORY / FIELD NOTES</span>
-              <h3 id="case-highlights-title">{c.highlights}</h3>
+            <p className={styles.kicker}>{labels.file}</p>
+            <h2 id="project-overview-title">{project.title}</h2>
+            <p className={styles.summary}>{project.summary[locale]}</p>
+
+            <aside className={styles.problem}>
+              <span>{labels.problem}</span>
+              <p>{study.problem[locale]}</p>
+            </aside>
+
+            <dl className={styles.projectFacts}>
+              <div>
+                <dt>{labels.projectType}</dt>
+                <dd>{study.projectType[locale]}</dd>
+              </div>
+              <div>
+                <dt>{labels.workingMode}</dt>
+                <dd>{study.teamContext[locale]}</dd>
+              </div>
+            </dl>
+
+            <div className={styles.technologies}>
+              <h3>{labels.technologies}</h3>
+              <ul aria-label={labels.technologies}>
+                {project.stack.map((technology) => (
+                  <li key={technology}>{technology}</li>
+                ))}
+              </ul>
             </div>
-            <ul>
-              {project.highlights.map((highlight, index) => (
-                <li key={highlight}>
-                  <span>0{index + 1}</span>
-                  <p>{highlight}</p>
-                </li>
-              ))}
-            </ul>
           </section>
-        )}
-
-        <section className={styles.facts}>
-          <article>
-            <span>01</span>
-            <h3>{c.context}</h3>
-            <p>{project.context[locale]}</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>{c.contribution}</h3>
-            <p>{project.contribution[locale]}</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>{c.engineering}</h3>
-            <p>{project.engineering[locale]}</p>
-          </article>
-          <article>
-            <span>04</span>
-            <h3>{c.evidence}</h3>
-            <p>{project.evidence[locale]}</p>
-          </article>
-          <aside>
-            <span>05 / LIMIT</span>
-            <h3>{c.limitation}</h3>
-            <p>{project.limitation[locale]}</p>
-          </aside>
-        </section>
-
+        </div>
       </article>
     </dialog>
   );

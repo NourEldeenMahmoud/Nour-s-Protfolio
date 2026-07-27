@@ -173,8 +173,25 @@ describe("Project Case Study", () => {
     expect(
       screen.getByRole("link", { name: /Project Details/ }),
     ).toHaveAttribute("href", "/en/case-studies/buildsense");
+    expect(
+      screen.getByText(caseStudies.buildsense.problem.en),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Core technologies")).toBeInTheDocument();
+    expect(screen.queryByText("Engineering shape")).not.toBeInTheDocument();
+    expect(screen.queryByText("Available evidence")).not.toBeInTheDocument();
+    expect(screen.queryByText("Honest boundary")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Repository field notes"),
+    ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Close case study" }));
+    await user.click(
+      screen.getByRole("button", { name: "Next project image" }),
+    );
+    expect(screen.getByText("Project image 2 / 4")).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Close project overview" }),
+    );
     expect(
       screen.queryByRole("dialog", { name: "BuildSense" }),
     ).not.toBeInTheDocument();
