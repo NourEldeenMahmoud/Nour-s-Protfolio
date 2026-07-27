@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import type { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { CategoryId } from "@/content/project-showcase";
@@ -46,6 +47,13 @@ const EXPLORE_YAW: Record<CategoryId, number> = {
 };
 
 const FLOAT_PHASES = [0.08, 0.42, 0.73, 0.25, 0.61];
+const HIT_WIDTHS: Record<CategoryId, number> = {
+  web: 1.12,
+  "game-development": 1.5,
+  desktop: 1.22,
+  "mobile-applications": 0.86,
+  bots: 1.28,
+};
 
 export type CategoryIconsCanvasProps = {
   viewportWidth: number;
@@ -55,6 +63,10 @@ export type CategoryIconsCanvasProps = {
   focusTarget: 0 | 1;
   activeCategoryId: CategoryId;
   hoveredCategoryId?: CategoryId | null;
+  focusedCategoryId?: CategoryId | null;
+  eventSource?: HTMLElement | null;
+  onCategoryClick?: (id: CategoryId) => void;
+  onCategoryHover?: (id: CategoryId | null) => void;
   reducedMotion?: boolean;
 };
 
@@ -90,8 +102,8 @@ function createAnimStates(): Record<CategoryId, IconAnimState> {
         interactionScale: 1,
         interactionFacing: 0,
         interactionTilt: 0,
-        emissiveIntensity: 0.1,
-        roughness: 0.37,
+        emissiveIntensity: 0.12,
+        roughness: 0.3,
         shadowOpacity: 0.2,
         shadowScale: 1,
       },
@@ -120,17 +132,17 @@ class IconLoadError extends Error {
 function createIconMaterial(sourceName: string): MaterialBinding {
   const isSide = sourceName.includes("IconSide");
   const material = new THREE.MeshStandardMaterial({
-    color: isSide ? 0x44362f : 0xe7cfaa,
-    metalness: isSide ? 0.38 : 0.46,
-    roughness: isSide ? 0.43 : 0.35,
-    emissive: isSide ? 0x382117 : 0x8b4926,
-    emissiveIntensity: isSide ? 0.04 : 0.1,
+    color: isSide ? 0x29343c : 0xffedc9,
+    metalness: isSide ? 0.44 : 0.54,
+    roughness: isSide ? 0.33 : 0.26,
+    emissive: isSide ? 0x4c2a20 : 0xc66c35,
+    emissiveIntensity: isSide ? 0.035 : 0.12,
   });
   material.name = sourceName;
   return {
     material,
-    emissiveFactor: isSide ? 0.42 : 1,
-    roughnessOffset: isSide ? 0.06 : -0.02,
+    emissiveFactor: isSide ? 0.28 : 1,
+    roughnessOffset: isSide ? 0.055 : -0.025,
   };
 }
 
@@ -170,6 +182,8 @@ function IconMesh({
   animState,
   invalidate,
   onLoadError,
+  onCategoryClick,
+  onCategoryHover,
   viewportHeight,
 }: {
   categoryId: CategoryId;
@@ -179,6 +193,8 @@ function IconMesh({
   animState: IconAnimState;
   invalidate: () => void;
   onLoadError: (error: IconLoadError) => void;
+  onCategoryClick?: (id: CategoryId) => void;
+  onCategoryHover?: (id: CategoryId | null) => void;
   viewportHeight: number;
 }) {
   const rootRef = useRef<THREE.Group>(null);
@@ -227,6 +243,7 @@ function IconMesh({
             : replacements[0]!;
           child.castShadow = false;
           child.receiveShadow = false;
+          child.raycast = () => null;
         });
 
         const bounds = new THREE.Box3().setFromObject(cloned);
@@ -295,6 +312,38 @@ function IconMesh({
 
   if (loadError) throw loadError;
 
+  function handlePointerEnter(event: ThreeEvent<PointerEvent>) {
+    event.stopPropagation();
+    document.body.style.cursor = "pointer";
+    onCategoryHover?.(categoryId);
+  }
+
+  function handlePointerLeave(event: ThreeEvent<PointerEvent>) {
+    event.stopPropagation();
+    document.body.style.cursor = "";
+    onCategoryHover?.(null);
+  }
+
+  function handleClick(event: ThreeEvent<MouseEvent>) {
+    event.stopPropagation();
+    const nativeTarget = event.nativeEvent.target;
+    if (
+      nativeTarget instanceof Element &&
+      nativeTarget.closest("[data-category-icon-control='true']")
+    ) {
+      return;
+    }
+    event.nativeEvent.preventDefault();
+    event.nativeEvent.stopImmediatePropagation();
+    onCategoryClick?.(categoryId);
+  }
+
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = "";
+    };
+  }, []);
+
   // eslint-disable-next-line react-hooks/immutability -- R3F frame callbacks mutate Three.js scene objects by design.
   useFrame(() => {
     const root = rootRef.current;
@@ -348,8 +397,8 @@ function IconMesh({
         animState.emissiveIntensity * binding.emissiveFactor;
       binding.material.roughness = THREE.MathUtils.clamp(
         animState.roughness + binding.roughnessOffset,
-        0.26,
-        0.46,
+        0.2,
+        0.39,
       );
     }
   });
@@ -359,7 +408,22 @@ function IconMesh({
       <mesh ref={shadowRef} material={shadowMaterial} renderOrder={-1}>
         <planeGeometry args={[1, 1]} />
       </mesh>
-      <group ref={modelTransformRef} />
+      <group ref={modelTransformRef}>
+        <mesh
+          position={[0, 0, 0.02]}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+          onClick={handleClick}
+        >
+          <boxGeometry args={[HIT_WIDTHS[categoryId], 1.12, 0.28]} />
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            colorWrite={false}
+          />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -391,22 +455,22 @@ function StudioLighting({
 
   return (
     <>
-      <hemisphereLight args={[0xc6d5e4, 0x241a18, 0.52]} />
+      <hemisphereLight args={[0xd2dfeb, 0x241a18, 0.58]} />
       <directionalLight
         ref={keyRef}
         position={[viewportWidth * 0.28, viewportHeight * 1.05, 520]}
-        intensity={2.15}
-        color={0xffd8aa}
+        intensity={2.7}
+        color={0xffdfb5}
       />
       <directionalLight
         ref={rimRef}
         position={[viewportWidth * 0.78, viewportHeight * 0.62, -360]}
-        intensity={1.05}
-        color={0x86b8df}
+        intensity={1.42}
+        color={0x91c9f0}
       />
       <pointLight
         position={[viewportWidth / 2, viewportHeight * 0.42, 180]}
-        intensity={0.48}
+        intensity={0.56}
         color={0xffa45f}
         distance={0}
         decay={0}
@@ -421,6 +485,9 @@ function Scene({
   focusTarget,
   activeCategoryId,
   hoveredCategoryId,
+  focusedCategoryId,
+  onCategoryClick,
+  onCategoryHover,
   reducedMotion = false,
   viewportWidth,
   viewportHeight,
@@ -518,31 +585,31 @@ function Scene({
 
   useEffect(() => {
     const targets = CATEGORY_IDS.map((id) => {
-      const hovered = hoveredCategoryId === id;
+      const engaged = hoveredCategoryId === id || focusedCategoryId === id;
       const active = activeCategoryId === id;
       return {
         state: animStates[id],
         values: {
-          interactionLift: hovered ? HOVER_LIFT : active ? 2 : 0,
-          interactionScale: hovered
+          interactionLift: engaged ? HOVER_LIFT : active ? 2 : 0,
+          interactionScale: engaged
             ? active
               ? 1.085
               : 1.06
             : active
               ? 1.05
               : 1,
-          interactionFacing: hovered ? -HERO_YAW[id] * 0.72 : 0,
-          interactionTilt: hovered ? -0.035 : 0,
-          emissiveIntensity: hovered
+          interactionFacing: engaged ? -HERO_YAW[id] * 0.72 : 0,
+          interactionTilt: engaged ? -0.035 : 0,
+          emissiveIntensity: engaged
             ? active
-              ? 0.25
-              : 0.17
+              ? 0.29
+              : 0.2
             : active
-              ? 0.21
-              : 0.1,
-          roughness: hovered ? 0.3 : active ? 0.32 : 0.37,
-          shadowOpacity: hovered ? 0.33 : active ? 0.27 : 0.2,
-          shadowScale: hovered ? 0.84 : active ? 0.92 : 1,
+              ? 0.27
+              : 0.12,
+          roughness: engaged ? 0.23 : active ? 0.26 : 0.3,
+          shadowOpacity: engaged ? 0.33 : active ? 0.27 : 0.2,
+          shadowScale: engaged ? 0.84 : active ? 0.92 : 1,
         },
       };
     });
@@ -578,6 +645,7 @@ function Scene({
   }, [
     activeCategoryId,
     animStates,
+    focusedCategoryId,
     hoveredCategoryId,
     invalidate,
     reducedMotion,
@@ -601,6 +669,8 @@ function Scene({
           animState={animStates[id]}
           invalidate={invalidate}
           onLoadError={handleLoadError}
+          onCategoryClick={onCategoryClick}
+          onCategoryHover={onCategoryHover}
           viewportHeight={viewportHeight}
         />
       ))}
@@ -641,6 +711,7 @@ class CanvasErrorBoundary extends Component<
 export default function CategoryIconsCanvas({
   viewportWidth,
   viewportHeight,
+  eventSource,
   ...sceneProps
 }: CategoryIconsCanvasProps) {
   return (
@@ -656,6 +727,8 @@ export default function CategoryIconsCanvas({
         position: [0, 0, 500],
       }}
       dpr={CATEGORY_ICONS_DPR}
+      eventSource={eventSource ?? undefined}
+      eventPrefix="client"
       frameloop="demand"
       gl={{
         antialias: true,
@@ -667,7 +740,7 @@ export default function CategoryIconsCanvas({
         gl.setClearColor(0x000000, 0);
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.08;
+        gl.toneMappingExposure = 1.12;
 
         if (CATEGORY_ICONS_DIAGNOSTICS_ENABLED && !canvasDiagnosticsReported) {
           canvasDiagnosticsReported = true;

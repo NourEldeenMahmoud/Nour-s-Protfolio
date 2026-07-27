@@ -340,8 +340,12 @@
 
 .tab:focus-visible {
   outline: 2px solid #66a7aa;
-  outline-offset: 2px;
+  outline-offset: 4px;
   color: #fff;
+  box-shadow:
+    0 0 0 5px rgb(102 167 170 / 22%),
+    0 0 24px rgb(245 214 157 / 38%);
+  translate: -50% calc(-50% - 2px);
 }
 
 .tabActive {
@@ -371,7 +375,7 @@
 }
 
 .tab:nth-child(2) {
-  left: 40.4600%;
+  left: 40.46%;
 }
 
 .tab:nth-child(3) {
@@ -379,7 +383,7 @@
 }
 
 .tab:nth-child(4) {
-  left: 59.5400%;
+  left: 59.54%;
 }
 
 .tab:nth-child(5) {

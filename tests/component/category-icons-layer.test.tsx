@@ -71,7 +71,7 @@ describe("CategoryIconsLayer", () => {
     );
 
     expect(
-      container.querySelector("[aria-hidden='true']"),
+      container.querySelector("[data-testid='category-icons-layer']"),
     ).not.toBeInTheDocument();
   });
 
@@ -98,11 +98,11 @@ describe("CategoryIconsLayer", () => {
 
     // Zero viewport → no anchors computed → no layer
     expect(
-      container.querySelector("[aria-hidden='true']"),
+      container.querySelector("[data-testid='category-icons-layer']"),
     ).not.toBeInTheDocument();
   });
 
-  it("renders the layer with aria-hidden when capability resolves to canvas", async () => {
+  it("renders an accessible layer while keeping the Canvas decorative", async () => {
     Object.defineProperty(window, "innerHeight", {
       writable: true,
       configurable: true,
@@ -120,9 +120,12 @@ describe("CategoryIconsLayer", () => {
       );
     });
 
-    const layer = document.querySelector("[aria-hidden='true']");
+    const layer = document.querySelector(
+      "[data-testid='category-icons-layer']",
+    );
     expect(layer).toBeInTheDocument();
-    expect(layer).toHaveAttribute("aria-hidden", "true");
+    expect(layer).not.toHaveAttribute("aria-hidden");
+    expect(layer?.querySelector("[aria-hidden='true']")).toBeInTheDocument();
   });
 
   it("enters canvas mode on capable desktop without SVG flash", async () => {
@@ -170,8 +173,9 @@ describe("CategoryIconsLayer", () => {
     // Canvas mode — no SVG fallback images
     const imgs = document.querySelectorAll("img[loading='lazy']");
     expect(imgs.length).toBe(0);
-    // Layer should still render (aria-hidden)
-    const layer = document.querySelector("[aria-hidden='true']");
+    const layer = document.querySelector(
+      "[data-testid='category-icons-layer']",
+    );
     expect(layer).toBeInTheDocument();
   });
 
@@ -268,7 +272,9 @@ describe("CategoryIconsLayer", () => {
       );
     });
 
-    const layer = container.querySelector("[aria-hidden='true']");
+    const layer = container.querySelector(
+      "[data-testid='category-icons-layer']",
+    );
     expect(layer).toHaveStyle({ opacity: "0" });
   });
 
@@ -290,7 +296,9 @@ describe("CategoryIconsLayer", () => {
       );
     });
 
-    const layer = container.querySelector("[aria-hidden='true']");
+    const layer = container.querySelector(
+      "[data-testid='category-icons-layer']",
+    );
     expect(layer).toHaveStyle({ opacity: "1" });
   });
 
@@ -312,10 +320,12 @@ describe("CategoryIconsLayer", () => {
       );
     });
 
-    const hitTargets = document.querySelectorAll(
-      "[aria-hidden='true'][tabindex='-1']",
-    );
+    const hitTargets = document.querySelectorAll("button[class*='hitTarget']");
     expect(hitTargets.length).toBe(5);
+    hitTargets.forEach((target) => {
+      expect((target as HTMLButtonElement).tabIndex).toBe(0);
+      expect(target).toHaveAccessibleName();
+    });
   });
 
   it("hides DOM hit targets when an area is focused", async () => {
@@ -336,9 +346,7 @@ describe("CategoryIconsLayer", () => {
       );
     });
 
-    const hitTargets = document.querySelectorAll(
-      "button[aria-hidden='true'][tabindex='-1']",
-    );
+    const hitTargets = document.querySelectorAll("button[class*='hitTarget']");
     expect(hitTargets.length).toBe(0);
   });
 
@@ -360,9 +368,7 @@ describe("CategoryIconsLayer", () => {
       );
     });
 
-    const hitTargets = document.querySelectorAll(
-      "button[aria-hidden='true'][tabindex='-1']",
-    );
+    const hitTargets = document.querySelectorAll("button[class*='hitTarget']");
     expect(hitTargets.length).toBe(0);
   });
 

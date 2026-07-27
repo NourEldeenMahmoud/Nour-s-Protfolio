@@ -2,7 +2,9 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Locale } from "@/i18n/routing";
 import type { CategoryId } from "@/content/project-showcase";
+import { categories } from "@/content/project-showcase";
 import {
   CATEGORY_IDS,
   EXPLORE_ANCHORS,
@@ -61,12 +63,15 @@ type CapabilityState = "pending" | "canvas" | "fallback";
 
 export type CategoryIconsLayerProps = {
   activeCategoryId: CategoryId;
+  locale?: Locale;
   focusedArea: string | null;
   isIdle: boolean;
   isIntro: boolean;
   onCategoryClick?: (id: CategoryId) => void;
   onCategoryHover?: (id: CategoryId | null) => void;
   hoveredCategoryId?: CategoryId | null;
+  focusedCategoryId?: CategoryId | null;
+  eventSource?: HTMLElement | null;
 };
 
 /**
@@ -81,12 +86,15 @@ export type CategoryIconsLayerProps = {
  */
 export function CategoryIconsLayer({
   activeCategoryId,
+  locale = "en",
   focusedArea,
   isIdle,
   isIntro,
   onCategoryClick,
   onCategoryHover,
   hoveredCategoryId,
+  focusedCategoryId,
+  eventSource,
 }: CategoryIconsLayerProps) {
   const [capability, setCapability] = useState<CapabilityState>("pending");
   const [viewportSize, setViewportSize] = useState({ w: 0, h: 0 });
@@ -188,14 +196,14 @@ export function CategoryIconsLayer({
   return (
     <div
       className={styles.layer}
-      aria-hidden="true"
+      data-testid="category-icons-layer"
       style={{
         opacity,
         transition: "opacity 600ms ease",
       }}
     >
       {effectiveFallback ? (
-        <div className={styles.fallbackContainer}>
+        <div className={styles.fallbackContainer} aria-hidden="true">
           {CATEGORY_IDS.map((id) => {
             const anchor =
               focusedArea === "exploration"
@@ -226,7 +234,7 @@ export function CategoryIconsLayer({
           })}
         </div>
       ) : capability === "canvas" ? (
-        <div className={styles.canvasContainer}>
+        <div className={styles.canvasContainer} aria-hidden="true">
           <CanvasErrorBoundary fallback={null} onError={handleCanvasError}>
             <CategoryIconsCanvas
               viewportWidth={viewportSize.w}
@@ -236,6 +244,10 @@ export function CategoryIconsLayer({
               focusTarget={focusTarget}
               activeCategoryId={activeCategoryId}
               hoveredCategoryId={hoveredCategoryId}
+              focusedCategoryId={focusedCategoryId}
+              eventSource={eventSource}
+              onCategoryClick={onCategoryClick}
+              onCategoryHover={onCategoryHover}
               reducedMotion={motionPolicy.effectiveReducedMotion}
             />
           </CanvasErrorBoundary>
@@ -252,17 +264,21 @@ export function CategoryIconsLayer({
                 key={id}
                 type="button"
                 className={styles.hitTarget}
-                aria-hidden="true"
-                tabIndex={-1}
+                data-category-icon-control="true"
+                aria-label={
+                  categories.find((cat) => cat.id === id)!.label[locale]
+                }
                 style={{
-                  left: `${anchor.px}px`,
-                  top: `${anchor.pb - anchor.ph}px`,
-                  width: `${anchor.ph}px`,
-                  height: `${anchor.ph}px`,
+                  left: `${anchor.px - anchor.ph * 0.675}px`,
+                  top: `${anchor.pb - anchor.ph * 1.1}px`,
+                  width: `${anchor.ph * 1.35}px`,
+                  height: `${anchor.ph * 1.25}px`,
                 }}
                 onClick={() => onCategoryClick?.(id)}
                 onMouseEnter={() => onCategoryHover?.(id)}
                 onMouseLeave={() => onCategoryHover?.(null)}
+                onFocus={() => onCategoryHover?.(id)}
+                onBlur={() => onCategoryHover?.(null)}
               />
             );
           })}

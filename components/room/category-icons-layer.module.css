@@ -51,10 +51,15 @@
   margin: 0;
   cursor: pointer;
   pointer-events: auto;
-  /* Slight padding for easier touch targets on mobile */
-  transform: translate(-10%, -10%);
-  width: 120%;
-  height: 120%;
+  border-radius: 42%;
+}
+
+.hitTarget:focus-visible {
+  outline: 2px solid #f5d69d;
+  outline-offset: 4px;
+  box-shadow:
+    0 0 0 5px rgb(102 167 170 / 22%),
+    0 0 24px rgb(245 214 157 / 42%);
 }
 
 /* Reduced motion — fully static, no transitions */

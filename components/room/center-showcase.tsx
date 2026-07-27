@@ -38,10 +38,7 @@ function ChevronArrow({
   "aria-hidden"?: boolean;
   focusable?: boolean;
 }) {
-  const d =
-    direction === "left"
-      ? "M15 4l-8 8 8 8"
-      : "M9 4l8 8-8 8";
+  const d = direction === "left" ? "M15 4l-8 8 8 8" : "M9 4l8 8-8 8";
   return (
     <svg
       viewBox="0 0 24 24"
@@ -83,6 +80,8 @@ export function CenterShowcase({
   copy,
   activeCategoryId: controlledCategoryId,
   onCategoryChange,
+  onCategoryHover,
+  onCategoryFocus,
 }: {
   locale: Locale;
   copy: ShowcaseCopy;
@@ -90,6 +89,8 @@ export function CenterShowcase({
   activeCategoryId?: CategoryId;
   /** Called when the user selects a different category tab. */
   onCategoryChange?: (id: CategoryId) => void;
+  onCategoryHover?: (id: CategoryId | null) => void;
+  onCategoryFocus?: (id: CategoryId | null) => void;
 }) {
   const [internalCategoryId, setInternalCategoryId] =
     useState<CategoryId>("web");
@@ -289,12 +290,17 @@ export function CenterShowcase({
             <button
               key={cat.id}
               role="tab"
+              data-category-icon-control="true"
               id={`tab-${cat.id}`}
               aria-selected={isActive}
               aria-controls={PANEL_ID}
-              tabIndex={isActive ? 0 : -1}
+              tabIndex={0}
               className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}
               onClick={() => switchCategory(cat.id)}
+              onPointerEnter={() => onCategoryHover?.(cat.id)}
+              onPointerLeave={() => onCategoryHover?.(null)}
+              onFocus={() => onCategoryFocus?.(cat.id)}
+              onBlur={() => onCategoryFocus?.(null)}
               onKeyDown={(e) => {
                 const idx = categories.findIndex((c) => c.id === cat.id);
                 handleTabKeyDown(e, idx);

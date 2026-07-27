@@ -83,6 +83,9 @@ export function RoomExperience({
   const [hoveredCategoryId, setHoveredCategoryId] = useState<CategoryId | null>(
     null,
   );
+  const [focusedCategoryId, setFocusedCategoryId] = useState<CategoryId | null>(
+    null,
+  );
   const activeArea = hoveredArea ?? focusedArea;
 
   function clearAnimation() {
@@ -348,9 +351,9 @@ export function RoomExperience({
   }
 
   function handleCategoryIconClick(categoryId: CategoryId) {
-    if (!isIdle || focusedArea !== null) return;
+    if (!isIdle) return;
     setActiveCategoryId(categoryId);
-    transitionToArea("exploration");
+    if (focusedArea === null) transitionToArea("exploration");
   }
 
   function handleCategoryIconHover(categoryId: CategoryId | null) {
@@ -527,19 +530,24 @@ export function RoomExperience({
           locale={locale}
           copy={copy.showcase}
           activeCategoryId={activeCategoryId}
-          onCategoryChange={setActiveCategoryId}
+          onCategoryChange={handleCategoryIconClick}
+          onCategoryHover={handleCategoryIconHover}
+          onCategoryFocus={setFocusedCategoryId}
         />
       )}
 
       {/* Category icon 3D overlay — below showcase (z-index 5) */}
       <CategoryIconsLayer
         activeCategoryId={activeCategoryId}
+        locale={locale}
         focusedArea={focusedArea}
         isIdle={isIdle}
         isIntro={!isIdle && !focusedArea}
         onCategoryClick={handleCategoryIconClick}
         onCategoryHover={handleCategoryIconHover}
         hoveredCategoryId={hoveredCategoryId}
+        focusedCategoryId={focusedCategoryId}
+        eventSource={rootRef.current}
       />
 
       {selectedProject && (
