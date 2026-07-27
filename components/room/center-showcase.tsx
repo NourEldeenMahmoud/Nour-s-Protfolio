@@ -4,6 +4,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { getProject } from "@/content/portfolio";
 import { categories, type CategoryId } from "@/content/project-showcase";
 import type { Locale } from "@/i18n/routing";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import {
   ProjectMediaPlayer,
   type ProjectMediaPlayerCopy,
@@ -43,6 +44,7 @@ export function CenterShowcase({
   const screenRef = useRef<HTMLDivElement>(null);
   const tablistRef = useRef<HTMLDivElement>(null);
   const contextRef = useRef<gsap.Context | null>(null);
+  const reducedMotion = useReducedMotion();
   const isRtl = locale === "ar";
 
   const activeCategory = useMemo(
@@ -117,7 +119,7 @@ export function CenterShowcase({
     void import("gsap").then(({ gsap }) => {
       if (cancelled) return;
       contextRef.current = gsap.context(() => {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+        if (reducedMotion)
           return;
         gsap.fromTo(
           screenRef.current!,
@@ -138,7 +140,7 @@ export function CenterShowcase({
       contextRef.current?.revert();
       contextRef.current = null;
     };
-  }, [activeCategoryId, projectIndex, slideDirection]);
+  }, [activeCategoryId, projectIndex, reducedMotion, slideDirection]);
 
   const previousProject = hasMultipleProjects
     ? projects[(projectIndex - 1 + projects.length) % projects.length]

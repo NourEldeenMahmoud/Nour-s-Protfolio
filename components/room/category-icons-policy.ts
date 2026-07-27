@@ -18,14 +18,16 @@ export const CATEGORY_ICONS_POWER_PREFERENCE: WebGLPowerPreference =
 
 export function resolveCategoryIconsMotionPolicy(
   detectedReducedMotion: boolean,
+  manualReducedMotionOverride: boolean = false,
 ): CategoryIconsMotionPolicy {
-  const developmentOverrideEnabled = IS_DEVELOPMENT && FORCE_FULL_MOTION_IN_DEV;
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const developmentOverrideEnabled = isDevelopment && !manualReducedMotionOverride;
 
   return {
     detectedReducedMotion,
     developmentOverrideEnabled,
     effectiveReducedMotion:
-      detectedReducedMotion && !developmentOverrideEnabled,
+      manualReducedMotionOverride || (detectedReducedMotion && !developmentOverrideEnabled),
   };
 }
 

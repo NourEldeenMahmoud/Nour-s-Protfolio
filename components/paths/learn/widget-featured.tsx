@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type JSX } from "react";
 import type { FeaturedWidget } from "@/content/learn";
 import { WidgetCard } from "./widget-card";
 import styles from "./learn.module.css";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 interface WidgetFeaturedProps {
   widget: FeaturedWidget;
@@ -33,7 +34,10 @@ const VARIANT_ICONS: Record<string, JSX.Element> = {
   ),
 };
 
+
+
 export function WidgetFeatured({ widget, onOpen }: WidgetFeaturedProps) {
+  const reducedMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -46,15 +50,13 @@ export function WidgetFeatured({ widget, onOpen }: WidgetFeaturedProps) {
   }, [items.length]);
 
   useEffect(() => {
-    if (isPaused) return;
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    if (isPaused || reducedMotion) return;
 
     intervalRef.current = setInterval(cycleNext, 6000);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isPaused, cycleNext]);
+  }, [isPaused, reducedMotion, cycleNext]);
 
   const handleOpen = useCallback(() => {
     if (current) onOpen(current.openFolderId, current.openFileId);

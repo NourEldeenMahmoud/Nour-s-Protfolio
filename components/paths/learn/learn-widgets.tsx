@@ -7,6 +7,8 @@ import { WidgetHero } from "./widget-hero";
 import { WidgetFeatured } from "./widget-featured";
 import styles from "./learn.module.css";
 
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+
 interface LearnWidgetsProps {
   locale: Locale;
   onOpenFolder: (id: string, name: string) => void;
@@ -20,6 +22,7 @@ export function LearnWidgets({
   onOpenFile,
   learnNodeMap,
 }: LearnWidgetsProps) {
+  const reducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleOpen = useCallback(
@@ -37,8 +40,7 @@ export function LearnWidgets({
 
   // GSAP entry animation
   useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    if (reducedMotion) return;
 
     let cleanup: (() => void) | undefined;
     void import("gsap").then(({ gsap }) => {
@@ -61,7 +63,7 @@ export function LearnWidgets({
     return () => {
       cleanup?.();
     };
-  }, []);
+  }, [reducedMotion]);
 
   const heroWidget = widgetsV2.find((w) => w.kind === "hero");
   const featuredWidget = widgetsV2.find((w) => w.kind === "featured");

@@ -261,6 +261,8 @@ function ArchitectureMap({
   );
 }
 
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+
 function buildSections(study: CaseStudy, locale: Locale): SectionDefinition[] {
   const labels = copy[locale];
   return [
@@ -295,6 +297,7 @@ export function CaseStudyExperience({
   project: Project;
   study: CaseStudy;
 }) {
+  const reducedMotion = useReducedMotion();
   const rootRef = useRef<HTMLElement>(null);
   const [activeSection, setActiveSection] = useState("context");
   const labels = copy[locale];
@@ -326,7 +329,7 @@ export function CaseStudyExperience({
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+    if (!root || reducedMotion)
       return;
     let context: gsap.Context | undefined;
     let cancelled = false;
@@ -375,7 +378,7 @@ export function CaseStudyExperience({
       cancelled = true;
       context?.revert();
     };
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <main ref={rootRef} className={styles.caseStudy}>

@@ -59,6 +59,8 @@ const CanvasErrorBoundary = dynamic(
 
 type CapabilityState = "pending" | "canvas" | "fallback";
 
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+
 /* ── Props ── */
 
 export type CategoryIconsLayerProps = {
@@ -96,10 +98,11 @@ export function CategoryIconsLayer({
   focusedCategoryId,
   eventSourceRef,
 }: CategoryIconsLayerProps) {
+  const reducedMotion = useReducedMotion();
   const [capability, setCapability] = useState<CapabilityState>("pending");
   const [viewportSize, setViewportSize] = useState({ w: 0, h: 0 });
   const [motionPolicy, setMotionPolicy] = useState(() =>
-    resolveCategoryIconsMotionPolicy(false),
+    resolveCategoryIconsMotionPolicy(reducedMotion),
   );
 
   /* ── Viewport measurement ── */
@@ -114,7 +117,6 @@ export function CategoryIconsLayer({
 
   /* ── Centralized capability and motion policy resolution after mount ── */
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const connection = (
       navigator as Navigator & { connection?: { saveData?: boolean } }
     ).connection;
@@ -124,28 +126,29 @@ export function CategoryIconsLayer({
       webGLAvailable: hasWebGL(),
     });
 
-    function updateMotionPolicy() {
-      const resolved = resolveCategoryIconsMotionPolicy(mediaQuery.matches);
-      setMotionPolicy(resolved);
+    const isDevelopment = process.env.NODE_ENV === "development";
+    const manualOverride =
+      typeof window !== "undefined" &&
+      (new URLSearchParams(window.location.search).get("reducedMotion") === "1" ||
+        window.localStorage.getItem("portfolio-reduced-motion") === "true");
 
-      if (CATEGORY_ICONS_DIAGNOSTICS_ENABLED) {
-        console.info("[CategoryIcons] motion policy", {
-          detectedReducedMotion: resolved.detectedReducedMotion,
-          developmentOverrideEnabled: resolved.developmentOverrideEnabled,
-          effectiveReducedMotion: resolved.effectiveReducedMotion,
-          renderingMode: reason ? "SVG fallback" : "Canvas",
-          fallbackReason: reason,
-          animationMode: resolved.effectiveReducedMotion ? "static" : "full",
-        });
-      }
+    const resolved = resolveCategoryIconsMotionPolicy(reducedMotion, manualOverride);
+    setMotionPolicy(resolved);
+
+    if (CATEGORY_ICONS_DIAGNOSTICS_ENABLED) {
+      console.info("[CategoryIcons] motion policy", {
+        detectedReducedMotion: resolved.detectedReducedMotion,
+        developmentOverrideEnabled: resolved.developmentOverrideEnabled,
+        effectiveReducedMotion: resolved.effectiveReducedMotion,
+        renderingMode: reason ? "SVG fallback" : "Canvas",
+        fallbackReason: reason,
+        animationMode: resolved.effectiveReducedMotion ? "static" : "full",
+      });
     }
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time mount detection
     setCapability(reason ? "fallback" : "canvas");
-    updateMotionPolicy();
-    mediaQuery.addEventListener("change", updateMotionPolicy);
-    return () => mediaQuery.removeEventListener("change", updateMotionPolicy);
-  }, []);
+  }, [reducedMotion]);
 
   /* ── Compute viewport anchors for both states ── */
   const heroAnchors = useMemo(() => {

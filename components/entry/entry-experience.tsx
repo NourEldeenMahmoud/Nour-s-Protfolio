@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/routing";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { ConnectionMap } from "./connection-map";
 import { EngineeringCore } from "./engineering-core";
 import {
@@ -47,6 +48,7 @@ export function EntryExperience({
   const contextRef = useRef<gsap.Context | null>(null);
   const visibilityCleanupRef = useRef<(() => void) | null>(null);
   const [run, setRun] = useState(0);
+  const reducedMotion = useReducedMotion();
   const [isSelectorReady, setIsSelectorReady] = useState(false);
   const [status, setStatus] = useState(copy.statusReady);
 
@@ -74,9 +76,6 @@ export function EntryExperience({
     const root = rootRef.current;
     if (!root) return;
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
     const seen = readIntroSeen(window.localStorage);
     const replayRequested =
       run > 0 || new URLSearchParams(window.location.search).has("replay");
@@ -246,7 +245,7 @@ export function EntryExperience({
       cancelled = true;
       clearTimeline();
     };
-  }, [copy.statusPlaying, copy.statusReady, run]);
+  }, [copy.statusPlaying, copy.statusReady, reducedMotion, run]);
 
   function replayIntro() {
     clearTimeline();
