@@ -18,6 +18,7 @@ import {
   type ProjectMedia,
 } from "@/content/portfolio";
 import { hasCaseStudy } from "@/content/case-studies";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { Locale } from "@/i18n/routing";
 import styles from "./project-experience.module.css";
 
@@ -281,6 +282,7 @@ export function ProjectExperience({
   const rootRef = useRef<HTMLElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const pointerStart = useRef<number | null>(null);
+  const reducedMotion = useReducedMotion();
   const media = getProjectDetailMedia(project);
   const [activeSection, setActiveSection] = useState("overview");
   const [activeExperience, setActiveExperience] = useState(0);
@@ -315,7 +317,7 @@ export function ProjectExperience({
 
   useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root || process.env.NODE_ENV === "test") return;
+    if (!root || reducedMotion || process.env.NODE_ENV === "test") return;
     let context: { revert: () => void } | undefined;
     let cancelled = false;
 
@@ -453,7 +455,7 @@ export function ProjectExperience({
       cancelled = true;
       context?.revert();
     };
-  }, []);
+  }, [reducedMotion]);
 
   useEffect(() => {
     const root = rootRef.current;

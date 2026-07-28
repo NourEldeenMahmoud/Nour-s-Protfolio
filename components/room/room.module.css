@@ -766,18 +766,16 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .sceneCamera {
-    transition-duration: 1150ms !important;
-  }
+:global(html[data-motion="reduced"]) .sceneCamera {
+  transition-duration: 1150ms !important;
+}
 
-  .roomFrame,
-  .lightSweep,
-  .controls,
-  .hotspot,
-  .hotspotMarker,
-  .focusedRoomImage {
-    transition: none;
-    animation: none;
-  }
+:global(html[data-motion="reduced"]) .roomFrame,
+:global(html[data-motion="reduced"]) .lightSweep,
+:global(html[data-motion="reduced"]) .controls,
+:global(html[data-motion="reduced"]) .hotspot,
+:global(html[data-motion="reduced"]) .hotspotMarker,
+:global(html[data-motion="reduced"]) .focusedRoomImage {
+  transition: none;
+  animation: none;
 }

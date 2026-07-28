@@ -95,11 +95,9 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .map,
-  .paperPreview,
-  .paperSurface,
-  .paperLabel {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .map,
+:global(html[data-motion="reduced"]) .paperPreview,
+:global(html[data-motion="reduced"]) .paperSurface,
+:global(html[data-motion="reduced"]) .paperLabel {
+  transition: none;
 }

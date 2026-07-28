@@ -662,23 +662,21 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .imageFrame {
-    animation: reducedReveal 180ms ease-out both;
-  }
+:global(html[data-motion="reduced"]) .imageFrame {
+  animation: reducedReveal 180ms ease-out both;
+}
 
-  .mediaImage {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .mediaImage {
+  transition: none;
+}
 
-  .projectNav,
-  .projectNav span,
-  .iconButton,
-  .primaryAction,
-  .primaryAction svg,
-  .topProjectLink svg {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .projectNav,
+:global(html[data-motion="reduced"]) .projectNav span,
+:global(html[data-motion="reduced"]) .iconButton,
+:global(html[data-motion="reduced"]) .primaryAction,
+:global(html[data-motion="reduced"]) .primaryAction svg,
+:global(html[data-motion="reduced"]) .topProjectLink svg {
+  transition: none;
 }
 
 @keyframes mediaReveal {

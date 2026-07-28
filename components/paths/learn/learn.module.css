@@ -2502,38 +2502,36 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .window,
-  .desktopIcon,
-  .fileItem,
-  .taskbarApp,
-  .taskbarReturn,
-  .taskbarStart,
-  .taskbarSearch,
-  .explorerNavItem,
-  .startMenuItem,
-  .searchResult,
-  .docProjectLink,
-  .docCopyLink,
-  .widget,
-  .widgetLarge,
-  .widgetSmall,
-  .widgetWide,
-  .widgetTile,
-  .widgetFocusChip,
-  .widgetCard,
-  .widgetCardAvatar,
-  .widgetCardAccentStrip,
-  .widgetCardCapsule,
-  .widgetCardFeatureItem,
-  .widgetFeaturedDot,
-  .widgetFeaturedArrow,
-  .widgetFeaturedIcon,
-  .widgetFeaturedStepCount,
-  .widgetFeaturedContent {
-    transition: none;
-    animation: none;
-  }
+:global(html[data-motion="reduced"]) .window,
+:global(html[data-motion="reduced"]) .desktopIcon,
+:global(html[data-motion="reduced"]) .fileItem,
+:global(html[data-motion="reduced"]) .taskbarApp,
+:global(html[data-motion="reduced"]) .taskbarReturn,
+:global(html[data-motion="reduced"]) .taskbarStart,
+:global(html[data-motion="reduced"]) .taskbarSearch,
+:global(html[data-motion="reduced"]) .explorerNavItem,
+:global(html[data-motion="reduced"]) .startMenuItem,
+:global(html[data-motion="reduced"]) .searchResult,
+:global(html[data-motion="reduced"]) .docProjectLink,
+:global(html[data-motion="reduced"]) .docCopyLink,
+:global(html[data-motion="reduced"]) .widget,
+:global(html[data-motion="reduced"]) .widgetLarge,
+:global(html[data-motion="reduced"]) .widgetSmall,
+:global(html[data-motion="reduced"]) .widgetWide,
+:global(html[data-motion="reduced"]) .widgetTile,
+:global(html[data-motion="reduced"]) .widgetFocusChip,
+:global(html[data-motion="reduced"]) .widgetCard,
+:global(html[data-motion="reduced"]) .widgetCardAvatar,
+:global(html[data-motion="reduced"]) .widgetCardAccentStrip,
+:global(html[data-motion="reduced"]) .widgetCardCapsule,
+:global(html[data-motion="reduced"]) .widgetCardFeatureItem,
+:global(html[data-motion="reduced"]) .widgetFeaturedDot,
+:global(html[data-motion="reduced"]) .widgetFeaturedArrow,
+:global(html[data-motion="reduced"]) .widgetFeaturedIcon,
+:global(html[data-motion="reduced"]) .widgetFeaturedStepCount,
+:global(html[data-motion="reduced"]) .widgetFeaturedContent {
+  transition: none;
+  animation: none;
 }
 
 /* ─── Global Toast ─── */
@@ -2588,8 +2586,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .desktopIconsRefreshing {
-    animation: none;
-  }
+:global(html[data-motion="reduced"]) .desktopIconsRefreshing {
+  animation: none;
 }

@@ -126,19 +126,12 @@ export function CategoryIconsLayer({
       webGLAvailable: hasWebGL(),
     });
 
-    const isDevelopment = process.env.NODE_ENV === "development";
-    const manualOverride =
-      typeof window !== "undefined" &&
-      (new URLSearchParams(window.location.search).get("reducedMotion") === "1" ||
-        window.localStorage.getItem("portfolio-reduced-motion") === "true");
-
-    const resolved = resolveCategoryIconsMotionPolicy(reducedMotion, manualOverride);
+    const resolved = resolveCategoryIconsMotionPolicy(reducedMotion);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time mount detection
     setMotionPolicy(resolved);
 
     if (CATEGORY_ICONS_DIAGNOSTICS_ENABLED) {
       console.info("[CategoryIcons] motion policy", {
-        detectedReducedMotion: resolved.detectedReducedMotion,
-        developmentOverrideEnabled: resolved.developmentOverrideEnabled,
         effectiveReducedMotion: resolved.effectiveReducedMotion,
         renderingMode: reason ? "SVG fallback" : "Canvas",
         fallbackReason: reason,
@@ -146,7 +139,6 @@ export function CategoryIconsLayer({
       });
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time mount detection
     setCapability(reason ? "fallback" : "canvas");
   }, [reducedMotion]);
 

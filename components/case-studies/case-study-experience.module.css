@@ -1569,29 +1569,27 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .caseStudy {
-    scroll-behavior: auto;
-  }
+:global(html[data-motion="reduced"]) .caseStudy {
+  scroll-behavior: auto;
+}
 
-  .coverEvidence,
-  .coverActions a,
-  .coverTopbar a span,
-  .notePath article,
-  .decisionCard,
-  .featureFiles article,
-  .evidenceGrid figure,
-  .coverImage img,
-  .evidenceMedia img {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .coverEvidence,
+:global(html[data-motion="reduced"]) .coverActions a,
+:global(html[data-motion="reduced"]) .coverTopbar a span,
+:global(html[data-motion="reduced"]) .notePath article,
+:global(html[data-motion="reduced"]) .decisionCard,
+:global(html[data-motion="reduced"]) .featureFiles article,
+:global(html[data-motion="reduced"]) .evidenceGrid figure,
+:global(html[data-motion="reduced"]) .coverImage img,
+:global(html[data-motion="reduced"]) .evidenceMedia img {
+  transition: none;
+}
 
-  .coverEvidence:hover,
-  .coverActions a:hover,
-  .notePath article:hover,
-  .decisionCard:hover,
-  .featureFiles article:hover,
-  .evidenceGrid figure:hover {
-    transform: none;
-  }
+:global(html[data-motion="reduced"]) .coverEvidence:hover,
+:global(html[data-motion="reduced"]) .coverActions a:hover,
+:global(html[data-motion="reduced"]) .notePath article:hover,
+:global(html[data-motion="reduced"]) .decisionCard:hover,
+:global(html[data-motion="reduced"]) .featureFiles article:hover,
+:global(html[data-motion="reduced"]) .evidenceGrid figure:hover {
+  transform: none;
 }

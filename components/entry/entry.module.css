@@ -525,9 +525,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .pathCard::before,
-  .pathArrow {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .pathCard::before,
+:global(html[data-motion="reduced"]) .pathArrow {
+  transition: none;
 }

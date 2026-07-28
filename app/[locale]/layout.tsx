@@ -8,6 +8,7 @@ import {
 } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { isLocale, locales } from "@/i18n/routing";
+import { MotionProvider } from "@/components/providers/motion-provider";
 import "@/styles/globals.css";
 
 type LocaleLayoutProps = {
@@ -35,6 +36,8 @@ export async function generateMetadata({
   };
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export default async function LocaleLayout({
   children,
   params,
@@ -50,11 +53,24 @@ export default async function LocaleLayout({
       lang={locale}
       dir={locale === "ar" ? "rtl" : "ltr"}
       data-scroll-behavior="smooth"
+      data-motion="full"
+      suppressHydrationWarning
     >
+      <head>
+        {isProduction && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){var root=document.documentElement;try{var params=new URLSearchParams(location.search);var manual=params.get("reducedMotion")==="1"||localStorage.getItem("portfolio-reduced-motion")==="true";var systemReduced=matchMedia("(prefers-reduced-motion:reduce)").matches;root.dataset.motion=manual||systemReduced?"reduced":"full";}catch(e){root.dataset.motion="full";}})()`,
+            }}
+          />
+        )}
+      </head>
       <body>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <MotionProvider>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </MotionProvider>
       </body>
     </html>
   );

@@ -63,8 +63,6 @@
 }
 
 /* Reduced motion — fully static, no transitions */
-@media (prefers-reduced-motion: reduce) {
-  .fallbackIcon {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .fallbackIcon {
+  transition: none;
 }

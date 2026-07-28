@@ -506,10 +506,8 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .path,
-  .projectImage img {
-    animation: none;
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .path,
+:global(html[data-motion="reduced"]) .projectImage img {
+  animation: none;
+  transition: none;
 }

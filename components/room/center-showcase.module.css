@@ -205,8 +205,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .tab {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .tab {
+  transition: none;
 }

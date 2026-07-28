@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EntryExperience } from "@/components/entry/entry-experience";
 import { INTRO_SEEN_KEY } from "@/components/entry/entry-state";
+import { MotionProvider } from "@/components/providers/motion-provider";
 
 const gsapControl = vi.hoisted(() => ({
   onComplete: null as null | (() => void),
@@ -72,29 +73,38 @@ const copy = {
 };
 
 function setReducedMotion(matches: boolean) {
-  vi.stubGlobal(
-    "matchMedia",
-    vi.fn().mockReturnValue({
-      matches,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }),
-  );
+  document.documentElement.dataset.motion = matches ? "reduced" : "full";
+}
+
+function renderWithMotion(ui: React.ReactElement) {
+  return render(<MotionProvider>{ui}</MotionProvider>);
 }
 
 describe("EntryExperience", () => {
   beforeEach(() => {
+    delete document.documentElement.dataset.motion;
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
     setReducedMotion(false);
     gsapControl.onComplete = null;
   });
 
   afterEach(() => {
+    delete document.documentElement.dataset.motion;
+    window.localStorage.clear();
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("persists Skip, reveals all routes, and focuses the selector heading", async () => {
     const user = userEvent.setup();
-    render(<EntryExperience locale="en" copy={copy} />);
+    renderWithMotion(<EntryExperience locale="en" copy={copy} />);
 
     await user.click(screen.getByRole("button", { name: "Skip intro" }));
 
@@ -121,7 +131,7 @@ describe("EntryExperience", () => {
   it("keeps the seen key while Replay starts a new intro", async () => {
     window.localStorage.setItem(INTRO_SEEN_KEY, "true");
     const user = userEvent.setup();
-    render(<EntryExperience locale="en" copy={copy} />);
+    renderWithMotion(<EntryExperience locale="en" copy={copy} />);
 
     const replay = await screen.findByRole("button", { name: "Replay intro" });
     await user.click(replay);
@@ -143,7 +153,7 @@ describe("EntryExperience", () => {
     let now = 0;
     vi.spyOn(document, "hidden", "get").mockImplementation(() => hidden);
     vi.spyOn(Date, "now").mockImplementation(() => now);
-    render(<EntryExperience locale="en" copy={copy} />);
+    renderWithMotion(<EntryExperience locale="en" copy={copy} />);
 
     await waitFor(() => expect(gsapControl.onComplete).not.toBeNull());
     hidden = false;
@@ -157,8 +167,8 @@ describe("EntryExperience", () => {
   });
 
   it("renders the static selector immediately for reduced motion", async () => {
-    setReducedMotion(true);
-    render(<EntryExperience locale="en" copy={copy} />);
+    window.localStorage.setItem("portfolio-reduced-motion", "true");
+    renderWithMotion(<EntryExperience locale="en" copy={copy} />);
 
     expect(
       await screen.findByRole("button", { name: "Replay intro" }),

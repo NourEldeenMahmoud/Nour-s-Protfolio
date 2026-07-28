@@ -1,6 +1,7 @@
 import { render, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CategoryIconsLayer } from "@/components/room/category-icons-layer";
+import { MotionProvider } from "@/components/providers/motion-provider";
 
 /* ── Mocks ── */
 
@@ -46,6 +47,7 @@ describe("CategoryIconsLayer", () => {
   });
 
   afterEach(() => {
+    delete document.documentElement.dataset.motion;
     vi.restoreAllMocks();
   });
 
@@ -152,7 +154,7 @@ describe("CategoryIconsLayer", () => {
   });
 
   it("enters canvas mode (not SVG) when prefers-reduced-motion is active", async () => {
-    setupMatchMedia(true);
+    document.documentElement.dataset.motion = "reduced";
     Object.defineProperty(window, "innerHeight", {
       writable: true,
       configurable: true,
@@ -161,12 +163,14 @@ describe("CategoryIconsLayer", () => {
 
     await act(async () => {
       render(
-        <CategoryIconsLayer
-          activeCategoryId="web"
-          focusedArea={null}
-          isIdle={true}
-          isIntro={false}
-        />,
+        <MotionProvider>
+          <CategoryIconsLayer
+            activeCategoryId="web"
+            focusedArea={null}
+            isIdle={true}
+            isIntro={false}
+          />
+        </MotionProvider>,
       );
     });
 

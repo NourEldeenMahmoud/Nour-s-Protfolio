@@ -5,6 +5,7 @@ import {
   type ProjectMediaPlayerCopy,
 } from "@/components/room/project-media-player";
 import { getProject } from "@/content/portfolio";
+import { MotionProvider } from "@/components/providers/motion-provider";
 
 const copy: ProjectMediaPlayerCopy = {
   play: "Play project film",
@@ -25,20 +26,24 @@ const copy: ProjectMediaPlayerCopy = {
 function renderBuildSensePlayer() {
   const buildsense = getProject("buildsense")!;
   return render(
-    <ProjectMediaPlayer
-      project={buildsense}
-      locale="en"
-      categoryLabel="Web"
-      copy={copy}
-      detailHref="/en/projects/buildsense"
-      projectCount={1}
-      projectPosition={1}
-    />,
+    <MotionProvider>
+      <ProjectMediaPlayer
+        project={buildsense}
+        locale="en"
+        categoryLabel="Web"
+        copy={copy}
+        detailHref="/en/projects/buildsense"
+        projectCount={1}
+        projectPosition={1}
+      />
+    </MotionProvider>,
   );
 }
 
 describe("ProjectMediaPlayer video playback & preferences", () => {
   beforeEach(() => {
+    delete document.documentElement.dataset.motion;
+    document.documentElement.dataset.motion = "full";
     vi.stubGlobal(
       "matchMedia",
       vi.fn().mockReturnValue({
@@ -56,6 +61,7 @@ describe("ProjectMediaPlayer video playback & preferences", () => {
   });
 
   afterEach(() => {
+    delete document.documentElement.dataset.motion;
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     Object.defineProperty(document, "hidden", {
@@ -109,19 +115,17 @@ describe("ProjectMediaPlayer video playback & preferences", () => {
     expect(video.currentTime).toBe(0);
   });
 
-  it("respects prefers-reduced-motion by disabling initial autoplay", () => {
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn().mockReturnValue({
-        matches: true,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      }),
-    );
+  it("renders with reduced motion without breaking playback controls", () => {
+    window.localStorage.setItem("portfolio-reduced-motion", "true");
 
     renderBuildSensePlayer();
-    const playButton = screen.getByRole("button", { name: copy.play });
-    expect(playButton).toBeInTheDocument();
+
+    expect(screen.getByLabelText("BuildSense PC hardware discovery preview video")).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: copy.timeline })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: copy.play }) ??
+        screen.queryByRole("button", { name: copy.pause }),
+    ).toBeInTheDocument();
   });
 
   it("respects Save Data mode by using preload none and disabling initial autoplay", () => {

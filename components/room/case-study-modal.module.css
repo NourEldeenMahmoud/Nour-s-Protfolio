@@ -665,28 +665,26 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .dialog,
-  .dialog::backdrop {
-    animation: none;
-  }
+:global(html[data-motion="reduced"]) .dialog,
+:global(html[data-motion="reduced"]) .dialog::backdrop {
+  animation: none;
+}
 
-  .header button,
-  .mediaStage figure,
-  .mediaStage img,
-  .mediaControls button,
-  .mediaIndex span,
-  .primaryAction,
-  .primaryAction span {
-    transition: none;
-  }
+:global(html[data-motion="reduced"]) .header button,
+:global(html[data-motion="reduced"]) .mediaStage figure,
+:global(html[data-motion="reduced"]) .mediaStage img,
+:global(html[data-motion="reduced"]) .mediaControls button,
+:global(html[data-motion="reduced"]) .mediaIndex span,
+:global(html[data-motion="reduced"]) .primaryAction,
+:global(html[data-motion="reduced"]) .primaryAction span {
+  transition: none;
+}
 
-  .header button:hover,
-  .mediaStage figure:hover,
-  .mediaStage figure:hover img,
-  .mediaControls button:hover,
-  .primaryAction:hover,
-  .primaryAction:hover span {
-    transform: none;
-  }
+:global(html[data-motion="reduced"]) .header button:hover,
+:global(html[data-motion="reduced"]) .mediaStage figure:hover,
+:global(html[data-motion="reduced"]) .mediaStage figure:hover img,
+:global(html[data-motion="reduced"]) .mediaControls button:hover,
+:global(html[data-motion="reduced"]) .primaryAction:hover,
+:global(html[data-motion="reduced"]) .primaryAction:hover span {
+  transform: none;
 }

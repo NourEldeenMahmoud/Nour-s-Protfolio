@@ -14,6 +14,7 @@ import {
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/content/portfolio";
 import type { CategoryId } from "@/content/project-showcase";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { CaseStudyModal } from "./case-study-modal";
 import { CaseStudyPaperMap } from "./case-study-paper-map";
 import { CenterShowcase, type ShowcaseCopy } from "./center-showcase";
@@ -61,6 +62,7 @@ export function RoomExperience({
   copy: RoomCopy;
 }) {
   const rootRef = useRef<HTMLElement>(null);
+  const reducedMotion = useReducedMotion();
   const frameRef = useRef<HTMLDivElement>(null);
   const roomImageRef = useRef<HTMLImageElement>(null);
   const introLightsRef = useRef<HTMLDivElement>(null);
@@ -117,24 +119,27 @@ export function RoomExperience({
           `.${styles.focusStill}`,
         );
         focusStills.forEach((still) => {
-          const currentOpacity = getComputedStyle(still).opacity;
           const targetOpacity = still.dataset.focusStill === nextArea ? 1 : 0;
           still.getAnimations().forEach((animation) => animation.cancel());
-          still.style.opacity = currentOpacity;
-          const animation = still.animate(
-            [{ opacity: currentOpacity }, { opacity: targetOpacity }],
-            {
-              duration: 1100,
-              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-            },
-          );
-          animation.onfinish = () => {
+          if (reducedMotion) {
             still.style.opacity = String(targetOpacity);
-          };
+          } else {
+            const currentOpacity = getComputedStyle(still).opacity;
+            const animation = still.animate(
+              [{ opacity: currentOpacity }, { opacity: targetOpacity }],
+              {
+                duration: 1100,
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              },
+            );
+            animation.onfinish = () => {
+              still.style.opacity = String(targetOpacity);
+            };
+          }
         });
       }
     },
-    [copy.areas, copy.readyStatus],
+    [copy.areas, copy.readyStatus, reducedMotion],
   );
 
   useLayoutEffect(() => {
@@ -144,6 +149,9 @@ export function RoomExperience({
       sessionStorage.getItem("learn-returning") === "true" ||
       new URLSearchParams(window.location.search).get("from") === "room";
     if (returning) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("[RoomIntro] skipped because: returning from learn path");
+      }
       sessionStorage.removeItem("learn-returning");
       window.history.replaceState(null, "", window.location.pathname);
       clearAnimation();
@@ -157,6 +165,11 @@ export function RoomExperience({
     const focusParam =
       new URLSearchParams(window.location.search).get("focus") ?? "";
     if (focusParam && roomAreas.includes(focusParam as RoomArea)) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `[RoomIntro] skipped because: focus param "${focusParam}"`,
+        );
+      }
       const targetArea = focusParam as RoomArea;
       window.history.replaceState(null, "", window.location.pathname);
       clearAnimation();
@@ -164,6 +177,17 @@ export function RoomExperience({
       setIsIdle(true);
       setStatus(copy.readyStatus);
       requestAnimationFrame(() => transitionToArea(targetArea));
+      return;
+    }
+
+    if (reducedMotion) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("[RoomIntro] skipped because: reduced motion");
+      }
+      clearAnimation();
+      if (rootRef.current) rootRef.current.dataset.roomState = "idle";
+      setIsIdle(true);
+      setStatus(copy.readyStatus);
       return;
     }
 
@@ -315,7 +339,7 @@ export function RoomExperience({
       cancelled = true;
       clearAnimation();
     };
-  }, [copy.introStatus, copy.readyStatus, imageReady, run, transitionToArea]);
+  }, [copy.introStatus, copy.readyStatus, imageReady, reducedMotion, run, transitionToArea]);
 
   function replayIntro() {
     clearAnimation();
