@@ -1,8 +1,104 @@
+.monitorStage {
+  position: relative;
+  display: grid;
+  box-sizing: border-box;
+  height: 100svh;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(0.75rem, 2vw, 1.75rem);
+  background:
+    radial-gradient(circle at 50% 38%, rgb(61 83 109 / 42%), transparent 48%),
+    linear-gradient(145deg, #17202b 0%, #090d13 58%, #030507 100%);
+  perspective: 120rem;
+}
+
+.monitorStage::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      112deg,
+      transparent 34%,
+      rgb(127 183 220 / 7%) 48%,
+      transparent 62%
+    ),
+    radial-gradient(circle at 50% 105%, rgb(0 0 0 / 75%), transparent 45%);
+  content: "";
+  pointer-events: none;
+}
+
+.monitorFrame {
+  position: relative;
+  box-sizing: border-box;
+  width: min(96vw, 120rem);
+  height: calc(100svh - clamp(1.5rem, 4vw, 3.5rem));
+  padding: clamp(0.65rem, 1.15vw, 1.35rem);
+  padding-block-end: clamp(0.85rem, 1.5vw, 1.65rem);
+  border: 1px solid rgb(145 177 205 / 28%);
+  border-radius: clamp(1rem, 2vw, 2rem);
+  background: linear-gradient(145deg, #344150 0%, #1b2530 42%, #101720 100%);
+  box-shadow:
+    0 2.5rem 7rem rgb(0 0 0 / 68%),
+    0 0 0 0.35rem rgb(5 9 14 / 88%),
+    inset 0 1px 0 rgb(255 255 255 / 18%),
+    inset 0 -0.35rem 0.9rem rgb(0 0 0 / 42%);
+  transform: rotateX(0.55deg) rotateY(-0.7deg) translateY(-0.35rem);
+  transform-style: preserve-3d;
+}
+
+.monitorFrame::after {
+  position: absolute;
+  inset: 0.3rem;
+  border: 1px solid rgb(255 255 255 / 7%);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+}
+
+.monitorCamera {
+  position: absolute;
+  z-index: 3;
+  top: clamp(0.25rem, 0.55vw, 0.6rem);
+  left: 50%;
+  width: clamp(3.6rem, 6vw, 6.5rem);
+  height: clamp(0.65rem, 1.1vw, 1.15rem);
+  border: 1px solid rgb(138 167 192 / 30%);
+  border-radius: 999px;
+  background:
+    radial-gradient(
+      circle at 50% 48%,
+      #15212e 0 12%,
+      #070c12 14% 21%,
+      transparent 23%
+    ),
+    linear-gradient(180deg, #3f4d5d, #202a35);
+  box-shadow:
+    0 0.2rem 0.5rem rgb(0 0 0 / 55%),
+    inset 0 1px 0 rgb(255 255 255 / 13%);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.monitorScreen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 92%);
+  border-radius: clamp(0.45rem, 0.8vw, 0.8rem);
+  background: #05070a;
+  box-shadow:
+    0 0 0 0.2rem rgb(0 0 0 / 72%),
+    inset 0 0 1.4rem rgb(0 0 0 / 48%);
+  transform: translateZ(0);
+}
+
 .learn {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100svh;
+  height: 100%;
   overflow: hidden;
   background: #0a0a0a;
   color: #fff;
@@ -2342,6 +2438,25 @@
 
 /* ─── Mobile overrides ─── */
 @media (max-width: 640px) {
+  .monitorStage {
+    padding: 0.45rem;
+  }
+
+  .monitorFrame {
+    width: calc(100vw - 0.9rem);
+    height: calc(100svh - 0.9rem);
+    padding: 0.45rem;
+    padding-block-end: 0.6rem;
+    border-radius: 0.9rem;
+    transform: none;
+  }
+
+  .monitorCamera {
+    top: 0.13rem;
+    width: 2.9rem;
+    height: 0.55rem;
+  }
+
   .desktop {
     padding: 0.6rem;
     position: static;

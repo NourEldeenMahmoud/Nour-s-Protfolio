@@ -155,6 +155,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const [widgetsVisible, setWidgetsVisible] = useState(true);
   const [workspaceRect, setWorkspaceRect] = useState<DOMRect | null>(null);
   const [toast, setToast] = useState<{ message: string } | null>(null);
+  const desktopRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const childMenuRef = useRef<HTMLDivElement | null>(null);
   const childMenuOpenRef = useRef(false);
@@ -338,7 +339,12 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const handleContextMenuOpen = useCallback(
     (x: number, y: number, target: ContextMenuTarget) => {
-      openContextMenu(x, y, target);
+      const screenRect = desktopRef.current?.getBoundingClientRect();
+      openContextMenu(
+        screenRect ? x - screenRect.left : x,
+        screenRect ? y - screenRect.top : y,
+        target,
+      );
       setStartOpen(false);
       setSearchOpen(false);
     },
@@ -368,9 +374,9 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
               window.innerHeight - 100,
               Math.max(10, window.innerHeight / 2),
             );
-      openContextMenu(x, y, target);
+      handleContextMenuOpen(x, y, target);
     },
-    [openContextMenu],
+    [handleContextMenuOpen],
   );
 
   const [childMenu, setChildMenu] = useState<{
@@ -390,11 +396,14 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
       const isRtl =
         document.dir === "rtl" || document.documentElement.dir === "rtl";
       const childWidth = 180;
-      const px = isRtl ? childX - childWidth : childX;
+      const screenRect = desktopRef.current?.getBoundingClientRect();
+      const localX = screenRect ? childX - screenRect.left : childX;
+      const localY = screenRect ? childY - screenRect.top : childY;
+      const px = isRtl ? localX - childWidth : localX;
       setChildMenu({
         open: true,
         x: px,
-        y: childY,
+        y: localY,
         items: [
           {
             id: "sort-name",
@@ -897,7 +906,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
       : undefined;
 
   return (
-    <div className={styles.learn} data-locale={locale}>
+    <div className={styles.learn} data-locale={locale} ref={desktopRef}>
       <div className={styles.wallpaper} aria-hidden="true" />
 
       <div className={styles.windowsArea} data-workspace ref={workspaceRef}>

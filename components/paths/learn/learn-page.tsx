@@ -2,6 +2,7 @@
 
 import type { Locale } from "@/i18n/routing";
 import { LearnExperience } from "./learn-experience";
+import styles from "./learn.module.css";
 
 interface LearnExperiencePageProps {
   locale: Locale;
@@ -48,6 +49,18 @@ interface LearnExperiencePageProps {
   };
 }
 
-export function LearnExperiencePage({ locale, copy }: LearnExperiencePageProps) {
-  return <LearnExperience locale={locale} copy={copy} />;
+export function LearnExperiencePage({
+  locale,
+  copy,
+}: LearnExperiencePageProps) {
+  return (
+    <main className={styles.monitorStage}>
+      <div className={styles.monitorFrame}>
+        <span className={styles.monitorCamera} aria-hidden="true" />
+        <div className={styles.monitorScreen}>
+          <LearnExperience locale={locale} copy={copy} />
+        </div>
+      </div>
+    </main>
+  );
 }
