@@ -234,7 +234,7 @@ describe("CenterShowcase", () => {
     timeline.focus();
     await user.keyboard("{ArrowRight}");
     expect(timeline).toHaveValue("5");
-    expect(screen.getByText("2 of 6 scenes")).toBeInTheDocument();
+    expect(screen.getByText("2 of 5 scenes")).toBeInTheDocument();
   });
 
   it("shows media arrows inside screen for multi-image projects", async () => {
@@ -322,6 +322,36 @@ describe("CenterShowcase", () => {
     await user.click(screen.getByRole("tab", { name: "Desktop" }));
     expect(
       screen.getByRole("heading", { name: "Blood Bank Management System" }),
+    ).toBeInTheDocument();
+  });
+
+  it("resets an out-of-range project index after an external category change", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <CenterShowcase activeCategoryId="web" locale="en" copy={copy} />,
+    );
+
+    await user.click(getProjectButton("Frontend Mini"));
+    expect(
+      screen.getByRole("heading", { name: "Frontend Mini Projects" }),
+    ).toBeInTheDocument();
+
+    rerender(
+      <CenterShowcase activeCategoryId="desktop" locale="en" copy={copy} />,
+    );
+    expect(
+      screen.getByRole("heading", { name: "Blood Bank Management System" }),
+    ).toBeInTheDocument();
+
+    rerender(
+      <CenterShowcase
+        activeCategoryId="mobile-applications"
+        locale="en"
+        copy={copy}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", { name: "Blood Bank Mobile App" }),
     ).toBeInTheDocument();
   });
 

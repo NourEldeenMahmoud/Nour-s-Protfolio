@@ -2,7 +2,12 @@ import type { ProjectMedia, ProjectSlug } from "@/content/portfolio";
 
 type ImageOptions = Pick<
   ProjectMedia,
-  "device" | "orientation" | "purpose" | "treatment" | "focalPosition"
+  | "device"
+  | "orientation"
+  | "purpose"
+  | "treatment"
+  | "focalPosition"
+  | "poster"
 >;
 
 const browserImage: ImageOptions = {
@@ -64,6 +69,7 @@ function video(
 }
 
 export type ProjectMediaSet = {
+  hero?: ProjectMedia;
   preview: ProjectMedia[];
   details: ProjectMedia[];
 };
@@ -337,6 +343,12 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
         "فيديو معاينة طريقة لعب How To Train Your AI",
       ),
     ],
+    hero: image(
+      "httyai-hero",
+      "/projects/how-to-train-your-ai/details/hero.webp",
+      "How To Train Your AI title artwork with a friendly robot at sunset",
+      "صورة عنوان How To Train Your AI مع روبوت ودود وقت الغروب",
+    ),
     details: [
       image(
         "httyai-frame-1",
@@ -386,30 +398,46 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
         "فيديو معاينة طريقة لعب Sharp Shooter",
       ),
     ],
+    hero: image(
+      "sharp-shooter-hero",
+      "/projects/sharp-shooter/details/hero-gameplay.gif",
+      "Sharp Shooter animated gameplay loop in the aim-training arena",
+      "مشهد لعب متحرك من Sharp Shooter داخل ساحة تدريب التصويب",
+      {
+        ...desktopImage,
+        poster: "/projects/sharp-shooter/preview/poster.webp",
+      },
+    ),
     details: [
       image(
-        "sharp-shooter-frame-1",
-        "/projects/sharp-shooter/details/01-gameplay.webp",
-        "Sharp Shooter gameplay — precision shooting round",
-        "طريقة لعب Sharp Shooter — جولة الرماية الدقيقة",
+        "sharp-shooter-victory",
+        "/projects/sharp-shooter/details/05-gameplay.webp",
+        "Sharp Shooter victory screen after clearing the arena",
+        "شاشة الفوز في Sharp Shooter بعد إنهاء أهداف الساحة",
       ),
       image(
-        "sharp-shooter-frame-2",
-        "/projects/sharp-shooter/details/02-gameplay.webp",
-        "Sharp Shooter gameplay — target hit feedback",
-        "طريقة لعب Sharp Shooter — التغذية الراجعة لإصابة الهدف",
-      ),
-      image(
-        "sharp-shooter-frame-3",
+        "sharp-shooter-targeting",
         "/projects/sharp-shooter/details/03-gameplay.webp",
-        "Sharp Shooter gameplay — time-limited round results",
-        "طريقة لعب Sharp Shooter — نتائج الجولة المحددة بوقت",
+        "Sharp Shooter precision targeting with the scoped weapon",
+        "تصويب دقيق في Sharp Shooter باستخدام السلاح ذي المنظار",
       ),
       image(
-        "sharp-shooter-frame-4",
+        "sharp-shooter-hit-feedback",
+        "/projects/sharp-shooter/details/02-gameplay.webp",
+        "Sharp Shooter target hit with impact particles and updated counters",
+        "إصابة هدف في Sharp Shooter مع مؤثرات الاصطدام وتحديث العدادات",
+      ),
+      image(
+        "sharp-shooter-pickup",
         "/projects/sharp-shooter/details/04-gameplay.webp",
-        "Sharp Shooter gameplay — raycast hit detection",
-        "طريقة لعب Sharp Shooter — كشف الإصابة عبر raycast",
+        "Sharp Shooter arena navigation beside an ammunition pickup",
+        "التنقل داخل ساحة Sharp Shooter بجوار ذخيرة قابلة للجمع",
+      ),
+      image(
+        "sharp-shooter-arena",
+        "/projects/sharp-shooter/details/01-gameplay.webp",
+        "Sharp Shooter arena overview with active targets and weapon HUD",
+        "نظرة عامة على ساحة Sharp Shooter مع الأهداف النشطة وواجهة السلاح",
       ),
     ],
   },
@@ -423,30 +451,46 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
         "فيديو معاينة طريقة لعب Royal Run",
       ),
     ],
+    hero: image(
+      "royal-run-hero",
+      "/projects/royal-run/details/hero-gameplay.gif",
+      "Royal Run animated gameplay loop through the castle course",
+      "مشهد لعب متحرك من Royal Run عبر مسار القلعة",
+      {
+        ...desktopImage,
+        poster: "/projects/royal-run/preview/poster.webp",
+      },
+    ),
     details: [
       image(
-        "royal-run-frame-1",
-        "/projects/royal-run/details/01-gameplay.webp",
-        "Royal Run gameplay — procedural obstacle course",
-        "طريقة لعب Royal Run — مسار العقبات الإجرائي",
-      ),
-      image(
-        "royal-run-frame-2",
-        "/projects/royal-run/details/02-gameplay.webp",
-        "Royal Run gameplay — running and jumping mechanics",
-        "طريقة لعب Royal Run — ميكانيكا الركض والقفز",
-      ),
-      image(
-        "royal-run-frame-3",
-        "/projects/royal-run/details/03-gameplay.webp",
-        "Royal Run gameplay — increasing speed and score tracking",
-        "طريقة لعب Royal Run — تزايد السرعة وتتبع النقاط",
-      ),
-      image(
-        "royal-run-frame-4",
+        "royal-run-game-over",
         "/projects/royal-run/details/04-gameplay.webp",
-        "Royal Run gameplay — game over and restart flow",
-        "طريقة لعب Royal Run — الشاشة النهائية وتدفق إعادات التشغيل",
+        "Royal Run game-over state with the final score",
+        "شاشة نهاية الجولة في Royal Run مع النتيجة النهائية",
+      ),
+      image(
+        "royal-run-barrel",
+        "/projects/royal-run/details/03-gameplay.webp",
+        "Royal Run rolling barrel obstacle between barricades",
+        "عقبة البرميل المتدحرج بين الحواجز في Royal Run",
+      ),
+      image(
+        "royal-run-catapult",
+        "/projects/royal-run/details/06-gameplay.webp",
+        "Royal Run catapult obstacle beside a coin trail",
+        "عقبة المنجنيق بجوار مسار العملات في Royal Run",
+      ),
+      image(
+        "royal-run-boulder",
+        "/projects/royal-run/details/05-gameplay.webp",
+        "Royal Run boulder hazard on the castle path",
+        "خطر الصخرة على مسار القلعة في Royal Run",
+      ),
+      image(
+        "royal-run-course",
+        "/projects/royal-run/details/01-gameplay.webp",
+        "Royal Run castle course with fruit and barricades ahead",
+        "مسار قلعة Royal Run مع الفاكهة والحواجز في الأمام",
       ),
     ],
   },
@@ -460,30 +504,46 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
         "فيديو معاينة طريقة لعب Galaxy Strike",
       ),
     ],
+    hero: image(
+      "galaxy-strike-hero",
+      "/projects/galaxy-strike/details/hero-gameplay.gif",
+      "Galaxy Strike animated canyon dogfight",
+      "معركة جوية متحركة داخل وادي Galaxy Strike",
+      {
+        ...desktopImage,
+        poster: "/projects/galaxy-strike/preview/poster.webp",
+      },
+    ),
     details: [
       image(
-        "galaxy-strike-frame-1",
+        "galaxy-strike-flight",
         "/projects/galaxy-strike/details/01-gameplay.webp",
-        "Galaxy Strike gameplay — top-down 2D space flight",
-        "طريقة لعب Galaxy Strike — الطيران الفضائي ثنائي الأبعاد",
+        "Galaxy Strike spacecraft flying through the forest canyon",
+        "مركبة Galaxy Strike تحلق عبر الوادي المليء بالأشجار",
       ),
       image(
-        "galaxy-strike-frame-2",
+        "galaxy-strike-briefing",
         "/projects/galaxy-strike/details/02-gameplay.webp",
-        "Galaxy Strike gameplay — continuous firing and projectile pooling",
-        "طريقة لعب Galaxy Strike — إطلاق النار المستمر وتجميع المقذوفات",
+        "Galaxy Strike mission dialogue during an enemy attack",
+        "حوار مهمة في Galaxy Strike أثناء هجوم الأعداء",
       ),
       image(
-        "galaxy-strike-frame-3",
+        "galaxy-strike-impact",
         "/projects/galaxy-strike/details/03-gameplay.webp",
-        "Galaxy Strike gameplay — enemy wave spawning",
-        "طريقة لعب Galaxy Strike — توليد موجات الأعداء",
+        "Galaxy Strike enemy destroyed by the player's laser fire",
+        "تدمير عدو في Galaxy Strike بنيران الليزر",
       ),
       image(
-        "galaxy-strike-frame-4",
+        "galaxy-strike-reinforcements",
+        "/projects/galaxy-strike/details/05-gameplay.webp",
+        "Galaxy Strike reinforcements entering the canyon battle",
+        "وصول تعزيزات إلى معركة الوادي في Galaxy Strike",
+      ),
+      image(
+        "galaxy-strike-dogfight",
         "/projects/galaxy-strike/details/04-gameplay.webp",
-        "Galaxy Strike gameplay — scrolling background and HLSL visuals",
-        "طريقة لعب Galaxy Strike — الخلفية المتحركة والتأثيرات البصرية",
+        "Galaxy Strike close-range dogfight beneath an enemy carrier",
+        "معركة جوية قريبة في Galaxy Strike أسفل سفينة معادية",
       ),
     ],
   },
@@ -497,48 +557,52 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
         "فيديو معاينة طريقة لعب Rocket Boost",
       ),
     ],
+    hero: image(
+      "rocket-boost-hero",
+      "/projects/rocket-boost/details/hero-gameplay.gif",
+      "Rocket Boost animated flight through the industrial colony",
+      "رحلة متحركة في Rocket Boost عبر المستعمرة الصناعية",
+      {
+        ...desktopImage,
+        poster: "/projects/rocket-boost/preview/poster.webp",
+      },
+    ),
     details: [
       image(
-        "rocket-boost-frame-1",
-        "/projects/rocket-boost/details/01-gameplay.webp",
-        "Rocket Boost physics flight level",
-        "مستوى الطيران الفيزيائي في Rocket Boost",
-      ),
-      image(
-        "rocket-boost-frame-2",
-        "/projects/rocket-boost/details/02-gameplay.webp",
-        "Rocket Boost obstacle navigation",
-        "التنقل عبر العقبات في Rocket Boost",
-      ),
-      image(
-        "rocket-boost-frame-3",
+        "rocket-boost-level-overview",
         "/projects/rocket-boost/details/03-gameplay.webp",
-        "Rocket Boost landing pad approach",
-        "الاقتراب من منصة الهبوط في Rocket Boost",
+        "Rocket Boost complete industrial level layout in the Unity editor",
+        "التخطيط الكامل للمستوى الصناعي في Rocket Boost داخل محرر Unity",
       ),
       image(
-        "rocket-boost-frame-4",
-        "/projects/rocket-boost/details/04-gameplay.webp",
-        "Rocket Boost thrust and rotation control",
-        "التحكم بالدفع والدوران في Rocket Boost",
+        "rocket-boost-launch-pad",
+        "/projects/rocket-boost/details/01-gameplay.webp",
+        "Rocket Boost spacecraft waiting on an elevated launch pad",
+        "مركبة Rocket Boost على منصة إطلاق مرتفعة",
       ),
       image(
-        "rocket-boost-frame-5",
+        "rocket-boost-debris",
         "/projects/rocket-boost/details/05-gameplay.webp",
-        "Rocket Boost hazard collision avoidance",
-        "تفادي تصادم المخاطر في Rocket Boost",
+        "Rocket Boost flying through a dense debris effect",
+        "التحليق عبر مؤثر حطام كثيف في Rocket Boost",
       ),
       image(
-        "rocket-boost-frame-6",
+        "rocket-boost-flight",
+        "/projects/rocket-boost/details/02-gameplay.webp",
+        "Rocket Boost spacecraft crossing the illuminated colony",
+        "مركبة Rocket Boost تعبر المستعمرة المضيئة",
+      ),
+      image(
+        "rocket-boost-landing",
         "/projects/rocket-boost/details/06-gameplay.webp",
-        "Rocket Boost level completion sequence",
-        "تسلسل إكمال المستوى في Rocket Boost",
+        "Rocket Boost spacecraft settling onto the destination pad",
+        "مركبة Rocket Boost تهبط على منصة الوصول",
       ),
       image(
-        "rocket-boost-frame-7",
-        "/projects/rocket-boost/details/07-gameplay.webp",
-        "Rocket Boost multi-stage flight course",
-        "مسار الطيران متعدد المراحل في Rocket Boost",
+        "rocket-boost-rock-field",
+        "/projects/rocket-boost/details/04-gameplay.webp",
+        "Rocket Boost spacecraft navigating a suspended rock field",
+        "مركبة Rocket Boost تتنقل عبر حقل صخري معلق",
       ),
     ],
   },
@@ -670,85 +734,66 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
   "met-summaries": {
     preview: [
       image(
-        "met-index",
-        "/projects/met-summaries/details/01-index.webp",
-        "MET Summaries main collection index",
-        "الفهرس الرئيسي لمجموعة ملخصات MET",
+        "met-hero-dark",
+        "/projects/met-summaries/details/hero-dark.webp",
+        "MET Summaries collection index in dark mode",
+        "فهرس مجموعة ملخصات MET بالوضع الداكن",
       ),
       image(
-        "met-gis",
-        "/projects/met-summaries/details/02-gis-index.webp",
-        "GIS course lecture summaries index",
-        "فهرس ملخصات مادة نظم المعلومات الجغرافية",
+        "met-lesson-example",
+        "/projects/met-summaries/details/lesson-example.webp",
+        "Computer Graphics lesson summary with an antialiasing example",
+        "ملخص درس في الرسومات الحاسوبية مع مثال على تنعيم الحواف",
       ),
       image(
-        "met-graphics",
-        "/projects/met-summaries/details/03-computer-graphics-index.webp",
-        "Computer Graphics course summaries index",
-        "فهرس ملخصات مادة الرسومات الحاسوبية",
+        "met-practice-example",
+        "/projects/met-summaries/details/practice-example.webp",
+        "Prolog practice page with worked parent and grandparent rules",
+        "صفحة تدريب Prolog مع حل قواعد الأب والجد",
       ),
       image(
-        "met-networks",
-        "/projects/met-summaries/details/04-networks-index.webp",
-        "Computer Networks course summaries index",
-        "فهرس ملخصات مادة شبكات الحاسوب",
+        "met-knowledge-graph",
+        "/projects/met-summaries/details/knowledge-graph.webp",
+        "MET Summaries interactive knowledge graph",
+        "الرسم المعرفي التفاعلي لملخصات MET",
       ),
       image(
-        "met-prolog",
-        "/projects/met-summaries/details/05-prolog-index.webp",
-        "Prolog programming course summaries index",
-        "فهرس ملخصات مادة برمجة Prolog",
-      ),
-      image(
-        "met-prolog-lecture",
-        "/projects/met-summaries/details/06-prolog-lecture.webp",
-        "Prolog individual lecture notes page",
-        "صفحة ملخص محاضرة فردية في Prolog",
+        "met-hero-light",
+        "/projects/met-summaries/details/hero-light.webp",
+        "MET Summaries collection index in light mode",
+        "فهرس مجموعة ملخصات MET بالوضع الفاتح",
       ),
     ],
     details: [
       image(
-        "met-index",
-        "/projects/met-summaries/details/01-index.webp",
-        "MET Summaries main collection index",
-        "الفهرس الرئيسي لمجموعة ملخصات MET",
+        "met-hero-dark",
+        "/projects/met-summaries/details/hero-dark.webp",
+        "MET Summaries collection index in dark mode",
+        "فهرس مجموعة ملخصات MET بالوضع الداكن",
       ),
       image(
-        "met-gis",
-        "/projects/met-summaries/details/02-gis-index.webp",
-        "GIS course lecture summaries index",
-        "فهرس ملخصات مادة نظم المعلومات الجغرافية",
+        "met-lesson-example",
+        "/projects/met-summaries/details/lesson-example.webp",
+        "Computer Graphics lesson summary with an antialiasing example",
+        "ملخص درس في الرسومات الحاسوبية مع مثال على تنعيم الحواف",
       ),
       image(
-        "met-graphics",
-        "/projects/met-summaries/details/03-computer-graphics-index.webp",
-        "Computer Graphics course summaries index",
-        "فهرس ملخصات مادة الرسومات الحاسوبية",
+        "met-practice-example",
+        "/projects/met-summaries/details/practice-example.webp",
+        "Prolog practice page with worked parent and grandparent rules",
+        "صفحة تدريب Prolog مع حل قواعد الأب والجد",
       ),
       image(
-        "met-networks",
-        "/projects/met-summaries/details/04-networks-index.webp",
-        "Computer Networks course summaries index",
-        "فهرس ملخصات مادة شبكات الحاسوب",
+        "met-knowledge-graph",
+        "/projects/met-summaries/details/knowledge-graph.webp",
+        "MET Summaries interactive knowledge graph",
+        "الرسم المعرفي التفاعلي لملخصات MET",
       ),
       image(
-        "met-prolog",
-        "/projects/met-summaries/details/05-prolog-index.webp",
-        "Prolog programming course summaries index",
-        "فهرس ملخصات مادة برمجة Prolog",
-      ),
-      image(
-        "met-prolog-lecture",
-        "/projects/met-summaries/details/06-prolog-lecture.webp",
-        "Prolog individual lecture notes page",
-        "صفحة ملخص محاضرة فردية في Prolog",
-      ),
-      image(
-        "met-mobile",
-        "/projects/met-summaries/details/07-mobile.webp",
-        "MET Summaries mobile view",
-        "عرض الهاتف المحمول لملخصات MET",
-        mobileImage,
+        "met-hero-light",
+        "/projects/met-summaries/details/hero-light.webp",
+        "MET Summaries collection index in light mode",
+        "فهرس مجموعة ملخصات MET بالوضع الفاتح",
       ),
     ],
   },
@@ -758,6 +803,6 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
 export const projectMediaPlaylists = Object.fromEntries(
   Object.entries(projectMediaSets).map(([slug, set]) => [
     slug,
-    [...set.preview, ...set.details],
+    [...(set.hero ? [set.hero] : []), ...set.preview, ...set.details],
   ]),
 ) as Record<ProjectSlug, ProjectMedia[]>;

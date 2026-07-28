@@ -100,6 +100,7 @@
       "preview": "/projects/how-to-train-your-ai/preview/preview.mp4",
       "poster": "/projects/how-to-train-your-ai/preview/poster.webp",
       "details": [
+        "/projects/how-to-train-your-ai/details/hero.webp",
         "/projects/how-to-train-your-ai/details/01-gameplay.webp",
         "/projects/how-to-train-your-ai/details/02-gameplay.webp",
         "/projects/how-to-train-your-ai/details/03-gameplay.webp",
@@ -110,7 +111,7 @@
       "provenance": {
         "preview": "extracted_optimized_video",
         "poster": "extracted_frame",
-        "details": "extracted_frame"
+        "details": "curated_source_and_extracted_frames"
       }
     },
     {
@@ -120,15 +121,17 @@
       "preview": "/projects/sharp-shooter/preview/preview.mp4",
       "poster": "/projects/sharp-shooter/preview/poster.webp",
       "details": [
-        "/projects/sharp-shooter/details/01-gameplay.webp",
-        "/projects/sharp-shooter/details/02-gameplay.webp",
+        "/projects/sharp-shooter/details/hero-gameplay.gif",
+        "/projects/sharp-shooter/details/05-gameplay.webp",
         "/projects/sharp-shooter/details/03-gameplay.webp",
-        "/projects/sharp-shooter/details/04-gameplay.webp"
+        "/projects/sharp-shooter/details/02-gameplay.webp",
+        "/projects/sharp-shooter/details/04-gameplay.webp",
+        "/projects/sharp-shooter/details/01-gameplay.webp"
       ],
       "provenance": {
         "preview": "extracted_optimized_video",
         "poster": "extracted_frame",
-        "details": "extracted_frame"
+        "details": "curated_source_and_video_excerpt"
       }
     },
     {
@@ -138,15 +141,17 @@
       "preview": "/projects/royal-run/preview/preview.mp4",
       "poster": "/projects/royal-run/preview/poster.webp",
       "details": [
-        "/projects/royal-run/details/01-gameplay.webp",
-        "/projects/royal-run/details/02-gameplay.webp",
+        "/projects/royal-run/details/hero-gameplay.gif",
+        "/projects/royal-run/details/04-gameplay.webp",
         "/projects/royal-run/details/03-gameplay.webp",
-        "/projects/royal-run/details/04-gameplay.webp"
+        "/projects/royal-run/details/06-gameplay.webp",
+        "/projects/royal-run/details/05-gameplay.webp",
+        "/projects/royal-run/details/01-gameplay.webp"
       ],
       "provenance": {
         "preview": "extracted_optimized_video",
         "poster": "extracted_frame",
-        "details": "extracted_frame"
+        "details": "curated_source_and_video_excerpt"
       }
     },
     {
@@ -156,15 +161,17 @@
       "preview": "/projects/galaxy-strike/preview/preview.mp4",
       "poster": "/projects/galaxy-strike/preview/poster.webp",
       "details": [
+        "/projects/galaxy-strike/details/hero-gameplay.gif",
         "/projects/galaxy-strike/details/01-gameplay.webp",
         "/projects/galaxy-strike/details/02-gameplay.webp",
         "/projects/galaxy-strike/details/03-gameplay.webp",
+        "/projects/galaxy-strike/details/05-gameplay.webp",
         "/projects/galaxy-strike/details/04-gameplay.webp"
       ],
       "provenance": {
         "preview": "extracted_optimized_video",
         "poster": "extracted_frame",
-        "details": "extracted_frame"
+        "details": "curated_source_and_video_excerpt"
       }
     },
     {
@@ -174,18 +181,18 @@
       "preview": "/projects/rocket-boost/preview/preview.mp4",
       "poster": "/projects/rocket-boost/preview/poster.webp",
       "details": [
-        "/projects/rocket-boost/details/01-gameplay.webp",
-        "/projects/rocket-boost/details/02-gameplay.webp",
+        "/projects/rocket-boost/details/hero-gameplay.gif",
         "/projects/rocket-boost/details/03-gameplay.webp",
-        "/projects/rocket-boost/details/04-gameplay.webp",
+        "/projects/rocket-boost/details/01-gameplay.webp",
         "/projects/rocket-boost/details/05-gameplay.webp",
+        "/projects/rocket-boost/details/02-gameplay.webp",
         "/projects/rocket-boost/details/06-gameplay.webp",
-        "/projects/rocket-boost/details/07-gameplay.webp"
+        "/projects/rocket-boost/details/04-gameplay.webp"
       ],
       "provenance": {
         "preview": "extracted_optimized_video",
         "poster": "extracted_frame",
-        "details": "extracted_frame"
+        "details": "curated_source_and_video_excerpt"
       }
     },
     {
@@ -264,13 +271,11 @@
       "preview": null,
       "poster": null,
       "details": [
-        "/projects/met-summaries/details/01-index.webp",
-        "/projects/met-summaries/details/02-gis-index.webp",
-        "/projects/met-summaries/details/03-computer-graphics-index.webp",
-        "/projects/met-summaries/details/04-networks-index.webp",
-        "/projects/met-summaries/details/05-prolog-index.webp",
-        "/projects/met-summaries/details/06-prolog-lecture.webp",
-        "/projects/met-summaries/details/07-mobile.webp"
+        "/projects/met-summaries/details/hero-dark.webp",
+        "/projects/met-summaries/details/lesson-example.webp",
+        "/projects/met-summaries/details/practice-example.webp",
+        "/projects/met-summaries/details/knowledge-graph.webp",
+        "/projects/met-summaries/details/hero-light.webp"
       ],
       "provenance": {
         "preview": "image_playlist",

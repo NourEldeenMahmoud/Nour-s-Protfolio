@@ -656,10 +656,10 @@ export const projects: Project[] = [
     kind: "collection",
     title: "MET Summaries",
     shortTitle: "MET Summaries",
-    image: "/projects/met-summaries/details/01-index.webp",
+    image: "/projects/met-summaries/details/hero-dark.webp",
     imageAlt: {
-      en: "MET Summaries academic notes collection index",
-      ar: "فهرس مجموعة ملاحظات MET الأكاديمية",
+      en: "MET Summaries academic notes collection in dark mode",
+      ar: "مجموعة ملاحظات MET الأكاديمية بالوضع الداكن",
     },
     summary: {
       en: "A structured set of academic lecture summaries in Egyptian Arabic covering GIS, Computer Graphics, Networks, and Prolog.",
@@ -705,7 +705,7 @@ export function getProject(slug: string): Project | undefined {
 export function getProjectMedia(project: Project): ProjectMedia[] {
   const set = projectMediaSets[project.slug];
   if (set) {
-    return [...set.preview, ...set.details];
+    return [...(set.hero ? [set.hero] : []), ...set.preview, ...set.details];
   }
   return [
     {
@@ -772,4 +772,9 @@ export function getProjectDetailMedia(project: Project): ProjectMedia[] {
     return set.details;
   }
   return getProjectMedia(project).filter((m) => m.type === "image");
+}
+
+/** Returns dedicated hero media when available, otherwise the first detail item. */
+export function getProjectHeroMedia(project: Project): ProjectMedia {
+  return projectMediaSets[project.slug]?.hero ?? getProjectDetailMedia(project)[0]!;
 }

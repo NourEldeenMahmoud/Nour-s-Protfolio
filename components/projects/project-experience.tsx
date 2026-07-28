@@ -13,6 +13,7 @@ import {
 } from "react";
 import {
   getProjectDetailMedia,
+  getProjectHeroMedia,
   projects,
   type Project,
   type ProjectMedia,
@@ -240,6 +241,7 @@ function ProjectVisual({
   priority?: boolean;
   sizes?: string;
 }) {
+  const reducedMotion = useReducedMotion();
   const style = { objectPosition: media.focalPosition } as CSSProperties;
 
   if (media.type === "video") {
@@ -258,17 +260,30 @@ function ProjectVisual({
     );
   }
 
-  return (
+  const source = reducedMotion && media.poster ? media.poster : media.src;
+  const animated = media.src.toLowerCase().endsWith(".gif");
+
+  const image = (
     <Image
-      src={media.src}
+      src={source}
       alt={media.alt[locale]}
       fill
       priority={priority}
       loading={priority ? undefined : "lazy"}
       sizes={sizes}
+      unoptimized={animated}
       className={styles.visualAsset}
       style={style}
     />
+  );
+
+  if (!animated || !media.poster) return image;
+
+  return (
+    <picture>
+      <source media="(prefers-reduced-motion: reduce)" srcSet={media.poster} />
+      {image}
+    </picture>
   );
 }
 
@@ -295,10 +310,12 @@ export function ProjectExperience({
   const previous =
     projects[(projectIndex - 1 + projects.length) % projects.length]!;
   const next = projects[(projectIndex + 1) % projects.length]!;
-  const heroMedia = media[0]!;
+  const heroMedia = getProjectHeroMedia(project);
   const activeMedia = media[activeExperience]!;
   const contributionMedia = media[Math.min(1, media.length - 1)]!;
-  const supportingMedia = media.slice(1, 3);
+  const supportingMedia = media
+    .filter((mediaItem) => mediaItem.id !== heroMedia.id)
+    .slice(0, 2);
   const mediaGroups = Array.from(
     new Set(media.map((mediaItem) => mediaItem.group).filter(Boolean)),
   ) as string[];
@@ -395,27 +412,6 @@ export function ProjectExperience({
               });
             });
 
-          root
-            .querySelectorAll<HTMLElement>(
-              `.${styles.highlightMedia} .${styles.visualAsset}, .${styles.contributionMedia} .${styles.visualAsset}, .${styles.galleryImage} .${styles.visualAsset}`,
-            )
-            .forEach((asset) => {
-              gsap.fromTo(
-                asset,
-                { scale: 1.075 },
-                {
-                  scale: 1,
-                  ease: "none",
-                  scrollTrigger: {
-                    trigger: asset,
-                    start: "top bottom",
-                    end: "bottom 35%",
-                    scrub: 0.7,
-                  },
-                },
-              );
-            });
-
           gsap.from(`.${styles.gallerySlide}`, {
             y: 90,
             autoAlpha: 0,
@@ -428,25 +424,6 @@ export function ProjectExperience({
               once: true,
             },
           });
-
-          root
-            .querySelectorAll<HTMLElement>("[data-parallax]")
-            .forEach((element) => {
-              gsap.fromTo(
-                element,
-                { yPercent: -5 },
-                {
-                  yPercent: 7,
-                  ease: "none",
-                  scrollTrigger: {
-                    trigger: element,
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: 0.6,
-                  },
-                },
-              );
-            });
         }, root);
       },
     );
@@ -539,7 +516,7 @@ export function ProjectExperience({
               <span />
               <span />
             </div>
-            <div className={styles.heroVisual} data-parallax>
+            <div className={styles.heroVisual}>
               <ProjectVisual
                 media={heroMedia}
                 locale={locale}
@@ -739,7 +716,7 @@ export function ProjectExperience({
                     onClick={() => showMedia(index % media.length)}
                     aria-label={`${c.view}: ${item.alt[locale]}`}
                   >
-                    <span data-parallax>
+                    <span>
                       <ProjectVisual
                         media={item}
                         locale={locale}

@@ -40,6 +40,8 @@ export function CenterShowcase({
   const [internalCategoryId, setInternalCategoryId] =
     useState<CategoryId>("web");
   const activeCategoryId = controlledCategoryId ?? internalCategoryId;
+  const [previousCategoryId, setPreviousCategoryId] =
+    useState(activeCategoryId);
   const [projectIndex, setProjectIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<SlideDirection>("next");
   const screenRef = useRef<HTMLDivElement>(null);
@@ -47,6 +49,12 @@ export function CenterShowcase({
   const contextRef = useRef<gsap.Context | null>(null);
   const reducedMotion = useReducedMotion();
   const isRtl = locale === "ar";
+
+  if (previousCategoryId !== activeCategoryId) {
+    setPreviousCategoryId(activeCategoryId);
+    setProjectIndex(0);
+    setSlideDirection("next");
+  }
 
   const activeCategory = useMemo(
     () => categories.find((category) => category.id === activeCategoryId)!,
@@ -59,16 +67,15 @@ export function CenterShowcase({
         .filter(Boolean) as NonNullable<ReturnType<typeof getProject>>[],
     [activeCategory],
   );
-  const currentProject = projects[projectIndex] ?? null;
+  const activeProjectIndex = projectIndex < projects.length ? projectIndex : 0;
+  const currentProject = projects[activeProjectIndex] ?? null;
   const hasMultipleProjects = projects.length > 1;
 
   const switchCategory = useCallback(
     (id: CategoryId) => {
       if (id === activeCategoryId) return;
-      setSlideDirection("next");
       onCategoryChange?.(id);
       if (!controlledCategoryId) setInternalCategoryId(id);
-      setProjectIndex(0);
     },
     [activeCategoryId, controlledCategoryId, onCategoryChange],
   );
@@ -88,11 +95,11 @@ export function CenterShowcase({
 
   const selectProject = useCallback(
     (index: number) => {
-      if (index === projectIndex) return;
-      setSlideDirection(index > projectIndex ? "next" : "prev");
+      if (index === activeProjectIndex) return;
+      setSlideDirection(index > activeProjectIndex ? "next" : "prev");
       setProjectIndex(index);
     },
-    [projectIndex],
+    [activeProjectIndex],
   );
 
   function handleTabKeyDown(
@@ -152,10 +159,10 @@ export function CenterShowcase({
   }, [activeCategoryId, projectIndex, reducedMotion, slideDirection]);
 
   const previousProject = hasMultipleProjects
-    ? projects[(projectIndex - 1 + projects.length) % projects.length]
+    ? projects[(activeProjectIndex - 1 + projects.length) % projects.length]
     : undefined;
   const nextProject = hasMultipleProjects
-    ? projects[(projectIndex + 1) % projects.length]
+    ? projects[(activeProjectIndex + 1) % projects.length]
     : undefined;
 
   return (
@@ -209,7 +216,7 @@ export function CenterShowcase({
           >
             <div>
               {projects.map((project, index) => {
-                const isActive = index === projectIndex;
+                const isActive = index === activeProjectIndex;
                 return (
                   <button
                     key={project.slug}
@@ -234,7 +241,7 @@ export function CenterShowcase({
             copy={copy}
             detailHref={`/${locale}/projects/${currentProject.slug}`}
             projectCount={projects.length}
-            projectPosition={projectIndex + 1}
+            projectPosition={activeProjectIndex + 1}
             previousProjectTitle={previousProject?.shortTitle}
             nextProjectTitle={nextProject?.shortTitle}
             onPreviousProject={

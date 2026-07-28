@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MotionContext } from "@/components/providers/motion-provider";
 import { ProjectExperience } from "@/components/projects/project-experience";
 import { getProject, getProjectDetailMedia } from "@/content/portfolio";
 
@@ -21,6 +22,7 @@ vi.mock("gsap/ScrollTrigger", () => ({ ScrollTrigger: {}, default: {} }));
 const buildsense = getProject("buildsense")!;
 const httyai = getProject("how-to-train-your-ai")!;
 const metSummaries = getProject("met-summaries")!;
+const sharpShooter = getProject("sharp-shooter")!;
 
 class MockIntersectionObserver {
   observe = vi.fn();
@@ -79,6 +81,23 @@ describe("ProjectExperience", () => {
     expect(screen.getByText("Explore the experience")).toBeInTheDocument();
     expect(screen.getByText("Gameplay highlights")).toBeInTheDocument();
     expect(screen.getByText("End of game world")).toBeInTheDocument();
+  });
+
+  it("uses the static poster for animated media when motion is reduced", () => {
+    render(
+      <MotionContext.Provider value>
+        <ProjectExperience locale="en" project={sharpShooter} />
+      </MotionContext.Provider>,
+    );
+
+    const heroImages = screen.getAllByAltText(
+      "Sharp Shooter animated gameplay loop in the aim-training arena",
+    );
+    expect(heroImages).toHaveLength(1);
+    expect(heroImages[0]).toHaveAttribute(
+      "src",
+      "/projects/sharp-shooter/preview/poster.webp",
+    );
   });
 
   it("adapts labels for collection kind", () => {

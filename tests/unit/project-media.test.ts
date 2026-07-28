@@ -4,6 +4,7 @@ import path from "path";
 import {
   getProject,
   getProjectDetailMedia,
+  getProjectHeroMedia,
   getProjectPreviewMedia,
   projects,
   projectSlugs,
@@ -52,6 +53,23 @@ describe("project media helpers & case study bounds", () => {
       const detailMedia = getProjectDetailMedia(project);
       expect(detailMedia.every((m) => m.type === "image")).toBe(true);
       expect(detailMedia.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("keeps dedicated hero media out of repeated detail galleries", () => {
+    const dedicatedHeroSlugs = [
+      "how-to-train-your-ai",
+      "sharp-shooter",
+      "royal-run",
+      "galaxy-strike",
+      "rocket-boost",
+    ] as const;
+
+    for (const slug of dedicatedHeroSlugs) {
+      const project = getProject(slug)!;
+      const hero = getProjectHeroMedia(project);
+      const details = getProjectDetailMedia(project);
+      expect(details.some((mediaItem) => mediaItem.id === hero.id)).toBe(false);
     }
   });
 
