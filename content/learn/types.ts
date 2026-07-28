@@ -2,11 +2,7 @@ import type { Locale } from "@/i18n/routing";
 import type { ProjectSlug } from "@/content/portfolio";
 
 export type FileKind =
-  | "document"
-  | "workflow"
-  | "skill"
-  | "collection"
-  | "folder";
+  "document" | "workflow" | "skill" | "collection" | "folder";
 
 export type LearnNodeType = "folder" | "file";
 
@@ -17,12 +13,19 @@ export interface LearnNode {
   kind: FileKind;
   summary: Record<Locale, string>;
   sections?: LearnSection[];
+  media?: LearnMediaItem[];
   tags: string[];
   relatedFileIds: string[];
   relatedProjectSlugs: ProjectSlug[];
   public: boolean;
   parentId: string | null;
   children: string[];
+}
+
+export interface LearnMediaItem {
+  src: string;
+  alt: Record<Locale, string>;
+  caption: Record<Locale, string>;
 }
 
 export interface LearnSection {

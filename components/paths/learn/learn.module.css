@@ -124,8 +124,8 @@
   box-sizing: border-box;
   overflow: hidden;
   z-index: 1;
-  --desktop-cell-w: 96px;
-  --desktop-cell-h: 108px;
+  --desktop-cell-w: 112px;
+  --desktop-cell-h: 124px;
   --desktop-gap-x: 12px;
   --desktop-gap-y: 12px;
   --desktop-pad-x: 16px;
@@ -220,6 +220,8 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   max-width: calc(var(--desktop-cell-w) - 8px);
+  min-height: 2.6em;
+  overflow-wrap: anywhere;
   pointer-events: none;
 }
 
@@ -746,10 +748,50 @@
   gap: 0.75rem;
   width: 28rem;
   pointer-events: none;
+  will-change: transform;
 }
 
 .learnWidgets > * {
   pointer-events: auto;
+}
+
+.learnWidgetsDragHandle {
+  position: absolute;
+  top: 0.8rem;
+  left: -2.35rem;
+  z-index: 2;
+  display: grid;
+  width: 1.9rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid var(--workspace-line-strong);
+  border-radius: 10px;
+  background: rgb(13 18 22 / 82%);
+  color: var(--workspace-text-muted);
+  font:
+    700 1rem/1 var(--font-mono),
+    monospace;
+  cursor: grab;
+  touch-action: none;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+  backdrop-filter: blur(18px);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.learnWidgetsDragHandle:hover,
+.learnWidgetsDragHandle:focus-visible {
+  border-color: rgb(226 185 116 / 55%);
+  background: rgb(24 30 34 / 94%);
+  color: var(--workspace-amber-bright);
+  outline: none;
+}
+
+.learnWidgets[data-dragging="true"] .learnWidgetsDragHandle {
+  cursor: grabbing;
+  color: var(--workspace-cyan);
 }
 
 .learnWidgetsRow {
@@ -1905,6 +1947,56 @@
   line-height: 1.7;
 }
 
+.docMediaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem 2rem;
+}
+
+.docMediaCard {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--workspace-line);
+  border-radius: 16px;
+  background: rgb(13 18 22 / 78%);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 20%);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.docMediaCard:hover {
+  transform: translateY(-2px);
+  border-color: rgb(226 185 116 / 42%);
+  box-shadow: 0 18px 38px rgb(0 0 0 / 28%);
+}
+
+.docMediaFrame {
+  display: grid;
+  aspect-ratio: 1.414 / 1;
+  place-items: center;
+  overflow: hidden;
+  border-block-end: 1px solid var(--workspace-line);
+  background: #e7e2d8;
+}
+
+.docMediaImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.docMediaCaption {
+  padding: 0.8rem 0.9rem 0.9rem;
+  color: var(--workspace-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
 .docList {
   list-style: none;
   padding: 0;
@@ -2505,6 +2597,11 @@
     gap: 0.5rem;
     pointer-events: auto;
     padding: 0 0.5rem;
+    transform: none !important;
+  }
+
+  .learnWidgetsDragHandle {
+    display: none;
   }
 
   .widget {
@@ -2649,6 +2746,11 @@
   animation: none;
 }
 
+:global(html[data-motion="reduced"]) .learnWidgetsDragHandle,
+:global(html[data-motion="reduced"]) .docMediaCard {
+  transition: none;
+}
+
 /* ─── Global Toast ─── */
 .globalToast {
   position: fixed;
@@ -2703,4 +2805,528 @@
 
 :global(html[data-motion="reduced"]) .desktopIconsRefreshing {
   animation: none;
+}
+
+/* ─── Portfolio workspace visual layer ─── */
+.learn {
+  --workspace-ink: #080b0f;
+  --workspace-panel: rgb(14 19 24 / 88%);
+  --workspace-panel-solid: #11171d;
+  --workspace-line: rgb(202 170 116 / 16%);
+  --workspace-line-strong: rgb(226 185 116 / 34%);
+  --workspace-amber: #e2b974;
+  --workspace-amber-bright: #f3d195;
+  --workspace-cyan: #78b8c6;
+  --workspace-text: #f3eee5;
+  --workspace-muted: #98a2aa;
+  --workspace-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  background: var(--workspace-ink);
+  color: var(--workspace-text);
+  font-family: var(--font-sans);
+}
+
+.wallpaper {
+  background: url("/learn/wallpaper.jpg") center / cover no-repeat;
+}
+
+.desktopIcon {
+  gap: 0.45rem;
+  padding: 0.65rem 0.4rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 5%),
+    rgb(255 255 255 / 1.5%)
+  );
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+  transition:
+    transform 220ms var(--workspace-ease),
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 220ms ease;
+}
+
+.desktopIcon:hover {
+  border-color: var(--workspace-line-strong);
+  background: linear-gradient(
+    145deg,
+    rgb(226 185 116 / 13%),
+    rgb(120 184 198 / 6%)
+  );
+  box-shadow:
+    0 12px 30px rgb(0 0 0 / 26%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+  transform: translateY(-4px);
+}
+
+.desktopIcon:focus-visible {
+  outline: 2px solid var(--workspace-amber);
+  outline-offset: 3px;
+  background: rgb(226 185 116 / 10%);
+}
+
+.desktopIcon[aria-selected="true"],
+.desktopIcon[data-selected="true"] {
+  border-color: rgb(226 185 116 / 55%);
+  background: linear-gradient(
+    145deg,
+    rgb(226 185 116 / 18%),
+    rgb(120 184 198 / 8%)
+  );
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgb(226 185 116 / 12%),
+    0 12px 32px rgb(0 0 0 / 28%);
+}
+
+.desktopIconImage {
+  width: 3.9rem;
+  height: 3.9rem;
+  filter: drop-shadow(0 8px 12px rgb(0 0 0 / 34%));
+  transition: transform 220ms var(--workspace-ease);
+}
+
+.desktopSectionIcon {
+  display: grid;
+  width: 3.7rem;
+  height: 3.7rem;
+  place-items: center;
+  border: 1px solid var(--workspace-line-strong);
+  border-radius: 17px;
+  background:
+    linear-gradient(145deg, rgb(226 185 116 / 13%), rgb(120 184 198 / 8%)),
+    #111820;
+  box-shadow:
+    0 10px 24px rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+.desktopSectionIcon svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.desktopIcon:hover .desktopIconImage {
+  transform: scale(1.06);
+}
+
+.desktopIconLabel {
+  color: var(--workspace-text);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 72%);
+}
+
+.selectionMarquee,
+.gridPreview {
+  border: 1px solid rgb(226 185 116 / 72%);
+  border-radius: 14px;
+  background: rgb(226 185 116 / 12%);
+  box-shadow: inset 0 0 24px rgb(226 185 116 / 8%);
+}
+
+.taskbar {
+  position: absolute;
+  z-index: 100;
+  bottom: 1rem;
+  left: 50%;
+  width: min(62rem, calc(100% - 2rem));
+  height: 4rem;
+  padding: 0.4rem 0.55rem;
+  gap: 0.25rem;
+  border: 1px solid var(--workspace-line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgb(22 29 35 / 88%), rgb(10 14 18 / 94%));
+  box-shadow:
+    0 18px 55px rgb(0 0 0 / 48%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+  backdrop-filter: blur(28px) saturate(135%);
+  transform: translateX(-50%);
+}
+
+.taskbarStart,
+.taskbarSearch,
+.taskbarApp,
+.taskbarReturn {
+  width: 3.15rem;
+  height: 3.15rem;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--workspace-muted);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 180ms var(--workspace-ease);
+}
+
+.taskbarStart {
+  color: var(--workspace-amber-bright);
+  background: rgb(226 185 116 / 10%);
+}
+
+.taskbarStart:hover,
+.taskbarSearch:hover,
+.taskbarApp:hover,
+.taskbarReturn:hover,
+.taskbarStart:focus-visible,
+.taskbarSearch:focus-visible,
+.taskbarApp:focus-visible,
+.taskbarReturn:focus-visible {
+  border-color: var(--workspace-line-strong);
+  background: rgb(226 185 116 / 10%);
+  color: var(--workspace-text);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.taskbarApp[aria-current="true"] {
+  background: linear-gradient(
+    145deg,
+    rgb(226 185 116 / 16%),
+    rgb(120 184 198 / 10%)
+  );
+  color: var(--workspace-amber-bright);
+  box-shadow: inset 0 -2px 0 var(--workspace-amber);
+}
+
+.taskbarApps {
+  gap: 0.3rem;
+  padding-inline: 0.5rem;
+}
+
+.taskbarRight {
+  gap: 0.75rem;
+  padding-inline: 0.6rem;
+  color: var(--workspace-muted);
+  font-family: var(--font-mono);
+}
+
+.taskbarLang {
+  border: 1px solid var(--workspace-line);
+  border-radius: 999px;
+  color: var(--workspace-amber-bright);
+}
+
+.taskbarLang:hover,
+.taskbarLang:focus-visible {
+  border-color: var(--workspace-line-strong);
+  background: rgb(226 185 116 / 10%);
+  outline: none;
+}
+
+.window {
+  min-width: min(30rem, calc(100% - 1rem));
+  border: 1px solid var(--workspace-line);
+  border-radius: 22px;
+  background: var(--workspace-panel-solid);
+  box-shadow:
+    0 28px 90px rgb(0 0 0 / 55%),
+    0 0 0 1px rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 7%);
+  transition:
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    transform 220ms var(--workspace-ease);
+}
+
+.window[data-active="true"],
+.window:focus-within {
+  border-color: rgb(226 185 116 / 30%);
+  box-shadow:
+    0 32px 100px rgb(0 0 0 / 62%),
+    0 0 0 1px rgb(226 185 116 / 9%),
+    inset 0 1px 0 rgb(255 255 255 / 9%);
+}
+
+.window[data-maximized="true"] {
+  border-radius: 18px;
+  border: 1px solid var(--workspace-line);
+}
+
+.windowHeader {
+  height: 3.35rem;
+  padding-inline: 1rem 0.65rem;
+  border-block-end: 1px solid var(--workspace-line);
+  background:
+    linear-gradient(90deg, rgb(226 185 116 / 7%), transparent 24%),
+    rgb(16 22 27 / 96%);
+}
+
+.windowTitle {
+  color: var(--workspace-text);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.windowControls {
+  gap: 0.35rem;
+}
+
+.windowControlBtn {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--workspace-line);
+  border-radius: 50%;
+  color: var(--workspace-muted);
+}
+
+.windowControlBtn:hover,
+.windowControlBtn:focus-visible {
+  border-color: var(--workspace-line-strong);
+  background: rgb(226 185 116 / 11%);
+  color: var(--workspace-text);
+  outline: none;
+}
+
+.windowControlBtn[data-action="close"]:hover {
+  border-color: rgb(217 116 103 / 45%);
+  background: rgb(217 116 103 / 16%);
+  color: #f0b4aa;
+}
+
+.windowBody,
+.explorerMain,
+.explorerContent {
+  background: linear-gradient(145deg, #11171d, #0d1217);
+}
+
+.explorerNav {
+  border-color: var(--workspace-line);
+  background: #0c1116;
+}
+
+.explorerNavItem {
+  margin: 0.14rem 0.5rem;
+  width: calc(100% - 1rem);
+  border-radius: 10px;
+  color: var(--workspace-muted);
+}
+
+.explorerNavItem:hover,
+.explorerNavItem[aria-current="page"] {
+  background: rgb(226 185 116 / 9%);
+  color: var(--workspace-text);
+}
+
+.explorerNavItem[aria-current="page"] {
+  box-shadow: inset 2px 0 0 var(--workspace-amber);
+}
+
+.explorerToolbar,
+.explorerStatus {
+  border-color: var(--workspace-line);
+  background: rgb(14 19 24 / 92%);
+}
+
+.startMenu,
+.searchPanel,
+.contextMenu {
+  border: 1px solid var(--workspace-line-strong);
+  background: linear-gradient(145deg, rgb(28 36 42 / 96%), rgb(10 14 18 / 97%));
+  box-shadow:
+    0 28px 80px rgb(0 0 0 / 58%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+  backdrop-filter: blur(30px) saturate(130%);
+}
+
+.startMenu {
+  bottom: 5.5rem;
+  left: 1.25rem;
+  width: min(24rem, calc(100% - 2.5rem));
+  padding: 0.8rem;
+  border-radius: 24px;
+}
+
+.startMenuTitle {
+  padding: 0.55rem 0.75rem;
+  color: var(--workspace-amber);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
+}
+
+.startMenuItem {
+  border-radius: 12px;
+  color: var(--workspace-text);
+}
+
+.startMenuItem:hover,
+.startMenuItem:focus-visible {
+  background: rgb(226 185 116 / 10%);
+  outline: none;
+}
+
+.searchOverlay {
+  padding-top: clamp(2rem, 8vh, 6rem);
+  background: rgb(4 7 10 / 66%);
+  backdrop-filter: blur(10px);
+}
+
+.searchPanel {
+  width: min(42rem, calc(100% - 2rem));
+  border-radius: 24px;
+}
+
+.searchInputWrap {
+  padding: 1.1rem 1.3rem;
+  border-color: var(--workspace-line);
+  color: var(--workspace-amber);
+}
+
+.searchInput {
+  color: var(--workspace-text);
+  font-family: var(--font-sans);
+}
+
+.searchResult {
+  margin: 0.2rem 0.5rem;
+  width: calc(100% - 1rem);
+  border-radius: 13px;
+}
+
+.searchResult:hover,
+.searchResult:focus-visible {
+  background: rgb(226 185 116 / 9%);
+  outline: none;
+}
+
+.searchResultSummary {
+  color: var(--workspace-muted);
+}
+
+.searchResultBadge {
+  border-radius: 999px;
+  background: rgb(120 184 198 / 13%);
+  color: #a5d5df;
+}
+
+.contextMenu {
+  padding: 0.45rem;
+  border-radius: 16px;
+  color: var(--workspace-text);
+}
+
+.contextMenuItem {
+  min-height: 2.25rem;
+  border-radius: 9px;
+}
+
+.contextMenuItem:hover,
+.contextMenuItem:focus-visible,
+.contextMenuActiveParent {
+  background: rgb(226 185 116 / 11%);
+  outline: none;
+}
+
+.contextMenuSep,
+.startMenuDivider {
+  background: var(--workspace-line);
+}
+
+.globalToast {
+  bottom: 5.7rem;
+  border: 1px solid var(--workspace-line-strong);
+  border-radius: 999px;
+  background: rgb(12 17 21 / 94%);
+  color: var(--workspace-text);
+  box-shadow: 0 14px 40px rgb(0 0 0 / 42%);
+}
+
+.widgetCard[data-variant="hero"],
+.widgetCard[data-variant="featured"],
+.widgetLarge,
+.widgetSmall,
+.widgetWide {
+  border-color: var(--workspace-line);
+  background: linear-gradient(145deg, rgb(25 33 39 / 88%), rgb(10 14 18 / 91%));
+  box-shadow:
+    0 16px 48px rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+
+.widgetCard[data-variant="hero"]::before,
+.widgetCard[data-variant="featured"]::before,
+.widgetLarge::before {
+  background: linear-gradient(
+    90deg,
+    var(--workspace-amber),
+    var(--workspace-cyan)
+  );
+}
+
+.widgetCardAvatar {
+  background: linear-gradient(145deg, #d2a85f, #735f3b);
+  box-shadow: 0 8px 28px rgb(226 185 116 / 24%);
+}
+
+.widgetCardName,
+.widgetFeaturedTitle {
+  color: var(--workspace-text);
+}
+
+.widgetCardSubtitle,
+.widgetFeaturedLabel,
+.widgetFeaturedStepCount,
+.widgetAction {
+  color: var(--workspace-amber-bright);
+}
+
+@media (max-width: 640px) {
+  .taskbar {
+    bottom: 0.45rem;
+    width: calc(100% - 0.9rem);
+    height: 3.5rem;
+    padding: 0.3rem;
+    border-radius: 18px;
+  }
+
+  .taskbarStart,
+  .taskbarSearch,
+  .taskbarApp,
+  .taskbarReturn {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 12px;
+  }
+
+  .window {
+    min-width: 0;
+    border-radius: 16px;
+  }
+
+  .windowHeader {
+    height: 3rem;
+  }
+
+  .startMenu {
+    bottom: 4.5rem;
+    left: 0.65rem;
+    width: calc(100% - 1.3rem);
+    max-height: calc(100% - 6rem);
+    overflow-y: auto;
+  }
+
+  .desktopIcon {
+    border-radius: 15px;
+  }
+}
+
+:global([dir="rtl"]) .explorerNavItem[aria-current="page"] {
+  box-shadow: inset -2px 0 0 var(--workspace-amber);
+}
+
+:global(html[data-motion="reduced"]) .desktopIcon,
+:global(html[data-motion="reduced"]) .desktopIconImage,
+:global(html[data-motion="reduced"]) .taskbarStart,
+:global(html[data-motion="reduced"]) .taskbarSearch,
+:global(html[data-motion="reduced"]) .taskbarApp,
+:global(html[data-motion="reduced"]) .taskbarReturn,
+:global(html[data-motion="reduced"]) .window {
+  transition: none;
 }

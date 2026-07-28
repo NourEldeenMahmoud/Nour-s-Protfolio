@@ -55,6 +55,14 @@ describe("learn content", () => {
         }
       }
     });
+
+    it("exposes all certificate previews without duplicate sources", () => {
+      const certificateMedia = learnNodeMap.get(
+        "certifications-overview",
+      )?.media;
+      expect(certificateMedia).toHaveLength(37);
+      expect(new Set(certificateMedia?.map(({ src }) => src)).size).toBe(37);
+    });
   });
 
   describe("desktopFolders", () => {
@@ -68,9 +76,17 @@ describe("learn content", () => {
       }
     });
 
-    it("contains the This PC root", () => {
+    it("contains the seven requested workspace sections", () => {
       const ids = desktopFolders.map((f) => f.id);
-      expect(ids).toContain("this-pc");
+      expect(ids).toEqual([
+        "apps",
+        "workflows",
+        "knowledge",
+        "certifications",
+        "about",
+        "skills",
+        "obsidian-vault",
+      ]);
     });
   });
 
@@ -135,11 +151,9 @@ describe("learn content", () => {
 
   describe("searchNodes", () => {
     it("finds nodes by name", () => {
-      const results = searchNodes("nour", learnNodeMap, "en");
+      const results = searchNodes("OpenCode", learnNodeMap, "en");
       expect(results.length).toBeGreaterThan(0);
-      expect(
-        results.some((r) => r.name.en.toLowerCase().includes("nour")),
-      ).toBe(true);
+      expect(results.some((result) => result.id === "app-opencode")).toBe(true);
     });
 
     it("finds nodes by tag", () => {
@@ -186,7 +200,7 @@ describe("learn content", () => {
 
   describe("isDesktopFolderId", () => {
     it("returns true for valid desktop folder ids", () => {
-      expect(isDesktopFolderId("this-pc")).toBe(true);
+      expect(isDesktopFolderId("apps")).toBe(true);
       expect(isDesktopFolderId("knowledge")).toBe(true);
     });
 
@@ -203,8 +217,14 @@ describe("learn content", () => {
   });
 
   describe("applications", () => {
-    it("has 10 applications", () => {
-      expect(applications).toHaveLength(10);
+    it("has the five approved essential applications", () => {
+      expect(applications.map((app) => app.id)).toEqual([
+        "app-antigravity",
+        "app-opencode",
+        "app-obsidian",
+        "app-notebooklm",
+        "app-hermes",
+      ]);
     });
 
     it("each application has required fields", () => {
@@ -234,18 +254,18 @@ describe("learn content", () => {
 
   describe("searchApplications", () => {
     it("finds applications by name", () => {
-      const results = searchApplications("Visual Studio");
+      const results = searchApplications("OpenCode");
       expect(results.length).toBe(1);
-      expect(results[0]!.id).toBe("app-vscode");
+      expect(results[0]!.id).toBe("app-opencode");
     });
 
     it("finds applications by tag", () => {
-      const results = searchApplications("database");
+      const results = searchApplications("automation");
       expect(results.length).toBeGreaterThan(0);
     });
 
     it("finds applications by category", () => {
-      const results = searchApplications("3D");
+      const results = searchApplications("Grounded Research");
       expect(results.length).toBeGreaterThan(0);
     });
 
@@ -313,9 +333,9 @@ describe("learn content", () => {
       expect(appsFolder!.parentId).toBe("this-pc");
     });
 
-    it("apps folder has 10 application children", () => {
+    it("apps folder has five application children", () => {
       const children = getChildNodes("apps", learnNodeMap);
-      expect(children).toHaveLength(10);
+      expect(children).toHaveLength(5);
       for (const child of children) {
         expect(child.type).toBe("file");
         expect(child.parentId).toBe("apps");

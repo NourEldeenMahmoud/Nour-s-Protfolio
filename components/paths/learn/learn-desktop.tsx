@@ -2,8 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/routing";
-import { desktopFolders, applications, type LearnNode, type LearnApplication } from "@/content/learn";
-import { DesktopIcon, AppIcon } from "./learn-icons";
+import {
+  desktopFolders,
+  applications,
+  type LearnNode,
+  type LearnApplication,
+} from "@/content/learn";
+import { AppIcon, NavIcon } from "./learn-icons";
 import { useDesktopSelectionMarquee } from "./use-desktop-selection-marquee";
 import {
   useDesktopIconGridPositions,
@@ -15,10 +20,7 @@ import {
   ICON_CELL_HEIGHT,
 } from "./use-desktop-icon-positions";
 import type { DesktopSortMode } from "./use-desktop-icon-positions";
-import {
-  sortItemsByName,
-  sortItemsByType,
-} from "./use-desktop-icon-positions";
+import { sortItemsByName, sortItemsByType } from "./use-desktop-icon-positions";
 import { useDesktopIconDrag, type DropUpdates } from "./use-desktop-icon-drag";
 import type { ContextMenuTarget } from "./use-context-menu";
 import styles from "./learn.module.css";
@@ -88,18 +90,45 @@ export function LearnDesktop({
 
   const layout = useMemo(() => {
     if (sortMode === "default") {
-      return resolveDesktopLayout(allItemIds, customPositions, defaultPositions, maxCols, maxRows);
+      return resolveDesktopLayout(
+        allItemIds,
+        customPositions,
+        defaultPositions,
+        maxCols,
+        maxRows,
+      );
     }
     let sortedPositions = customPositions;
     if (sortMode === "name") {
       sortedPositions = sortItemsByName(allItemIds, maxCols, maxRows, getLabel);
     } else if (sortMode === "item-type") {
-      sortedPositions = sortItemsByType(allItemIds, maxCols, maxRows, getLabel, isFolder);
+      sortedPositions = sortItemsByType(
+        allItemIds,
+        maxCols,
+        maxRows,
+        getLabel,
+        isFolder,
+      );
     } else if (sortMode === "custom") {
       sortedPositions = customPositions;
     }
-    return resolveDesktopLayout(allItemIds, sortedPositions, defaultPositions, maxCols, maxRows);
-  }, [allItemIds, customPositions, defaultPositions, maxCols, maxRows, sortMode, getLabel, isFolder]);
+    return resolveDesktopLayout(
+      allItemIds,
+      sortedPositions,
+      defaultPositions,
+      maxCols,
+      maxRows,
+    );
+  }, [
+    allItemIds,
+    customPositions,
+    defaultPositions,
+    maxCols,
+    maxRows,
+    sortMode,
+    getLabel,
+    isFolder,
+  ]);
 
   const getOccupancy = useCallback(
     (excludeId: string | null) =>
@@ -178,24 +207,21 @@ export function LearnDesktop({
     onDragEnd,
   });
 
-  const handleSelect = useCallback(
-    (id: string, ctrlOrMeta: boolean) => {
-      if (ctrlOrMeta) {
-        setSelectedIds((prev) => {
-          const next = new Set(prev);
-          if (next.has(id)) {
-            next.delete(id);
-          } else {
-            next.add(id);
-          }
-          return next;
-        });
-      } else {
-        setSelectedIds(new Set([id]));
-      }
-    },
-    [],
-  );
+  const handleSelect = useCallback((id: string, ctrlOrMeta: boolean) => {
+    if (ctrlOrMeta) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+        return next;
+      });
+    } else {
+      setSelectedIds(new Set([id]));
+    }
+  }, []);
 
   const handleOpenFolder = useCallback(
     (node: LearnNode) => {
@@ -223,8 +249,16 @@ export function LearnDesktop({
 
   const handleDesktopContextMenu = useCallback(
     (e: React.MouseEvent) => {
-      if (e.target instanceof HTMLElement && e.target.closest("[data-desktop-item]")) return;
-      if (!(e.target instanceof HTMLElement && e.target.closest("[data-desktop-surface]"))) return;
+      if (
+        e.target instanceof HTMLElement &&
+        e.target.closest("[data-desktop-item]")
+      )
+        return;
+      if (!(
+        e.target instanceof HTMLElement &&
+        e.target.closest("[data-desktop-surface]")
+      ))
+        return;
       e.preventDefault();
       onContextMenu?.(e.clientX, e.clientY, { type: "desktop" });
     },
@@ -285,7 +319,12 @@ export function LearnDesktop({
   const previewStyle = useMemo(() => {
     if (!previewCell) return null;
     const { x, y } = gridToPixel(previewCell.column, previewCell.row);
-    return { left: x, top: y, width: ICON_CELL_WIDTH, height: ICON_CELL_HEIGHT };
+    return {
+      left: x,
+      top: y,
+      width: ICON_CELL_WIDTH,
+      height: ICON_CELL_HEIGHT,
+    };
   }, [previewCell]);
 
   const swapPreviewStyle = useMemo(() => {
@@ -316,7 +355,9 @@ export function LearnDesktop({
       role="grid"
       aria-label="Desktop"
     >
-      <div className={`${styles.desktopIconsLayer} ${sortMode !== "custom" ? styles.desktopIconsRefreshing : ""}`}>
+      <div
+        className={`${styles.desktopIconsLayer} ${sortMode !== "custom" ? styles.desktopIconsRefreshing : ""}`}
+      >
         {draggingId && previewStyle && (
           <div
             className={styles.gridPreview}
@@ -353,7 +394,7 @@ export function LearnDesktop({
           const pixelY = layoutItem?.y ?? 0;
           const style = getIconStyle(id, pixelX, pixelY);
           const isDragging = draggingId === id;
-          const label = folder ? folder.name[locale] : app?.name ?? "";
+          const label = folder ? folder.name[locale] : (app?.name ?? "");
 
           return (
             <button
@@ -405,7 +446,9 @@ export function LearnDesktop({
             >
               <span className={styles.desktopIconImage}>
                 {folder ? (
-                  <DesktopIcon kind={id === "this-pc" ? "pc" : "folder"} />
+                  <span className={styles.desktopSectionIcon}>
+                    <NavIcon id={id} />
+                  </span>
                 ) : (
                   <AppIcon app={app!} />
                 )}

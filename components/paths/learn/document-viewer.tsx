@@ -88,6 +88,38 @@ export function DocumentViewer({
 
         <p className={styles.docSectionContent}>{node.summary[locale]}</p>
 
+        {node.media && node.media.length > 0 && (
+          <div
+            className={styles.docMediaGrid}
+            role="list"
+            aria-label={
+              locale === "ar" ? "معرض الشهادات" : "Certificate gallery"
+            }
+          >
+            {node.media.map((item) => (
+              <figure
+                key={item.src}
+                className={styles.docMediaCard}
+                role="listitem"
+              >
+                <div className={styles.docMediaFrame}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- static certificate previews are already optimized WebP files */}
+                  <img
+                    className={styles.docMediaImage}
+                    src={item.src}
+                    alt={item.alt[locale]}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption className={styles.docMediaCaption}>
+                  {item.caption[locale]}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
+
         {node.sections?.map((section, i) => (
           <div key={i} className={styles.docSection}>
             <h3 className={styles.docSectionHeading}>

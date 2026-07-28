@@ -2,9 +2,28 @@ import type { Locale } from "@/i18n/routing";
 import { learnNodes } from "./tree";
 import type { LearnNode } from "./types";
 
-export type { LearnNode, Breadcrumb, FileKind, LearnNodeType, LearnSection, LearnApplication, Widget, WidgetBase, HeroWidget, FeaturedItem, FeaturedWidget, WidgetV2 } from "./types";
+export type {
+  LearnNode,
+  Breadcrumb,
+  FileKind,
+  LearnNodeType,
+  LearnSection,
+  LearnMediaItem,
+  LearnApplication,
+  Widget,
+  WidgetBase,
+  HeroWidget,
+  FeaturedItem,
+  FeaturedWidget,
+  WidgetV2,
+} from "./types";
+export { certificateGallery } from "./certificates";
 export { getNodePath, getChildNodes, searchNodes } from "./types";
-export { applications, applicationMap, searchApplications } from "./applications";
+export {
+  applications,
+  applicationMap,
+  searchApplications,
+} from "./applications";
 export { widgets } from "./widgets";
 export { widgetsV2 } from "./widgets-v2";
 
@@ -13,14 +32,13 @@ export const learnNodeMap = new Map<string, LearnNode>(
 );
 
 export const rootDesktopIds = [
-  "this-pc",
-  "start-here",
-  "knowledge",
-  "about",
-  "workflows",
-  "skills",
-  "lab",
   "apps",
+  "workflows",
+  "knowledge",
+  "certifications",
+  "about",
+  "skills",
+  "obsidian-vault",
 ] as const;
 
 export type DesktopFolderId = (typeof rootDesktopIds)[number];

@@ -1,4 +1,5 @@
 import type { LearnNode } from "./types";
+import { certificateGallery } from "./certificates";
 
 export const learnNodes: LearnNode[] = [
   {
@@ -15,7 +16,15 @@ export const learnNodes: LearnNode[] = [
     relatedProjectSlugs: [],
     public: true,
     parentId: null,
-    children: ["start-here", "knowledge", "about", "workflows", "skills", "lab", "apps"],
+    children: [
+      "apps",
+      "workflows",
+      "knowledge",
+      "certifications",
+      "about",
+      "skills",
+      "obsidian-vault",
+    ],
   },
   {
     id: "start-here",
@@ -30,7 +39,7 @@ export const learnNodes: LearnNode[] = [
     relatedFileIds: ["about-profile", "knowledge-dotnet"],
     relatedProjectSlugs: [],
     public: true,
-    parentId: "this-pc",
+    parentId: "about",
     children: ["start-here-welcome"],
   },
   {
@@ -58,11 +67,26 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Knowledge Library — verified technical collections", ar: "المكتبة المعرفية — مجموعات تقنية مؤكدة" },
-          { en: "About Nour — engineering identity and journey", ar: "عن نور — الهوية والرحلة الهندسية" },
-          { en: "AI-Assisted Workflows — human-reviewed processes", ar: "سير العمل بمساعدة الذكاء الاصطناعي — عمليات مراجعة بشرية" },
-          { en: "Skills & Evidence — project-backed capabilities", ar: "المهارات والأدلة — قدرات مدعومة بالمشاريع" },
-          { en: "Learning Lab — experiments and reflections", ar: "مختبر التعلم — تجارب وتأملات" },
+          {
+            en: "Knowledge Library — verified technical collections",
+            ar: "المكتبة المعرفية — مجموعات تقنية مؤكدة",
+          },
+          {
+            en: "About Nour — engineering identity and journey",
+            ar: "عن نور — الهوية والرحلة الهندسية",
+          },
+          {
+            en: "AI-Assisted Workflows — human-reviewed processes",
+            ar: "سير العمل بمساعدة الذكاء الاصطناعي — عمليات مراجعة بشرية",
+          },
+          {
+            en: "Skills & Evidence — project-backed capabilities",
+            ar: "المهارات والأدلة — قدرات مدعومة بالمشاريع",
+          },
+          {
+            en: "Learning Lab — experiments and reflections",
+            ar: "مختبر التعلم — تجارب وتأملات",
+          },
         ],
       },
       {
@@ -83,12 +107,12 @@ export const learnNodes: LearnNode[] = [
   },
   {
     id: "knowledge",
-    name: { en: "01 Knowledge Library", ar: "01 المكتبة المعرفية" },
+    name: { en: "03 Summaries", ar: "03 الملخصات" },
     type: "folder",
     kind: "folder",
     summary: {
-      en: "Verified technical knowledge collections organized by domain.",
-      ar: "مجموعات معرفية تقنية مؤكدة مرتّبة حسب المجال.",
+      en: "Technical and university summaries organized by domain.",
+      ar: "ملخصات تقنية وجامعية منظمة حسب المجال.",
     },
     tags: ["knowledge", "library"],
     relatedFileIds: [],
@@ -138,8 +162,14 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Bookify — N-tier MVC with Repository, Unit of Work, and ViewModel patterns", ar: "Bookify — بنية متعددة الطبقات مع أنماط Repository وUnit of Work وViewModel" },
-          { en: "CinemaVerse — service and repository stack behind the Angular frontend", ar: "CinemaVerse — طبقات الخدمة والمستودعات خلف واجهة Angular" },
+          {
+            en: "Bookify — N-tier MVC with Repository, Unit of Work, and ViewModel patterns",
+            ar: "Bookify — بنية متعددة الطبقات مع أنماط Repository وUnit of Work وViewModel",
+          },
+          {
+            en: "CinemaVerse — service and repository stack behind the Angular frontend",
+            ar: "CinemaVerse — طبقات الخدمة والمستودعات خلف واجهة Angular",
+          },
         ],
       },
       {
@@ -183,8 +213,14 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Blood Bank Mobile — REST API with Swagger, JWT, and CORS", ar: "Blood Bank Mobile — REST API مع Swagger وJWT وCORS" },
-          { en: "CinemaVerse — 94 documented endpoints with Hangfire background jobs", ar: "CinemaVerse — 94 نقطة نهاية موثقة مع مهام Hangfire الخلفية" },
+          {
+            en: "Blood Bank Mobile — REST API with Swagger, JWT, and CORS",
+            ar: "Blood Bank Mobile — REST API مع Swagger وJWT وCORS",
+          },
+          {
+            en: "CinemaVerse — 94 documented endpoints with Hangfire background jobs",
+            ar: "CinemaVerse — 94 نقطة نهاية موثقة مع مهام Hangfire الخلفية",
+          },
         ],
       },
     ],
@@ -220,9 +256,18 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Bookify — Stripe, ASP.NET Identity, RBAC, CSRF", ar: "Bookify — Stripe وASP.NET Identity والوصول المبني على الأدوار وCSRF" },
-          { en: "CinemaVerse — JWT, rate limiting, Hangfire expiry", ar: "CinemaVerse — JWT وتحديد المعدل ومهام انتهاء الصلاحية" },
-          { en: "Blood Bank Desktop — role-based access and authentication", ar: "Blood Bank Desktop — الوصول المبني على الأدوار والمصادقة" },
+          {
+            en: "Bookify — Stripe, ASP.NET Identity, RBAC, CSRF",
+            ar: "Bookify — Stripe وASP.NET Identity والوصول المبني على الأدوار وCSRF",
+          },
+          {
+            en: "CinemaVerse — JWT, rate limiting, Hangfire expiry",
+            ar: "CinemaVerse — JWT وتحديد المعدل ومهام انتهاء الصلاحية",
+          },
+          {
+            en: "Blood Bank Desktop — role-based access and authentication",
+            ar: "Blood Bank Desktop — الوصول المبني على الأدوار والمصادقة",
+          },
         ],
       },
     ],
@@ -274,7 +319,10 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "BuildSense — Angular 19, Express, MongoDB, Nx", ar: "BuildSense — Angular 19 وExpress وMongoDB وNx" },
+          {
+            en: "BuildSense — Angular 19, Express, MongoDB, Nx",
+            ar: "BuildSense — Angular 19 وExpress وMongoDB وNx",
+          },
         ],
       },
     ],
@@ -326,7 +374,10 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Published at noureldeenmahmoud.github.io/MET-Summaries/", ar: "منشورة على noureldeenmahmoud.github.io/MET-Summaries/" },
+          {
+            en: "Published at noureldeenmahmoud.github.io/MET-Summaries/",
+            ar: "منشورة على noureldeenmahmoud.github.io/MET-Summaries/",
+          },
         ],
       },
       {
@@ -347,7 +398,7 @@ export const learnNodes: LearnNode[] = [
   },
   {
     id: "about",
-    name: { en: "02 About Nour", ar: "02 عن نور" },
+    name: { en: "05 About Me", ar: "05 عني" },
     type: "folder",
     kind: "folder",
     summary: {
@@ -360,6 +411,7 @@ export const learnNodes: LearnNode[] = [
     public: true,
     parentId: "this-pc",
     children: [
+      "start-here",
       "about-profile",
       "about-identity",
       "about-learning",
@@ -418,9 +470,18 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Make the system legible — Clear boundaries and evidence are more useful than hidden cleverness.", ar: "اجعل النظام مفهوماً — الحدود الواضحة والأدلة أنفع من الذكاء المخفي." },
-          { en: "Treat constraints as design inputs — Platform, team, domain, and data limits shape the solution.", ar: "عامل القيود كمدخلات تصميم — قيود المنصة والفريق والنطاق والبيانات تشكل الحل." },
-          { en: "Validate before presenting — Tests, review, repositories, and honest limitations support every claim.", ar: "تحقق قبل العرض — تدعم الاختبارات والمراجعة والمستودعات والقيود الصريحة كل ادعاء." },
+          {
+            en: "Make the system legible — Clear boundaries and evidence are more useful than hidden cleverness.",
+            ar: "اجعل النظام مفهوماً — الحدود الواضحة والأدلة أنفع من الذكاء المخفي.",
+          },
+          {
+            en: "Treat constraints as design inputs — Platform, team, domain, and data limits shape the solution.",
+            ar: "عامل القيود كمدخلات تصميم — قيود المنصة والفريق والنطاق والبيانات تشكل الحل.",
+          },
+          {
+            en: "Validate before presenting — Tests, review, repositories, and honest limitations support every claim.",
+            ar: "تحقق قبل العرض — تدعم الاختبارات والمراجعة والمستودعات والقيود الصريحة كل ادعاء.",
+          },
         ],
       },
     ],
@@ -449,10 +510,22 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "steps",
         items: [
-          { en: "Understand — Read official docs, identify core patterns, and define the scope.", ar: "فهم — اقرأ التوثيق الرسمي، حدّد الأنماط الأساسية، وعرّف النطاق." },
-          { en: "Design — Apply patterns to a real project constraint or problem.", ar: "تصميم — طبّق الأنماط على قيود أو مشكلات مشاريع حقيقية." },
-          { en: "Build — Implement with tests, documentation, and repository evidence.", ar: "بناء — نفّذ مع اختبارات وتوثيق وأدلة مستودع." },
-          { en: "Validate — Review against official patterns, compare with peers, and document limitations.", ar: "تحقق — راجع مقابل الأنماط الرسميّة، قارن مع الأقران، ووثّق القيود." },
+          {
+            en: "Understand — Read official docs, identify core patterns, and define the scope.",
+            ar: "فهم — اقرأ التوثيق الرسمي، حدّد الأنماط الأساسية، وعرّف النطاق.",
+          },
+          {
+            en: "Design — Apply patterns to a real project constraint or problem.",
+            ar: "تصميم — طبّق الأنماط على قيود أو مشكلات مشاريع حقيقية.",
+          },
+          {
+            en: "Build — Implement with tests, documentation, and repository evidence.",
+            ar: "بناء — نفّذ مع اختبارات وتوثيق وأدلة مستودع.",
+          },
+          {
+            en: "Validate — Review against official patterns, compare with peers, and document limitations.",
+            ar: "تحقق — راجع مقابل الأنماط الرسميّة، قارن مع الأقران، ووثّق القيود.",
+          },
         ],
       },
     ],
@@ -481,17 +554,39 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "University team projects: Blood Bank (desktop, mobile, API, SQL Server)", ar: "مشاريع جماعية جامعية: بنك الدم (مكتب، موبايل، API، SQL Server)" },
-          { en: "Desktop systems: DVLD (WinForms, ADO.NET, rules-heavy domain)", ar: "أنظمة مكتبية: DVLD (WinForms وADO.NET ونطاق كثيف القواعد)" },
-          { en: "Full-stack team: Bookify (MVC, identity, payments, EF Core)", ar: "فل ستاك جماعي: Bookify (MVC والهوية والمدفوعات وEF Core)" },
-          { en: "Full-stack team: CinemaVerse (API, Angular, JWT, Hangfire)", ar: "فل ستاك جماعي: CinemaVerse (API وAngular وJWT وHangfire)" },
-          { en: "Solo product: BuildSense (Angular, Node, Express, Nx, CI)", ar: "منتج فردي: BuildSense (Angular وNode وExpress وNx وCI)" },
+          {
+            en: "University team projects: Blood Bank (desktop, mobile, API, SQL Server)",
+            ar: "مشاريع جماعية جامعية: بنك الدم (مكتب، موبايل، API، SQL Server)",
+          },
+          {
+            en: "Desktop systems: DVLD (WinForms, ADO.NET, rules-heavy domain)",
+            ar: "أنظمة مكتبية: DVLD (WinForms وADO.NET ونطاق كثيف القواعد)",
+          },
+          {
+            en: "Full-stack team: Bookify (MVC, identity, payments, EF Core)",
+            ar: "فل ستاك جماعي: Bookify (MVC والهوية والمدفوعات وEF Core)",
+          },
+          {
+            en: "Full-stack team: CinemaVerse (API, Angular, JWT, Hangfire)",
+            ar: "فل ستاك جماعي: CinemaVerse (API وAngular وJWT وHangfire)",
+          },
+          {
+            en: "Solo product: BuildSense (Angular, Node, Express, Nx, CI)",
+            ar: "منتج فردي: BuildSense (Angular وNode وExpress وNx وCI)",
+          },
         ],
       },
     ],
     tags: ["journey", "timeline", "projects"],
     relatedFileIds: ["about-profile", "skill-crossplatform"],
-    relatedProjectSlugs: ["bookify", "cinemaverse", "blood-bank-desktop", "blood-bank-mobile", "dvld", "buildsense"],
+    relatedProjectSlugs: [
+      "bookify",
+      "cinemaverse",
+      "blood-bank-desktop",
+      "blood-bank-mobile",
+      "dvld",
+      "buildsense",
+    ],
     public: true,
     parentId: "about",
     children: [],
@@ -514,9 +609,18 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Email: noureldeendev@gmail.com", ar: "البريد الإلكتروني: noureldeendev@gmail.com" },
-          { en: "LinkedIn: linkedin.com/in/nour-eldeen-eg", ar: "LinkedIn: linkedin.com/in/nour-eldeen-eg" },
-          { en: "GitHub: github.com/NourEldeenMahmoud", ar: "GitHub: github.com/NourEldeenMahmoud" },
+          {
+            en: "Email: noureldeendev@gmail.com",
+            ar: "البريد الإلكتروني: noureldeendev@gmail.com",
+          },
+          {
+            en: "LinkedIn: linkedin.com/in/nour-eldeen-eg",
+            ar: "LinkedIn: linkedin.com/in/nour-eldeen-eg",
+          },
+          {
+            en: "GitHub: github.com/NourEldeenMahmoud",
+            ar: "GitHub: github.com/NourEldeenMahmoud",
+          },
         ],
       },
     ],
@@ -529,12 +633,15 @@ export const learnNodes: LearnNode[] = [
   },
   {
     id: "workflows",
-    name: { en: "03 AI-Assisted Workflows", ar: "03 سير العمل بمساعدة الذكاء الاصطناعي" },
+    name: {
+      en: "02 AI Skills, Agents & Workflows",
+      ar: "02 مهارات ووكلاء وسير عمل الذكاء الاصطناعي",
+    },
     type: "folder",
     kind: "folder",
     summary: {
-      en: "Human-reviewed processes where AI assists but does not replace engineering judgment.",
-      ar: "عمليات مراجعة بشرية يساعد فيها الذكاء الاصطناعي لكنه لا يحل محل الحكم الهندسي.",
+      en: "Reusable AI capabilities, specialized agents, and human-reviewed workflows.",
+      ar: "قدرات ذكاء اصطناعي قابلة لإعادة الاستخدام ووكلاء متخصصون وسير عمل بمراجعة بشرية.",
     },
     tags: ["ai", "workflow", "process"],
     relatedFileIds: ["skill-engineering-practice"],
@@ -542,6 +649,8 @@ export const learnNodes: LearnNode[] = [
     public: true,
     parentId: "this-pc",
     children: [
+      "ai-skills-overview",
+      "ai-agents-overview",
       "workflow-course-to-obsidian",
       "workflow-review-quality",
       "workflow-requirements-to-code",
@@ -583,12 +692,30 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "steps",
         items: [
-          { en: "Collect source material and identify which topics to summarize.", ar: "اجمع المادة المصدرية وحدد المواضيع المراد تلخيصها." },
-          { en: "Draft a structured outline with headings, key concepts, and cross-references.", ar: "أعد مخططًا منظماً بعناوين ومفاهيم أساسية وروابط مرجعية." },
-          { en: "Use AI to generate a first draft from the outline and source material.", ar: "استخدم الذكاء الاصطناعي لإنشاء مسودة أولية من المخطط والمادة المصدرية." },
-          { en: "Review every claim against the source material. Correct inaccuracies.", ar: "راجع كل ادعاء مقابل المادة المصدرية. صحّح عدم الدقة." },
-          { en: "Format for Obsidian: add tags, wikilinks, and metadata.", ar: "نسّق لـObsidian: أضف وسوم وروابط wikilink وبيانات وصفية." },
-          { en: "Publish to the MET Summaries repository after review.", ar: "انشر إلى مستودع MET Summaries بعد المراجعة." },
+          {
+            en: "Collect source material and identify which topics to summarize.",
+            ar: "اجمع المادة المصدرية وحدد المواضيع المراد تلخيصها.",
+          },
+          {
+            en: "Draft a structured outline with headings, key concepts, and cross-references.",
+            ar: "أعد مخططًا منظماً بعناوين ومفاهيم أساسية وروابط مرجعية.",
+          },
+          {
+            en: "Use AI to generate a first draft from the outline and source material.",
+            ar: "استخدم الذكاء الاصطناعي لإنشاء مسودة أولية من المخطط والمادة المصدرية.",
+          },
+          {
+            en: "Review every claim against the source material. Correct inaccuracies.",
+            ar: "راجع كل ادعاء مقابل المادة المصدرية. صحّح عدم الدقة.",
+          },
+          {
+            en: "Format for Obsidian: add tags, wikilinks, and metadata.",
+            ar: "نسّق لـObsidian: أضف وسوم وروابط wikilink وبيانات وصفية.",
+          },
+          {
+            en: "Publish to the MET Summaries repository after review.",
+            ar: "انشر إلى مستودع MET Summaries بعد المراجعة.",
+          },
         ],
       },
       {
@@ -607,7 +734,10 @@ export const learnNodes: LearnNode[] = [
         },
       },
       {
-        heading: { en: "Nour's review and decisions", ar: "مراجعة نور وقراراته" },
+        heading: {
+          en: "Nour's review and decisions",
+          ar: "مراجعة نور وقراراته",
+        },
         content: {
           en: "Nour reviews every draft against source material, corrects errors, removes unsupported claims, adds cross-references, and approves for publication.",
           ar: "يراجع نور كل مسودة مقابل المادة المصدرية، ويصحح الأخطاء، ويحذف الادعاءات غير المدعومة، ويضيف مراجع تكاملية، ويوافق على النشر.",
@@ -672,14 +802,32 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "Steps", ar: "الخطوات" },
-        content: { en: "A systematic review checklist.", ar: "قائمة مراجعة منهجية." },
+        content: {
+          en: "A systematic review checklist.",
+          ar: "قائمة مراجعة منهجية.",
+        },
         kind: "steps",
         items: [
-          { en: "Compare each claim against the source material.", ar: "قارن كل ادعاء مع المادة المصدرية." },
-          { en: "Flag any hallucinated facts, incorrect attributions, or invented details.", ar: "حدد أي حقائق وهمية أو نسب خاطئة أو تفاصيل مختلقة." },
-          { en: "Verify cross-references and wikilinks point to real notes.", ar: "تحقق من أن الروابط المرجعية تشير إلى ملاحظات حقيقية." },
-          { en: "Check that limitations are stated explicitly.", ar: "تأكد من ذكر القيود بوضوح." },
-          { en: "Approve, request changes, or reject.", ar: "وافق، أو اطلب تغييرات، أو ارفض." },
+          {
+            en: "Compare each claim against the source material.",
+            ar: "قارن كل ادعاء مع المادة المصدرية.",
+          },
+          {
+            en: "Flag any hallucinated facts, incorrect attributions, or invented details.",
+            ar: "حدد أي حقائق وهمية أو نسب خاطئة أو تفاصيل مختلقة.",
+          },
+          {
+            en: "Verify cross-references and wikilinks point to real notes.",
+            ar: "تحقق من أن الروابط المرجعية تشير إلى ملاحظات حقيقية.",
+          },
+          {
+            en: "Check that limitations are stated explicitly.",
+            ar: "تأكد من ذكر القيود بوضوح.",
+          },
+          {
+            en: "Approve, request changes, or reject.",
+            ar: "وافق، أو اطلب تغييرات، أو ارفض.",
+          },
         ],
       },
       {
@@ -699,7 +847,10 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["review", "quality", "ai-assisted", "checklist"],
-    relatedFileIds: ["workflow-course-to-obsidian", "workflow-validating-ai-code"],
+    relatedFileIds: [
+      "workflow-course-to-obsidian",
+      "workflow-validating-ai-code",
+    ],
     relatedProjectSlugs: [],
     public: true,
     parentId: "workflows",
@@ -734,16 +885,40 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "Steps", ar: "الخطوات" },
-        content: { en: "From requirements to code.", ar: "من المتطلبات إلى الكود." },
+        content: {
+          en: "From requirements to code.",
+          ar: "من المتطلبات إلى الكود.",
+        },
         kind: "steps",
         items: [
-          { en: "Read and understand the requirement or ADR completely.", ar: "اقرأ وافهم المتطلب أو سجل القرار بالكامل." },
-          { en: "Identify constraints: framework, team conventions, data shape.", ar: "حدد القيود: الإطار، اتفاقيات الفريق، شكل البيانات." },
-          { en: "Draft an implementation plan with clear boundaries.", ar: "أعد خطة تنفيذ بحدود واضحة." },
-          { en: "Use AI to draft initial code structure from the plan.", ar: "استخدم الذكاء الاصطناعي للكتابة المسودة لهيكل الكود من الخطة." },
-          { en: "Review AI-generated code against the plan and constraints.", ar: "راجع الكود المولّد بالذكاء الاصطناعي مقابل الخطة والقيود." },
-          { en: "Write tests that verify the implementation meets the requirement.", ar: "اكتب اختبارات تتحقق من أن التنفيذ يلبي المتطلب." },
-          { en: "Document decisions and tradeoffs in code or ADR updates.", ar: "وثّق القرارات والمفاضلات في الكود أو تحديثات ADR." },
+          {
+            en: "Read and understand the requirement or ADR completely.",
+            ar: "اقرأ وافهم المتطلب أو سجل القرار بالكامل.",
+          },
+          {
+            en: "Identify constraints: framework, team conventions, data shape.",
+            ar: "حدد القيود: الإطار، اتفاقيات الفريق، شكل البيانات.",
+          },
+          {
+            en: "Draft an implementation plan with clear boundaries.",
+            ar: "أعد خطة تنفيذ بحدود واضحة.",
+          },
+          {
+            en: "Use AI to draft initial code structure from the plan.",
+            ar: "استخدم الذكاء الاصطناعي للكتابة المسودة لهيكل الكود من الخطة.",
+          },
+          {
+            en: "Review AI-generated code against the plan and constraints.",
+            ar: "راجع الكود المولّد بالذكاء الاصطناعي مقابل الخطة والقيود.",
+          },
+          {
+            en: "Write tests that verify the implementation meets the requirement.",
+            ar: "اكتب اختبارات تتحقق من أن التنفيذ يلبي المتطلب.",
+          },
+          {
+            en: "Document decisions and tradeoffs in code or ADR updates.",
+            ar: "وثّق القرارات والمفاضلات في الكود أو تحديثات ADR.",
+          },
         ],
       },
       {
@@ -763,7 +938,10 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["requirements", "adr", "implementation", "ai-assisted"],
-    relatedFileIds: ["skill-engineering-practice", "workflow-validating-ai-code"],
+    relatedFileIds: [
+      "skill-engineering-practice",
+      "workflow-validating-ai-code",
+    ],
     relatedProjectSlugs: ["bookify", "buildsense"],
     public: true,
     parentId: "workflows",
@@ -801,13 +979,34 @@ export const learnNodes: LearnNode[] = [
         content: { en: "A validation checklist.", ar: "قائمة تحقق من التحقق." },
         kind: "steps",
         items: [
-          { en: "Read the AI-generated code line by line.", ar: "اقرأ الكود المولّد بالذكاء الاصطناعي سطرًا بسطر." },
-          { en: "Verify it follows project conventions and patterns.", ar: "تحقق من أنه يتبع اتفاقيات وأنماط المشروع." },
-          { en: "Run the existing test suite.", ar: "شغّل مجموعة الاختبارات الحالية." },
-          { en: "Write new tests for AI-generated logic.", ar: "اكتب اختبارات جديدة للمنطق المولّد بالذكاء الاصطناعي." },
-          { en: "Check for security issues: secrets, injection, unvalidated input.", ar: "تحقق من المشاكل الأمنية: أسرار، حقن، مدخلات غير محققة." },
-          { en: "Verify error handling covers failure cases.", ar: "تحقق من تغطية معالجة الأخطاء لحالات الفشل." },
-          { en: "Review with a peer or document the review decision.", ar: "راجع مع زميل أو وثّق قرار المراجعة." },
+          {
+            en: "Read the AI-generated code line by line.",
+            ar: "اقرأ الكود المولّد بالذكاء الاصطناعي سطرًا بسطر.",
+          },
+          {
+            en: "Verify it follows project conventions and patterns.",
+            ar: "تحقق من أنه يتبع اتفاقيات وأنماط المشروع.",
+          },
+          {
+            en: "Run the existing test suite.",
+            ar: "شغّل مجموعة الاختبارات الحالية.",
+          },
+          {
+            en: "Write new tests for AI-generated logic.",
+            ar: "اكتب اختبارات جديدة للمنطق المولّد بالذكاء الاصطناعي.",
+          },
+          {
+            en: "Check for security issues: secrets, injection, unvalidated input.",
+            ar: "تحقق من المشاكل الأمنية: أسرار، حقن، مدخلات غير محققة.",
+          },
+          {
+            en: "Verify error handling covers failure cases.",
+            ar: "تحقق من تغطية معالجة الأخطاء لحالات الفشل.",
+          },
+          {
+            en: "Review with a peer or document the review decision.",
+            ar: "راجع مع زميل أو وثّق قرار المراجعة.",
+          },
         ],
       },
       {
@@ -827,7 +1026,10 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["validation", "testing", "ai-generated", "security"],
-    relatedFileIds: ["workflow-requirements-to-code", "skill-engineering-practice"],
+    relatedFileIds: [
+      "workflow-requirements-to-code",
+      "skill-engineering-practice",
+    ],
     relatedProjectSlugs: ["buildsense"],
     public: true,
     parentId: "workflows",
@@ -835,7 +1037,7 @@ export const learnNodes: LearnNode[] = [
   },
   {
     id: "skills",
-    name: { en: "04 Skills & Evidence", ar: "04 المهارات والأدلة" },
+    name: { en: "06 Technical Skills", ar: "06 المهارات التقنية" },
     type: "folder",
     kind: "folder",
     summary: {
@@ -852,6 +1054,7 @@ export const learnNodes: LearnNode[] = [
       "skill-fullstack",
       "skill-crossplatform",
       "skill-engineering-practice",
+      "lab",
     ],
   },
   {
@@ -865,7 +1068,10 @@ export const learnNodes: LearnNode[] = [
     },
     sections: [
       {
-        heading: { en: "What this capability means", ar: "ماذا تعني هذه القدرة" },
+        heading: {
+          en: "What this capability means",
+          ar: "ماذا تعني هذه القدرة",
+        },
         content: {
           en: "Design and implement .NET backend systems with layered architecture, data access through EF Core, REST API design, authentication, and SQL Server persistence.",
           ar: "تصميم وتنفيذ أنظمة باك إند .NET ببنية متعددة الطبقات والوصول للبيانات عبر EF Core وتصميم REST API والمصادقة وتخزين SQL Server.",
@@ -873,22 +1079,46 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "Where Nour used it", ar: "حيث استخدمها نور" },
-        content: { en: "Project evidence for this capability.", ar: "أدلة المشاريع لهذه القدرة." },
+        content: {
+          en: "Project evidence for this capability.",
+          ar: "أدلة المشاريع لهذه القدرة.",
+        },
         kind: "list",
         items: [
-          { en: "Bookify — N-tier MVC with Repository, Unit of Work, Stripe, Identity, and health checks", ar: "Bookify — بنية متعددة الطبقات مع Repository وUnit of Work وStripe والهوية وفحوصات الصحة" },
-          { en: "CinemaVerse — API with JWT, Hangfire, 94 endpoints, and Angular frontend", ar: "CinemaVerse — API مع JWT وHangfire و94 نقطة نهاية وواجهة Angular" },
-          { en: "Blood Bank Desktop — WinForms, ADO.NET, three-tier architecture", ar: "Blood Bank Desktop — WinForms وADO.NET وبنية ثلاثية الطبقات" },
+          {
+            en: "Bookify — N-tier MVC with Repository, Unit of Work, Stripe, Identity, and health checks",
+            ar: "Bookify — بنية متعددة الطبقات مع Repository وUnit of Work وStripe والهوية وفحوصات الصحة",
+          },
+          {
+            en: "CinemaVerse — API with JWT, Hangfire, 94 endpoints, and Angular frontend",
+            ar: "CinemaVerse — API مع JWT وHangfire و94 نقطة نهاية وواجهة Angular",
+          },
+          {
+            en: "Blood Bank Desktop — WinForms, ADO.NET, three-tier architecture",
+            ar: "Blood Bank Desktop — WinForms وADO.NET وبنية ثلاثية الطبقات",
+          },
         ],
       },
       {
         heading: { en: "Related knowledge", ar: "معرفة ذات صلة" },
-        content: { en: "Knowledge collections that support this skill.", ar: "مجموعات معرفية تدعم هذه المهارة." },
+        content: {
+          en: "Knowledge collections that support this skill.",
+          ar: "مجموعات معرفية تدعم هذه المهارة.",
+        },
         kind: "list",
         items: [
-          { en: "EF Core — Repository, Unit of Work, DbContext", ar: "EF Core — Repository وUnit of Work وDbContext" },
-          { en: "REST APIs — controller design, Swagger, error handling", ar: "REST APIs — تصميم الكنترولر وSwagger ومعالجة الأخطاء" },
-          { en: "Secured APIs — JWT, Identity, RBAC", ar: "Secured APIs — JWT والهوية والوصول المبني على الأدوار" },
+          {
+            en: "EF Core — Repository, Unit of Work, DbContext",
+            ar: "EF Core — Repository وUnit of Work وDbContext",
+          },
+          {
+            en: "REST APIs — controller design, Swagger, error handling",
+            ar: "REST APIs — تصميم الكنترولر وSwagger ومعالجة الأخطاء",
+          },
+          {
+            en: "Secured APIs — JWT, Identity, RBAC",
+            ar: "Secured APIs — JWT والهوية والوصول المبني على الأدوار",
+          },
         ],
       },
       {
@@ -918,7 +1148,10 @@ export const learnNodes: LearnNode[] = [
     },
     sections: [
       {
-        heading: { en: "What this capability means", ar: "ماذا تعني هذه القدرة" },
+        heading: {
+          en: "What this capability means",
+          ar: "ماذا تعني هذه القدرة",
+        },
         content: {
           en: "Build and maintain full-stack applications spanning frontend frameworks, API layers, databases, and deployment pipelines.",
           ar: "بناء وصيانة تطبيقات فل ستاك تمتد عبر أطر الواجهة الأمامية وطبقات API وقواعد البيانات وخطوط النشر.",
@@ -926,10 +1159,16 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "Where Nour used it", ar: "حيث استخدمها نور" },
-        content: { en: "BuildSense is the primary full-stack evidence.", ar: "BuildSense هو الدليل الرئيسي على الفل ستاك." },
+        content: {
+          en: "BuildSense is the primary full-stack evidence.",
+          ar: "BuildSense هو الدليل الرئيسي على الفل ستاك.",
+        },
         kind: "list",
         items: [
-          { en: "BuildSense — Angular 19, Express, MongoDB, Nx monorepo, CI", ar: "BuildSense — Angular 19 وExpress وMongoDB وNx monorepo وCI" },
+          {
+            en: "BuildSense — Angular 19, Express, MongoDB, Nx monorepo, CI",
+            ar: "BuildSense — Angular 19 وExpress وMongoDB وNx monorepo وCI",
+          },
         ],
       },
       {
@@ -959,7 +1198,10 @@ export const learnNodes: LearnNode[] = [
     },
     sections: [
       {
-        heading: { en: "What this capability means", ar: "ماذا تعني هذه القدرة" },
+        heading: {
+          en: "What this capability means",
+          ar: "ماذا تعني هذه القدرة",
+        },
         content: {
           en: "Build applications that span desktop, mobile, and web platforms while sharing domain logic and data through a common backend.",
           ar: "بناء تطبيقات تمتد عبر سطح المكتب والموبايل والويب مع مشاركة منطق النطاق والبيانات من خلال باك إند مشترك.",
@@ -967,11 +1209,20 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "Where Nour used it", ar: "حيث استخدمها نور" },
-        content: { en: "The Blood Bank platform and DVLD demonstrate cross-platform coverage.", ar: "تُظهر منصة بنك الدم وDVLD التغطية متعددة المنصات." },
+        content: {
+          en: "The Blood Bank platform and DVLD demonstrate cross-platform coverage.",
+          ar: "تُظهر منصة بنك الدم وDVLD التغطية متعددة المنصات.",
+        },
         kind: "list",
         items: [
-          { en: "Blood Bank — WinForms desktop, Flutter mobile, ASP.NET Core API, shared SQL Server", ar: "بنك الدم — WinForms مكتب وFlutter موبايل وASP.NET Core API وSQL Server مشترك" },
-          { en: "DVLD — WinForms with ADO.NET and rules-heavy domain logic", ar: "DVLD — WinForms مع ADO.NET ومنطق نطاق كثيف القواعد" },
+          {
+            en: "Blood Bank — WinForms desktop, Flutter mobile, ASP.NET Core API, shared SQL Server",
+            ar: "بنك الدم — WinForms مكتب وFlutter موبايل وASP.NET Core API وSQL Server مشترك",
+          },
+          {
+            en: "DVLD — WinForms with ADO.NET and rules-heavy domain logic",
+            ar: "DVLD — WinForms مع ADO.NET ومنطق نطاق كثيف القواعد",
+          },
         ],
       },
       {
@@ -1001,7 +1252,10 @@ export const learnNodes: LearnNode[] = [
     },
     sections: [
       {
-        heading: { en: "What this capability means", ar: "ماذا تعني هذه القدرة" },
+        heading: {
+          en: "What this capability means",
+          ar: "ماذا تعني هذه القدرة",
+        },
         content: {
           en: "Apply engineering discipline across all projects: testing, code review, documentation, version control, and honest limitation reporting.",
           ar: "تطبيق الانضباط الهندسي عبر جميع المشاريع: الاختبارات ومراجعة الكود والتوثيق والتحكم في الإصدارات والقيود الصريحة.",
@@ -1009,12 +1263,24 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "Where Nour used it", ar: "حيث استخدمها نور" },
-        content: { en: "Every public project demonstrates some aspect of engineering practice.", ar: "يُظهر كل مشروع عام جانباً من الممارسة الهندسية." },
+        content: {
+          en: "Every public project demonstrates some aspect of engineering practice.",
+          ar: "يُظهر كل مشروع عام جانباً من الممارسة الهندسية.",
+        },
         kind: "list",
         items: [
-          { en: "BuildSense — automated tests, CI, architecture documentation", ar: "BuildSense — اختبارات آلية وCI وتوثيق هندسي" },
-          { en: "Bookify — repository patterns, migrations, health checks", ar: "Bookify — أنماط المستودعات والترحيل وفحوصات الصحة" },
-          { en: "CinemaVerse — 94 documented endpoints, Swagger", ar: "CinemaVerse — 94 نقطة نهاية موثقة وSwagger" },
+          {
+            en: "BuildSense — automated tests, CI, architecture documentation",
+            ar: "BuildSense — اختبارات آلية وCI وتوثيق هندسي",
+          },
+          {
+            en: "Bookify — repository patterns, migrations, health checks",
+            ar: "Bookify — أنماط المستودعات والترحيل وفحوصات الصحة",
+          },
+          {
+            en: "CinemaVerse — 94 documented endpoints, Swagger",
+            ar: "CinemaVerse — 94 نقطة نهاية موثقة وSwagger",
+          },
         ],
       },
       {
@@ -1035,7 +1301,7 @@ export const learnNodes: LearnNode[] = [
   },
   {
     id: "lab",
-    name: { en: "05 Learning Lab", ar: "05 مختبر التعلم" },
+    name: { en: "Learning Lab", ar: "مختبر التعلم" },
     type: "folder",
     kind: "folder",
     summary: {
@@ -1046,7 +1312,7 @@ export const learnNodes: LearnNode[] = [
     relatedFileIds: ["about-learning"],
     relatedProjectSlugs: [],
     public: true,
-    parentId: "this-pc",
+    parentId: "skills",
     children: ["lab-currently", "lab-experiments", "lab-reflections"],
   },
   {
@@ -1067,9 +1333,18 @@ export const learnNodes: LearnNode[] = [
         },
         kind: "list",
         items: [
-          { en: "Advanced EF Core patterns and performance tuning", ar: "أنماط EF Core المتقدمة وتحسين الأداء" },
-          { en: "ASP.NET Core minimal APIs and vertical slice architecture", ar: "ASP.NET Core minimal APIs والبنية العمودية" },
-          { en: "Integration testing and contract testing", ar: "اختبار التكامل واختبار العقود" },
+          {
+            en: "Advanced EF Core patterns and performance tuning",
+            ar: "أنماط EF Core المتقدمة وتحسين الأداء",
+          },
+          {
+            en: "ASP.NET Core minimal APIs and vertical slice architecture",
+            ar: "ASP.NET Core minimal APIs والبنية العمودية",
+          },
+          {
+            en: "Integration testing and contract testing",
+            ar: "اختبار التكامل واختبار العقود",
+          },
         ],
       },
       {
@@ -1106,7 +1381,10 @@ export const learnNodes: LearnNode[] = [
   },
   {
     id: "lab-reflections",
-    name: { en: "Reflections and Postmortems", ar: "تأملات وتحليل ما بعد الانتهاء" },
+    name: {
+      en: "Reflections and Postmortems",
+      ar: "تأملات وتحليل ما بعد الانتهاء",
+    },
     type: "folder",
     kind: "folder",
     summary: {
@@ -1122,12 +1400,12 @@ export const learnNodes: LearnNode[] = [
   },
   {
     id: "apps",
-    name: { en: "06 Applications I Use", ar: "06 التطبيقات التي أستخدمها" },
+    name: { en: "01 Essential Apps", ar: "01 التطبيقات الأساسية" },
     type: "folder",
     kind: "folder",
     summary: {
-      en: "Tools and applications used across Nour's development workflow.",
-      ar: "الأدوات والتطبيقات المستخدمة عبر سير عمل نور التطويري.",
+      en: "The five tools at the center of Nour's AI-assisted learning and development workflow.",
+      ar: "الأدوات الخمس الأساسية في سير عمل نور للتعلم والتطوير بمساعدة الذكاء الاصطناعي.",
     },
     tags: ["applications", "tools"],
     relatedFileIds: [],
@@ -1135,16 +1413,11 @@ export const learnNodes: LearnNode[] = [
     public: true,
     parentId: "this-pc",
     children: [
-      "app-vscode",
+      "app-antigravity",
+      "app-opencode",
       "app-obsidian",
-      "app-postman",
-      "app-ssms",
-      "app-mongodb-compass",
-      "app-unity",
-      "app-blender",
-      "app-discord",
-      "app-steam",
-      "app-bitwarden",
+      "app-notebooklm",
+      "app-hermes",
     ],
   },
   {
@@ -1166,18 +1439,36 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "Daily development tasks.", ar: "مهام التطوير اليومية." },
+        content: {
+          en: "Daily development tasks.",
+          ar: "مهام التطوير اليومية.",
+        },
         kind: "list",
         items: [
-          { en: "Writing and debugging C#, TypeScript, and Dart code", ar: "كتابة وتنقيح كود C# وTypeScript وDart" },
-          { en: "Running tests and viewing results inline", ar: "تشغيل الاختبارات وعرض النتائج" },
-          { en: "Managing Git branches, commits, and diffs", ar: "إدارة فروع Git والالتزامات والفروقات" },
-          { en: "Terminal commands for builds, scripts, and tooling", ar: "أوامر الطرفية للبناء والسكريبتات والأدوات" },
+          {
+            en: "Writing and debugging C#, TypeScript, and Dart code",
+            ar: "كتابة وتنقيح كود C# وTypeScript وDart",
+          },
+          {
+            en: "Running tests and viewing results inline",
+            ar: "تشغيل الاختبارات وعرض النتائج",
+          },
+          {
+            en: "Managing Git branches, commits, and diffs",
+            ar: "إدارة فروع Git والالتزامات والفروقات",
+          },
+          {
+            en: "Terminal commands for builds, scripts, and tooling",
+            ar: "أوامر الطرفية للبناء والسكريبتات والأدوات",
+          },
         ],
       },
       {
         heading: { en: "Related skills", ar: "مهارات ذات صلة" },
-        content: { en: "Engineering practice across all projects.", ar: "الممارسة الهندسية عبر جميع المشاريع." },
+        content: {
+          en: "Engineering practice across all projects.",
+          ar: "الممارسة الهندسية عبر جميع المشاريع.",
+        },
         kind: "list",
         items: [
           { en: ".NET Backend", ar: "باك إند .NET" },
@@ -1188,8 +1479,13 @@ export const learnNodes: LearnNode[] = [
     ],
     tags: ["editor", "ide", "development", "vscode"],
     relatedFileIds: ["knowledge-dotnet", "knowledge-web"],
-    relatedProjectSlugs: ["bookify", "cinemaverse", "buildsense", "blood-bank-desktop"],
-    public: true,
+    relatedProjectSlugs: [
+      "bookify",
+      "cinemaverse",
+      "buildsense",
+      "blood-bank-desktop",
+    ],
+    public: false,
     parentId: "apps",
     children: [],
   },
@@ -1212,18 +1508,37 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "Knowledge management tasks.", ar: "مهام إدارة المعرفة." },
+        content: {
+          en: "Knowledge management tasks.",
+          ar: "مهام إدارة المعرفة.",
+        },
         kind: "list",
         items: [
-          { en: "Writing and organizing technical summaries", ar: "كتابة وتنظيم الملخصات التقنية" },
-          { en: "Linking related notes with wikilinks", ar: "ربط الملاحظات ذات الصلة بروابط wikilink" },
-          { en: "Maintaining the MET Summaries workflow source files", ar: "صيانة ملفات مصدر سير عمل MET Summaries" },
-          { en: "Structuring learning notes by domain", ar: "هيكلة ملاحظات التعلم حسب المجال" },
+          {
+            en: "Writing and organizing technical summaries",
+            ar: "كتابة وتنظيم الملخصات التقنية",
+          },
+          {
+            en: "Linking related notes with wikilinks",
+            ar: "ربط الملاحظات ذات الصلة بروابط wikilink",
+          },
+          {
+            en: "Maintaining the MET Summaries workflow source files",
+            ar: "صيانة ملفات مصدر سير عمل MET Summaries",
+          },
+          {
+            en: "Structuring learning notes by domain",
+            ar: "هيكلة ملاحظات التعلم حسب المجال",
+          },
         ],
       },
     ],
     tags: ["notes", "knowledge", "vault", "markdown", "obsidian"],
-    relatedFileIds: ["workflow-course-to-obsidian", "workflow-review-quality", "knowledge-met"],
+    relatedFileIds: [
+      "workflow-course-to-obsidian",
+      "workflow-review-quality",
+      "knowledge-met",
+    ],
     relatedProjectSlugs: [],
     public: true,
     parentId: "apps",
@@ -1251,22 +1566,34 @@ export const learnNodes: LearnNode[] = [
         content: { en: "API testing tasks.", ar: "مهام اختبار API." },
         kind: "list",
         items: [
-          { en: "Testing REST API endpoints during development", ar: "اختبار نقاط نهاية REST API أثناء التطوير" },
-          { en: "Validating authentication flows with JWT tokens", ar: "التحقق من تدفقات المصادقة برموز JWT" },
-          { en: "Inspecting response bodies, status codes, and headers", ar: "فحص هيئات الاستجابة وأكواد الحالة والترويسات" },
+          {
+            en: "Testing REST API endpoints during development",
+            ar: "اختبار نقاط نهاية REST API أثناء التطوير",
+          },
+          {
+            en: "Validating authentication flows with JWT tokens",
+            ar: "التحقق من تدفقات المصادقة برموز JWT",
+          },
+          {
+            en: "Inspecting response bodies, status codes, and headers",
+            ar: "فحص هيئات الاستجابة وأكواد الحالة والترويسات",
+          },
         ],
       },
     ],
     tags: ["api", "testing", "rest", "http", "postman"],
     relatedFileIds: ["knowledge-rest", "knowledge-secured"],
     relatedProjectSlugs: ["cinemaverse", "blood-bank-mobile"],
-    public: true,
+    public: false,
     parentId: "apps",
     children: [],
   },
   {
     id: "app-ssms",
-    name: { en: "SQL Server Management Studio", ar: "SQL Server Management Studio" },
+    name: {
+      en: "SQL Server Management Studio",
+      ar: "SQL Server Management Studio",
+    },
     type: "file",
     kind: "document",
     summary: {
@@ -1283,19 +1610,31 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "Database management tasks.", ar: "مهام إدارة قاعدة البيانات." },
+        content: {
+          en: "Database management tasks.",
+          ar: "مهام إدارة قاعدة البيانات.",
+        },
         kind: "list",
         items: [
-          { en: "Writing and testing SQL queries", ar: "كتابة واختبار استعلامات SQL" },
-          { en: "Inspecting database schemas and table structures", ar: "فحص مخططات قاعدة البيانات وهيكل الجداول" },
-          { en: "Managing migrations and seed data", ar: "إدارة الترحيل والبيانات الأولية" },
+          {
+            en: "Writing and testing SQL queries",
+            ar: "كتابة واختبار استعلامات SQL",
+          },
+          {
+            en: "Inspecting database schemas and table structures",
+            ar: "فحص مخططات قاعدة البيانات وهيكل الجداول",
+          },
+          {
+            en: "Managing migrations and seed data",
+            ar: "إدارة الترحيل والبيانات الأولية",
+          },
         ],
       },
     ],
     tags: ["database", "sql", "sqlserver", "ssms"],
     relatedFileIds: ["knowledge-efcore", "knowledge-dotnet"],
     relatedProjectSlugs: ["bookify", "blood-bank-desktop"],
-    public: true,
+    public: false,
     parentId: "apps",
     children: [],
   },
@@ -1321,15 +1660,21 @@ export const learnNodes: LearnNode[] = [
         content: { en: "MongoDB data inspection.", ar: "فحص بيانات MongoDB." },
         kind: "list",
         items: [
-          { en: "Exploring document collections and schemas", ar: "استكشاف مجموعات المستندات والمخططات" },
-          { en: "Running and debugging aggregation pipelines", ar: "تشغيل وتنقيح خطوط أنابيب التجميع" },
+          {
+            en: "Exploring document collections and schemas",
+            ar: "استكشاف مجموعات المستندات والمخططات",
+          },
+          {
+            en: "Running and debugging aggregation pipelines",
+            ar: "تشغيل وتنقيح خطوط أنابيب التجميع",
+          },
         ],
       },
     ],
     tags: ["database", "mongodb", "nosql", "compass"],
     relatedFileIds: ["knowledge-javascript"],
     relatedProjectSlugs: ["buildsense"],
-    public: true,
+    public: false,
     parentId: "apps",
     children: [],
   },
@@ -1352,18 +1697,27 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "3D prototyping tasks.", ar: "مهام النموذج الأولي ثلاثي الأبعاد." },
+        content: {
+          en: "3D prototyping tasks.",
+          ar: "مهام النموذج الأولي ثلاثي الأبعاد.",
+        },
         kind: "list",
         items: [
-          { en: "Prototyping 3D room scenes and lighting setups", ar: "نموذج مشاهد الغرف ثلاثية الأبعاد وإعدادات الإضاءة" },
-          { en: "Testing camera angles and spatial compositions", ar: "اختبار زوايا الكاميرا والتراكيب المكانية" },
+          {
+            en: "Prototyping 3D room scenes and lighting setups",
+            ar: "نموذج مشاهد الغرف ثلاثية الأبعاد وإعدادات الإضاءة",
+          },
+          {
+            en: "Testing camera angles and spatial compositions",
+            ar: "اختبار زوايا الكاميرا والتراكيب المكانية",
+          },
         ],
       },
     ],
     tags: ["3d", "engine", "unity", "prototyping"],
     relatedFileIds: [],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "apps",
     children: [],
   },
@@ -1386,19 +1740,31 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "3D content creation tasks.", ar: "مهام إنشاء المحتوى ثلاثي الأبعاد." },
+        content: {
+          en: "3D content creation tasks.",
+          ar: "مهام إنشاء المحتوى ثلاثي الأبعاد.",
+        },
         kind: "list",
         items: [
-          { en: "3D modeling and material setup for scene assets", ar: "النمذجة ثلاثية الأبعاد وإعداد المواد لأصول المشاهد" },
-          { en: "Rendering preview images of spatial compositions", ar: "عرض صور معاينة للتركيبات المكانية" },
-          { en: "Importing and arranging third-party 3D models", ar: "استيراد وترتيب نماذج طرف ثالث ثلاثية الأبعاد" },
+          {
+            en: "3D modeling and material setup for scene assets",
+            ar: "النمذجة ثلاثية الأبعاد وإعداد المواد لأصول المشاهد",
+          },
+          {
+            en: "Rendering preview images of spatial compositions",
+            ar: "عرض صور معاينة للتركيبات المكانية",
+          },
+          {
+            en: "Importing and arranging third-party 3D models",
+            ar: "استيراد وترتيب نماذج طرف ثالث ثلاثية الأبعاد",
+          },
         ],
       },
     ],
     tags: ["3d", "modeling", "blender", "rendering"],
     relatedFileIds: [],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "apps",
     children: [],
   },
@@ -1421,19 +1787,31 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "Communication and collaboration.", ar: "التواصل والتعاون." },
+        content: {
+          en: "Communication and collaboration.",
+          ar: "التواصل والتعاون.",
+        },
         kind: "list",
         items: [
-          { en: "Communicating with development communities", ar: "التواصل مع مجتمعات التطوير" },
-          { en: "Collaborating on projects with remote teammates", ar: "التعاون في المشاريع مع أعضاء الفريق عن بُعد" },
-          { en: "Screen sharing for code reviews", ar: "مشاركة الشاشة لمراجعة الكود" },
+          {
+            en: "Communicating with development communities",
+            ar: "التواصل مع مجتمعات التطوير",
+          },
+          {
+            en: "Collaborating on projects with remote teammates",
+            ar: "التعاون في المشاريع مع أعضاء الفريق عن بُعد",
+          },
+          {
+            en: "Screen sharing for code reviews",
+            ar: "مشاركة الشاشة لمراجعة الكود",
+          },
         ],
       },
     ],
     tags: ["communication", "chat", "community", "discord"],
     relatedFileIds: [],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "apps",
     children: [],
   },
@@ -1456,18 +1834,27 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "Gaming and design research.", ar: "الألعاب وبحث التصميم." },
+        content: {
+          en: "Gaming and design research.",
+          ar: "الألعاب وبحث التصميم.",
+        },
         kind: "list",
         items: [
-          { en: "Playing and testing PC games", ar: "تشغيل واختبار ألعاب الكمبيوتر" },
-          { en: "Discovering indie games for design inspiration", ar: "اكتشاف ألعاب indie للإلهام التصميمي" },
+          {
+            en: "Playing and testing PC games",
+            ar: "تشغيل واختبار ألعاب الكمبيوتر",
+          },
+          {
+            en: "Discovering indie games for design inspiration",
+            ar: "اكتشاف ألعاب indie للإلهام التصميمي",
+          },
         ],
       },
     ],
     tags: ["gaming", "platform", "steam", "indie"],
     relatedFileIds: [],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "apps",
     children: [],
   },
@@ -1490,17 +1877,563 @@ export const learnNodes: LearnNode[] = [
       },
       {
         heading: { en: "What Nour uses it for", ar: "لماذا يستخدمها نور" },
-        content: { en: "Security and credential management.", ar: "الأمان وإدارة بيانات الاعتماد." },
+        content: {
+          en: "Security and credential management.",
+          ar: "الأمان وإدارة بيانات الاعتماد.",
+        },
         kind: "list",
         items: [
-          { en: "Managing passwords for development accounts", ar: "إدارة كلمات مرور حسابات التطوير" },
-          { en: "Storing secure notes and API keys safely", ar: "تخزين ملاحظات آمنة ومفاتيح API بأمان" },
-          { en: "Generating strong, unique passwords", ar: "إنشاء كلمات مرور قوية وفريدة" },
+          {
+            en: "Managing passwords for development accounts",
+            ar: "إدارة كلمات مرور حسابات التطوير",
+          },
+          {
+            en: "Storing secure notes and API keys safely",
+            ar: "تخزين ملاحظات آمنة ومفاتيح API بأمان",
+          },
+          {
+            en: "Generating strong, unique passwords",
+            ar: "إنشاء كلمات مرور قوية وفريدة",
+          },
         ],
       },
     ],
     tags: ["security", "password", "vault", "bitwarden"],
     relatedFileIds: [],
+    relatedProjectSlugs: [],
+    public: false,
+    parentId: "apps",
+    children: [],
+  },
+  {
+    id: "ai-skills-overview",
+    name: { en: "AI Skills Library", ar: "مكتبة مهارات الذكاء الاصطناعي" },
+    type: "file",
+    kind: "skill",
+    summary: {
+      en: "Reusable capabilities that give coding agents focused methods and quality rules.",
+      ar: "قدرات قابلة لإعادة الاستخدام تمنح وكلاء البرمجة أساليب مركزة وقواعد جودة.",
+    },
+    sections: [
+      {
+        heading: { en: "Engineering quality", ar: "جودة الهندسة" },
+        content: {
+          en: "Guard skills review production code, tests, documentation, and security-sensitive changes before delivery.",
+          ar: "تراجع مهارات الحماية كود الإنتاج والاختبارات والتوثيق والتغييرات الحساسة أمنياً قبل التسليم.",
+        },
+        kind: "list",
+        items: [
+          { en: "Clean Code Guard", ar: "مراجعة نظافة الكود" },
+          { en: "Test Guard", ar: "مراجعة الاختبارات" },
+          { en: "Docs Guard", ar: "مراجعة التوثيق" },
+          { en: "Security Review", ar: "المراجعة الأمنية" },
+        ],
+      },
+      {
+        heading: { en: "Planning and delivery", ar: "التخطيط والتسليم" },
+        content: {
+          en: "Planning, interrogation, delegation, and skill-building capabilities structure complex work before implementation.",
+          ar: "تنظم قدرات التخطيط والاستجواب والتفويض وبناء المهارات العمل المعقد قبل التنفيذ.",
+        },
+        kind: "list",
+        items: [
+          { en: "Planner and Grill Me", ar: "التخطيط واختبار القرارات" },
+          { en: "Codex Delegation", ar: "تفويض مهام البرمجة" },
+          { en: "Skill Creator", ar: "إنشاء وتقييم المهارات" },
+        ],
+      },
+      {
+        heading: { en: "Knowledge and visualization", ar: "المعرفة والتصور" },
+        content: {
+          en: "Obsidian, Canvas, Mermaid, Excalidraw, and content-extraction skills turn source material into connected, reviewable knowledge.",
+          ar: "تحول مهارات Obsidian وCanvas وMermaid وExcalidraw واستخراج المحتوى المواد المصدرية إلى معرفة مترابطة قابلة للمراجعة.",
+        },
+      },
+      {
+        heading: {
+          en: "Frontend, motion, and Unity",
+          ar: "الواجهات والحركة وUnity",
+        },
+        content: {
+          en: "Specialized frontend, GSAP, interaction, and Unity architecture skills provide focused implementation patterns without mixing responsibilities.",
+          ar: "توفر مهارات الواجهات وGSAP والتفاعل وهندسة Unity أنماط تنفيذ متخصصة دون خلط المسؤوليات.",
+        },
+      },
+    ],
+    tags: [
+      "ai",
+      "skills",
+      "quality",
+      "planning",
+      "obsidian",
+      "unity",
+      "motion",
+    ],
+    relatedFileIds: ["ai-agents-overview", "workflow-validating-ai-code"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "workflows",
+    children: [],
+  },
+  {
+    id: "ai-agents-overview",
+    name: { en: "Agent Team", ar: "فريق الوكلاء" },
+    type: "file",
+    kind: "workflow",
+    summary: {
+      en: "Specialized agents divide discovery, implementation, and content quality into reviewable roles.",
+      ar: "يقسم الوكلاء المتخصصون الاستكشاف والتنفيذ وجودة المحتوى إلى أدوار قابلة للمراجعة.",
+    },
+    sections: [
+      {
+        heading: { en: "Software delivery", ar: "تسليم البرمجيات" },
+        content: {
+          en: "The manager owns scope and review, the explorer maps the relevant code, and the writer implements bounded changes with validation.",
+          ar: "يدير الوكيل المسؤول النطاق والمراجعة، ويستكشف وكيل المشروع الكود المطلوب، وينفذ وكيل الكتابة تغييرات محددة مع التحقق.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Manager — scope, planning, coordination, review",
+            ar: "المدير — النطاق والتخطيط والتنسيق والمراجعة",
+          },
+          {
+            en: "Project Explorer — focused read-only discovery",
+            ar: "مستكشف المشروع — استكشاف مركز للقراءة فقط",
+          },
+          {
+            en: "Code Writer — scoped implementation and validation",
+            ar: "كاتب الكود — تنفيذ محدد والتحقق",
+          },
+        ],
+      },
+      {
+        heading: { en: "Summary pipeline", ar: "خط إنتاج الملخصات" },
+        content: {
+          en: "An orchestrator assigns units, workers summarize, reviewers compare against sources, and fixers apply only required corrections.",
+          ar: "يوزع المنسق الوحدات، ويلخص العمال، ويقارن المراجعون بالمصادر، ويطبق المصححون التعديلات المطلوبة فقط.",
+        },
+        kind: "list",
+        items: [
+          { en: "Course Summary Orchestrator", ar: "منسق ملخصات الدورات" },
+          { en: "Course Summary Worker", ar: "عامل تلخيص الدورات" },
+          { en: "Course Summary Reviewer", ar: "مراجع ملخصات الدورات" },
+          { en: "Course Summary Fixer", ar: "مصحح ملخصات الدورات" },
+        ],
+      },
+    ],
+    tags: ["ai", "agents", "delegation", "review", "workflow"],
+    relatedFileIds: ["ai-skills-overview", "workflow-requirements-to-code"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "workflows",
+    children: [],
+  },
+  {
+    id: "certifications",
+    name: { en: "04 Certifications", ar: "04 الشهادات" },
+    type: "folder",
+    kind: "folder",
+    summary: {
+      en: "Completed programs and courses across .NET, databases, algorithms, frontend, Unity, and professional development.",
+      ar: "برامج ودورات مكتملة في .NET وقواعد البيانات والخوارزميات والواجهات وUnity والتطوير المهني.",
+    },
+    tags: ["certificates", "courses", "learning"],
+    relatedFileIds: ["about-learning", "skill-dotnet-backend"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "this-pc",
+    children: ["certifications-overview"],
+  },
+  {
+    id: "certifications-overview",
+    name: { en: "Certificate Library", ar: "مكتبة الشهادات" },
+    type: "file",
+    kind: "collection",
+    summary: {
+      en: "A complete, equal-weight view of 37 course and program certificates.",
+      ar: "عرض كامل ومتساوي الأهمية لـ37 شهادة دورة وبرنامج.",
+    },
+    media: certificateGallery,
+    sections: [
+      {
+        heading: { en: "Programs", ar: "البرامج" },
+        content: {
+          en: "Long-form professional development programs.",
+          ar: "برامج تطوير مهني ممتدة.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "DEPI — Full Stack .NET Web Developer",
+            ar: "DEPI — مطور ويب Full Stack .NET",
+          },
+          {
+            en: "DEPI — Business English Track",
+            ar: "DEPI — مسار اللغة الإنجليزية للأعمال",
+          },
+        ],
+      },
+      {
+        heading: { en: "Udemy", ar: "Udemy" },
+        content: {
+          en: "Project-led frontend and game-development courses.",
+          ar: "دورات عملية في الواجهات وتطوير الألعاب.",
+        },
+        kind: "list",
+        items: [
+          { en: "Tailwind CSS From Scratch", ar: "Tailwind CSS من البداية" },
+          {
+            en: "Complete C# Unity 3D Game Development in Unity 6",
+            ar: "تطوير ألعاب Unity 3D باستخدام C# وUnity 6",
+          },
+        ],
+      },
+      {
+        heading: { en: "ITI Mahara-Tech", ar: "ITI Mahara-Tech" },
+        content: {
+          en: "Database foundations and Transact-SQL.",
+          ar: "أساسيات قواعد البيانات وTransact-SQL.",
+        },
+        kind: "list",
+        items: [
+          { en: "Database Fundamentals", ar: "أساسيات قواعد البيانات" },
+          { en: "Introduction to Databases", ar: "مقدمة إلى قواعد البيانات" },
+          {
+            en: "Transact-SQL Queries Using SQL Server",
+            ar: "استعلامات Transact-SQL باستخدام SQL Server",
+          },
+        ],
+      },
+      {
+        heading: { en: "ProgrammingAdvices", ar: "ProgrammingAdvices" },
+        content: {
+          en: "A progressive track from programming foundations to backend engineering.",
+          ar: "مسار متدرج من أساسيات البرمجة إلى هندسة الباك إند.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Programming Foundations — Levels 1 and 2",
+            ar: "أساسيات البرمجة — المستويان 1 و2",
+          },
+          {
+            en: "Algorithms & Problem Solving — Levels 1 through 6",
+            ar: "الخوارزميات وحل المشكلات — المستويات 1 إلى 6",
+          },
+          {
+            en: "C++ Programming — Levels 1 and 2",
+            ar: "برمجة C++ — المستويان 1 و2",
+          },
+          {
+            en: "OOP Concepts and Applications",
+            ar: "مفاهيم وتطبيقات البرمجة كائنية التوجه",
+          },
+          {
+            en: "Data Structures — Levels 1 and 2",
+            ar: "هياكل البيانات — المستويان 1 و2",
+          },
+          {
+            en: "C# Programming — Levels 1 and 2",
+            ar: "برمجة C# — المستويان 1 و2",
+          },
+          {
+            en: "SQL and Database Projects — Levels 1 and 2",
+            ar: "SQL ومشاريع قواعد البيانات — المستويان 1 و2",
+          },
+          {
+            en: "C# Database Connectivity and Full Real Project",
+            ar: "ربط C# بقواعد البيانات ومشروع عملي كامل",
+          },
+          {
+            en: "RESTful APIs, Secure APIs, and Windows Services",
+            ar: "RESTful APIs وتأمين APIs وخدمات Windows",
+          },
+          {
+            en: "SOLID Principles and EF Core Fundamentals",
+            ar: "مبادئ SOLID وأساسيات EF Core",
+          },
+          { en: "HTML and CSS Deep Dive", ar: "تعمق في HTML وCSS" },
+        ],
+      },
+    ],
+    tags: [
+      "certificates",
+      ".net",
+      "algorithms",
+      "database",
+      "frontend",
+      "unity",
+    ],
+    relatedFileIds: ["skill-dotnet-backend", "skill-engineering-practice"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "certifications",
+    children: [],
+  },
+  {
+    id: "obsidian-vault",
+    name: { en: "07 Obsidian Vault", ar: "07 خزانة Obsidian" },
+    type: "folder",
+    kind: "folder",
+    summary: {
+      en: "How Nour captures, organizes, connects, and retrieves technical knowledge.",
+      ar: "كيف يجمع نور المعرفة التقنية وينظمها ويربطها ويسترجعها.",
+    },
+    tags: ["obsidian", "vault", "knowledge management", "linked thinking"],
+    relatedFileIds: ["app-obsidian", "workflow-course-to-obsidian"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "this-pc",
+    children: ["obsidian-vault-overview"],
+  },
+  {
+    id: "obsidian-vault-overview",
+    name: { en: "How My Vault Works", ar: "كيف تعمل خزانتي" },
+    type: "file",
+    kind: "collection",
+    summary: {
+      en: "A technical learning system built around an extended PARA structure and linked notes.",
+      ar: "نظام تعلم تقني مبني على هيكل PARA موسع وملاحظات مترابطة.",
+    },
+    sections: [
+      {
+        heading: { en: "Structure", ar: "الهيكل" },
+        content: {
+          en: "The vault separates navigation, active projects, ongoing areas, reference material, archives, media, and an AI-assisted workspace layer.",
+          ar: "تفصل الخزانة بين التنقل والمشاريع النشطة والمجالات المستمرة والمواد المرجعية والأرشيف والوسائط وطبقة عمل بمساعدة الذكاء الاصطناعي.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Index — capture, templates, and navigation",
+            ar: "الفهرس — الجمع والقوالب والتنقل",
+          },
+          { en: "Projects — active outcomes", ar: "المشاريع — النتائج النشطة" },
+          {
+            en: "Areas — ongoing responsibilities and learning",
+            ar: "المجالات — المسؤوليات والتعلم المستمر",
+          },
+          {
+            en: "Resources — technical knowledge library",
+            ar: "المصادر — مكتبة المعرفة التقنية",
+          },
+          {
+            en: "Archive, Extras, and Agent workspace",
+            ar: "الأرشيف والإضافات ومساحة عمل الوكلاء",
+          },
+        ],
+      },
+      {
+        heading: { en: "Linked thinking", ar: "التفكير المترابط" },
+        content: {
+          en: "Wikilinks connect hub notes, projects, learning areas, resources, and workflows so related material can be reached from more than one path.",
+          ar: "تربط wikilinks ملاحظات المحاور والمشاريع ومجالات التعلم والمصادر وسير العمل حتى يمكن الوصول إلى المواد المرتبطة من أكثر من مسار.",
+        },
+      },
+      {
+        heading: { en: "Knowledge workflow", ar: "سير عمل المعرفة" },
+        content: {
+          en: "A repeatable path from raw input to reusable knowledge.",
+          ar: "مسار متكرر من المدخل الخام إلى معرفة قابلة لإعادة الاستخدام.",
+        },
+        kind: "steps",
+        items: [
+          {
+            en: "Capture material in the inbox or a project context.",
+            ar: "اجمع المادة في صندوق الوارد أو سياق مشروع.",
+          },
+          {
+            en: "Classify it into Projects, Areas, Resources, or Archive.",
+            ar: "صنفها إلى مشاريع أو مجالات أو مصادر أو أرشيف.",
+          },
+          {
+            en: "Connect related notes with links, tags, and frontmatter.",
+            ar: "اربط الملاحظات ذات الصلة بالروابط والوسوم والبيانات الوصفية.",
+          },
+          {
+            en: "Use queries, dashboards, and reviews to retrieve and maintain it.",
+            ar: "استخدم الاستعلامات ولوحات المتابعة والمراجعات لاسترجاعها وصيانتها.",
+          },
+        ],
+      },
+      {
+        heading: { en: "Tools inside the vault", ar: "أدوات داخل الخزانة" },
+        content: {
+          en: "Dataview, Tasks, Canvas, Templater, QuickAdd, Kanban, Excalidraw, Bases, RTL support, and GitHub Sync extend the plain-Markdown foundation.",
+          ar: "توسع Dataview وTasks وCanvas وTemplater وQuickAdd وKanban وExcalidraw وBases ودعم RTL وGitHub Sync أساس Markdown البسيط.",
+        },
+      },
+    ],
+    tags: ["obsidian", "para", "wikilinks", "dataview", "canvas", "pkm"],
+    relatedFileIds: [
+      "app-obsidian",
+      "workflow-course-to-obsidian",
+      "knowledge-met",
+    ],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "obsidian-vault",
+    children: [],
+  },
+  {
+    id: "app-antigravity",
+    name: { en: "Antigravity", ar: "Antigravity" },
+    type: "file",
+    kind: "document",
+    summary: {
+      en: "Google AI Pro backup for AI-assisted coding.",
+      ar: "أداة احتياطية للبرمجة بمساعدة الذكاء الاصطناعي عبر Google AI Pro.",
+    },
+    sections: [
+      {
+        heading: { en: "Place in the workflow", ar: "مكانها في سير العمل" },
+        content: {
+          en: "Nour uses Antigravity as a backup when his main AI coding tools run out, keeping development work moving through a second model ecosystem.",
+          ar: "يستخدم نور Antigravity كأداة احتياطية عند نفاد حدود أدوات البرمجة الأساسية بالذكاء الاصطناعي، ليستمر العمل عبر منظومة نماذج ثانية.",
+        },
+      },
+    ],
+    tags: ["ai", "google", "coding", "backup"],
+    relatedFileIds: ["ai-skills-overview"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "apps",
+    children: [],
+  },
+  {
+    id: "app-opencode",
+    name: { en: "OpenCode CLI", ar: "OpenCode CLI" },
+    type: "file",
+    kind: "document",
+    summary: {
+      en: "Terminal-native coding agent for end-to-end repository work.",
+      ar: "وكيل برمجة يعمل من الطرفية لإدارة العمل الكامل داخل المستودع.",
+    },
+    sections: [
+      {
+        heading: { en: "Why it is essential", ar: "لماذا هو أساسي" },
+        content: {
+          en: "OpenCode brings codebase exploration, implementation, commands, testing, review, and Git workflows into one model-agnostic terminal interface.",
+          ar: "يجمع OpenCode استكشاف قاعدة الكود والتنفيذ والأوامر والاختبارات والمراجعة وسير عمل Git في واجهة طرفية واحدة تدعم نماذج متعددة.",
+        },
+      },
+      {
+        heading: { en: "Core uses", ar: "الاستخدامات الأساسية" },
+        content: {
+          en: "Daily AI-assisted engineering tasks.",
+          ar: "مهام هندسية يومية بمساعدة الذكاء الاصطناعي.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Features, bug fixes, refactors, and migrations",
+            ar: "الميزات وإصلاح الأخطاء وإعادة الهيكلة والترحيل",
+          },
+          {
+            en: "Code review, testing, builds, and validation",
+            ar: "مراجعة الكود والاختبارات والبناء والتحقق",
+          },
+          {
+            en: "Repository-wide exploration and Git workflows",
+            ar: "استكشاف المستودع وسير عمل Git",
+          },
+        ],
+      },
+    ],
+    tags: ["ai", "cli", "coding agent", "terminal", "git"],
+    relatedFileIds: ["ai-skills-overview", "ai-agents-overview"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "apps",
+    children: [],
+  },
+  {
+    id: "app-notebooklm",
+    name: { en: "NotebookLM", ar: "NotebookLM" },
+    type: "file",
+    kind: "document",
+    summary: {
+      en: "Grounded research notebook with source citations.",
+      ar: "دفتر بحث يعتمد على المصادر ويقدم استشهادات.",
+    },
+    sections: [
+      {
+        heading: { en: "How it helps", ar: "كيف يساعد" },
+        content: {
+          en: "NotebookLM turns supplied documents, transcripts, pages, and videos into a focused conversational knowledge base whose answers cite the original material.",
+          ar: "يحول NotebookLM المستندات والنصوص والصفحات والفيديوهات المضافة إلى قاعدة معرفة حوارية مركزة تستشهد بالمادة الأصلية.",
+        },
+      },
+      {
+        heading: { en: "Core uses", ar: "الاستخدامات الأساسية" },
+        content: {
+          en: "Research and learning from large source sets.",
+          ar: "البحث والتعلم من مجموعات كبيرة من المصادر.",
+        },
+        kind: "list",
+        items: [
+          { en: "Course and lecture analysis", ar: "تحليل الدورات والمحاضرات" },
+          {
+            en: "Comparing evidence across sources",
+            ar: "مقارنة الأدلة بين المصادر",
+          },
+          {
+            en: "Following cited answers back to source material",
+            ar: "العودة من الإجابات المستشهدة إلى المادة المصدرية",
+          },
+        ],
+      },
+    ],
+    tags: ["ai", "research", "citations", "learning"],
+    relatedFileIds: ["knowledge-met", "workflow-review-quality"],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "apps",
+    children: [],
+  },
+  {
+    id: "app-hermes",
+    name: { en: "Hermes Agent", ar: "Hermes Agent" },
+    type: "file",
+    kind: "document",
+    summary: {
+      en: "Local personal agent with memory, schedules, skills, and tools.",
+      ar: "وكيل شخصي محلي بذاكرة ومهام مجدولة ومهارات وأدوات.",
+    },
+    sections: [
+      {
+        heading: { en: "What makes it different", ar: "ما الذي يميزه" },
+        content: {
+          en: "Hermes Agent combines persistent memory, scheduled tasks, reusable skills, terminal tools, messaging integrations, and sub-agent delegation in a customizable local framework.",
+          ar: "يجمع Hermes Agent الذاكرة المستمرة والمهام المجدولة والمهارات القابلة لإعادة الاستخدام وأدوات الطرفية وتكاملات المراسلة وتفويض الوكلاء في إطار محلي قابل للتخصيص.",
+        },
+      },
+      {
+        heading: { en: "Core uses", ar: "الاستخدامات الأساسية" },
+        content: {
+          en: "Long-running and repeatable assistance.",
+          ar: "مساعدة مستمرة وقابلة للتكرار.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Personal automation and scheduled workflows",
+            ar: "الأتمتة الشخصية وسير العمل المجدول",
+          },
+          {
+            en: "Research, note-taking, and coding support",
+            ar: "دعم البحث وتدوين الملاحظات والبرمجة",
+          },
+          {
+            en: "Multi-agent delegation for complex tasks",
+            ar: "تفويض متعدد الوكلاء للمهام المعقدة",
+          },
+        ],
+      },
+    ],
+    tags: ["ai", "agent", "memory", "automation", "skills"],
+    relatedFileIds: ["ai-agents-overview", "ai-skills-overview"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "apps",
