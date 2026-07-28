@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
-import type {
-  CaseStudy,
-  CaseStudyArchitecture,
-  CaseStudyDecision,
-  CaseStudyEvidence,
-  LocalizedCaseStudyText,
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  caseStudySlugs,
+  type CaseStudy,
+  type CaseStudyArchitecture,
+  type CaseStudyEvidence,
+  type LocalizedCaseStudyText,
 } from "@/content/case-studies";
 import { projects, type Project } from "@/content/portfolio";
 import type { Locale } from "@/i18n/routing";
@@ -19,32 +19,25 @@ const copy = {
     archive: "Pinboard archive / Engineering case study",
     file: "Investigation file",
     back: "Back to Pinboard",
-    visual: "View Visual Exploration",
     repository: "Repository",
     demo: "Verified live demo",
     type: "Project type",
     team: "Working context",
-    role: "Nour's role",
+    role: "My role",
     stack: "Technology",
     index: "Case study index",
     context: "Context",
     problem: "Problem",
-    investigation: "Investigation",
-    decisions: "Decisions",
-    solution: "Solution",
-    features: "Features",
+    investigation: "Problem Research",
+    solution: "How I Solved It",
     challenges: "Challenges",
-    quality: "Performance & safeguards",
+    quality: "Technical Safeguards",
     contribution: "My Contribution",
     outcome: "Outcome",
     evidence: "Related Evidence",
     constraints: "Operating constraints",
     affected: "Who was affected",
-    decision: "Selected approach",
-    alternatives: "Rejected / constrained alternatives",
-    rationale: "Why this approach",
-    tradeoff: "Trade-off",
-    architecture: "System architecture",
+    architecture: "System Architecture",
     architectureFlow: "Architecture flow",
     implementation: "Implementation note",
     response: "Engineering response",
@@ -56,36 +49,39 @@ const copy = {
     nextCase: "Next case study",
     caseNavigation: "Case study navigation",
     exhibit: "Evidence exhibit",
+    problemBrief: "Problem brief",
+    researchNotes: "Evidence / reasoning",
+    implementationFiles: "Implementation files",
+    systemMap: "System map",
+    diagnosticNotes: "Diagnostic notes",
+    qualityGates: "Quality gates",
+    ownershipRecord: "Ownership record",
+    closingRecord: "Closing record",
+    curatedMedia: "Curated project media",
+    issue: "Issue",
   },
   ar: {
     archive: "أرشيف اللوحة / دراسة حالة هندسية",
     file: "ملف التحقيق",
     back: "العودة إلى لوحة المشاريع",
-    visual: "عرض الاستكشاف البصري",
     repository: "المستودع",
     demo: "النسخة المنشورة المؤكدة",
     type: "نوع المشروع",
     team: "سياق العمل",
-    role: "دور نور",
+    role: "دوري",
     stack: "التقنيات",
     index: "فهرس دراسة الحالة",
     context: "السياق",
     problem: "المشكلة",
-    investigation: "التحقيق",
-    decisions: "القرارات",
-    solution: "الحل",
-    features: "الخصائص",
+    investigation: "بحث المشكلة",
+    solution: "كيف حللت المشكلة",
     challenges: "التحديات",
-    quality: "الأداء والحماية",
+    quality: "إجراءات الحماية التقنية",
     contribution: "مساهمتي",
     outcome: "النتيجة",
     evidence: "الأدلة المرتبطة",
     constraints: "قيود التشغيل",
     affected: "من تأثر بالمشكلة",
-    decision: "النهج المختار",
-    alternatives: "البدائل المرفوضة أو المقيدة",
-    rationale: "سبب الاختيار",
-    tradeoff: "المقايضة",
     architecture: "بنية النظام",
     architectureFlow: "تدفق البنية",
     implementation: "ملاحظة التنفيذ",
@@ -98,10 +94,44 @@ const copy = {
     nextCase: "دراسة الحالة التالية",
     caseNavigation: "التنقل بين دراسات الحالة",
     exhibit: "دليل المشروع",
+    problemBrief: "ملخص المشكلة",
+    researchNotes: "الأدلة والاستدلال",
+    implementationFiles: "ملفات التنفيذ",
+    systemMap: "خريطة النظام",
+    diagnosticNotes: "ملاحظات التشخيص",
+    qualityGates: "بوابات الجودة",
+    ownershipRecord: "سجل المساهمة",
+    closingRecord: "السجل الختامي",
+    curatedMedia: "وسائط المشروع المختارة",
+    issue: "مشكلة",
   },
 } as const;
 
 type SectionDefinition = { id: string; label: string };
+type DiagramPosition = { x: number; y: number };
+
+const diagramNodeWidth = 260;
+const diagramNodeHeight = 112;
+
+function architectureConnectionPath(
+  start: DiagramPosition,
+  end: DiagramPosition,
+) {
+  if (start.y === end.y) {
+    const movesRight = end.x > start.x;
+    const startX = start.x + (movesRight ? diagramNodeWidth : 0);
+    const endX = end.x + (movesRight ? 0 : diagramNodeWidth);
+    const centerY = start.y + diagramNodeHeight / 2;
+    const controlX = (startX + endX) / 2;
+    return `M ${startX} ${centerY} C ${controlX} ${centerY}, ${controlX} ${centerY}, ${endX} ${centerY}`;
+  }
+
+  const startX = start.x + diagramNodeWidth / 2;
+  const startY = start.y + diagramNodeHeight;
+  const endX = end.x + diagramNodeWidth / 2;
+  const controlY = (startY + end.y) / 2;
+  return `M ${startX} ${startY} C ${startX} ${controlY}, ${endX} ${controlY}, ${endX} ${end.y}`;
+}
 
 function localized(value: LocalizedCaseStudyText, locale: Locale) {
   return value[locale];
@@ -183,46 +213,6 @@ function EvidenceAsset({
   );
 }
 
-function DecisionCard({
-  decision,
-  locale,
-  labels,
-}: {
-  decision: CaseStudyDecision;
-  locale: Locale;
-  labels: (typeof copy)[Locale];
-}) {
-  return (
-    <article className={styles.decisionCard} data-reveal>
-      <span className={styles.decisionStamp}>{labels.decision}</span>
-      <h3>{localized(decision.title, locale)}</h3>
-      <p className={styles.decisionLead}>
-        {localized(decision.decision, locale)}
-      </p>
-      {decision.alternatives?.length ? (
-        <div className={styles.alternatives}>
-          <h4>{labels.alternatives}</h4>
-          <ul>
-            {decision.alternatives.map((alternative) => (
-              <li key={alternative.en}>{localized(alternative, locale)}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-      <dl>
-        <div>
-          <dt>{labels.rationale}</dt>
-          <dd>{localized(decision.rationale, locale)}</dd>
-        </div>
-        <div>
-          <dt>{labels.tradeoff}</dt>
-          <dd>{localized(decision.tradeoff, locale)}</dd>
-        </div>
-      </dl>
-    </article>
-  );
-}
-
 function ArchitectureMap({
   architecture,
   locale,
@@ -232,31 +222,89 @@ function ArchitectureMap({
   locale: Locale;
   flowLabel: string;
 }) {
-  const nodeLabels = new Map(
-    architecture.nodes.map((node) => [node.id, localized(node.label, locale)]),
+  const titleId = useId();
+  const markerId = useId().replaceAll(":", "");
+  const columns = Math.min(3, architecture.nodes.length);
+  const rows = Math.ceil(architecture.nodes.length / columns);
+  const width = 960;
+  const height = rows * 180 + 40;
+  const gapX = (width - columns * diagramNodeWidth) / (columns + 1);
+  const positions = new Map(
+    architecture.nodes.map((node, index) => {
+      const logicalColumn = index % columns;
+      const column =
+        locale === "ar" ? columns - logicalColumn - 1 : logicalColumn;
+      return [
+        node.id,
+        {
+          x: gapX + column * (diagramNodeWidth + gapX),
+          y: 42 + Math.floor(index / columns) * 180,
+        },
+      ];
+    }),
   );
 
   return (
     <figure className={styles.architectureMap} data-reveal>
-      <figcaption>{localized(architecture.summary, locale)}</figcaption>
-      <div className={styles.architectureNodes}>
-        {architecture.nodes.map((node, index) => (
-          <article key={node.id}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <h3>{localized(node.label, locale)}</h3>
-            <p>{localized(node.detail, locale)}</p>
-          </article>
-        ))}
+      <figcaption id={titleId}>
+        {localized(architecture.summary, locale)}
+      </figcaption>
+      <div className={styles.architectureCanvas}>
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-labelledby={titleId}
+          aria-label={flowLabel}
+        >
+          <defs>
+            <marker
+              id={markerId}
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="7"
+              markerHeight="7"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+          </defs>
+          <g className={styles.architectureConnections} aria-hidden="true">
+            {architecture.links.map(([from, to]) => {
+              const start = positions.get(from);
+              const end = positions.get(to);
+              if (!start || !end) return null;
+              return (
+                <path
+                  key={`${from}-${to}`}
+                  d={architectureConnectionPath(start, end)}
+                  markerEnd={`url(#${markerId})`}
+                />
+              );
+            })}
+          </g>
+          {architecture.nodes.map((node, index) => {
+            const position = positions.get(node.id)!;
+            return (
+              <foreignObject
+                key={node.id}
+                x={position.x}
+                y={position.y}
+                width={diagramNodeWidth}
+                height={diagramNodeHeight}
+              >
+                <article className={styles.architectureNode}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <div>
+                    <h3>{localized(node.label, locale)}</h3>
+                    <p>{localized(node.detail, locale)}</p>
+                  </div>
+                </article>
+              </foreignObject>
+            );
+          })}
+        </svg>
       </div>
-      <ol className={styles.architectureLinks} aria-label={flowLabel}>
-        {architecture.links.map(([from, to]) => (
-          <li key={`${from}-${to}`}>
-            <span>{nodeLabels.get(from)}</span>
-            <i aria-hidden="true" />
-            <span>{nodeLabels.get(to)}</span>
-          </li>
-        ))}
-      </ol>
     </figure>
   );
 }
@@ -269,11 +317,8 @@ function buildSections(study: CaseStudy, locale: Locale): SectionDefinition[] {
     { id: "context", label: labels.context },
     { id: "problem", label: labels.problem },
     { id: "investigation", label: labels.investigation },
-    ...(study.decisions?.length
-      ? [{ id: "decisions", label: labels.decisions }]
-      : []),
     { id: "solution", label: labels.solution },
-    { id: "features", label: labels.features },
+    { id: "architecture", label: labels.architecture },
     ...(study.challenges?.length
       ? [{ id: "challenges", label: labels.challenges }]
       : []),
@@ -302,10 +347,22 @@ export function CaseStudyExperience({
   const [activeSection, setActiveSection] = useState("context");
   const labels = copy[locale];
   const sections = useMemo(() => buildSections(study, locale), [locale, study]);
-  const projectIndex = projects.findIndex((item) => item.slug === project.slug);
+  const sectionNumber = (id: string) =>
+    String(sections.findIndex((section) => section.id === id) + 1).padStart(
+      2,
+      "0",
+    );
+  const caseProjects = projects.filter((item) =>
+    caseStudySlugs.includes(item.slug),
+  );
+  const projectIndex = caseProjects.findIndex(
+    (item) => item.slug === project.slug,
+  );
   const previous =
-    projects[(projectIndex - 1 + projects.length) % projects.length]!;
-  const next = projects[(projectIndex + 1) % projects.length]!;
+    caseProjects[
+      (projectIndex - 1 + caseProjects.length) % caseProjects.length
+    ]!;
+  const next = caseProjects[(projectIndex + 1) % caseProjects.length]!;
   const coverEvidence = study.evidence[0]!;
 
   useEffect(() => {
@@ -329,8 +386,7 @@ export function CaseStudyExperience({
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root || reducedMotion)
-      return;
+    if (!root || reducedMotion) return;
     let context: gsap.Context | undefined;
     let cancelled = false;
     void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
@@ -434,10 +490,6 @@ export function CaseStudyExperience({
                     <span aria-hidden="true">↗</span>
                   </a>
                 ) : null}
-                <Link href={`/${locale}/projects/${project.slug}`}>
-                  {labels.visual}
-                  <span aria-hidden="true">{locale === "ar" ? "←" : "→"}</span>
-                </Link>
               </div>
             </div>
             <figure className={styles.coverEvidence}>
@@ -484,7 +536,7 @@ export function CaseStudyExperience({
             className={styles.paperSection}
           >
             <SectionHeading
-              number="01"
+              number={sectionNumber("context")}
               eyebrow={labels.archive}
               title={labels.context}
             />
@@ -513,8 +565,8 @@ export function CaseStudyExperience({
             className={`${styles.paperSection} ${styles.problemSection}`}
           >
             <SectionHeading
-              number="02"
-              eyebrow="PROBLEM BRIEF"
+              number={sectionNumber("problem")}
+              eyebrow={labels.problemBrief}
               title={labels.problem}
             />
             <blockquote data-reveal>
@@ -539,8 +591,8 @@ export function CaseStudyExperience({
             className={styles.paperSection}
           >
             <SectionHeading
-              number="03"
-              eyebrow="EVIDENCE / REASONING"
+              number={sectionNumber("investigation")}
+              eyebrow={labels.researchNotes}
               title={labels.investigation}
             />
             <div className={styles.notePath}>
@@ -554,56 +606,15 @@ export function CaseStudyExperience({
             </div>
           </section>
 
-          {study.decisions?.length ? (
-            <section
-              id="decisions"
-              data-case-section
-              className={styles.paperSection}
-            >
-              <SectionHeading
-                number="04"
-                eyebrow="DECISION RECORD"
-                title={labels.decisions}
-              />
-              <div className={styles.decisionGrid}>
-                {study.decisions.map((decision) => (
-                  <DecisionCard
-                    key={decision.title.en}
-                    decision={decision}
-                    locale={locale}
-                    labels={labels}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
-
           <section
             id="solution"
             data-case-section
             className={styles.paperSection}
           >
             <SectionHeading
-              number="05"
-              eyebrow="SYSTEM MAP"
-              title={labels.architecture}
-            />
-            <ArchitectureMap
-              architecture={study.architecture}
-              locale={locale}
-              flowLabel={labels.architectureFlow}
-            />
-          </section>
-
-          <section
-            id="features"
-            data-case-section
-            className={styles.paperSection}
-          >
-            <SectionHeading
-              number="06"
-              eyebrow="IMPLEMENTATION FILES"
-              title={labels.features}
+              number={sectionNumber("solution")}
+              eyebrow={labels.implementationFiles}
+              title={labels.solution}
             />
             <div className={styles.featureFiles}>
               {study.features.map((feature, index) => (
@@ -620,6 +631,23 @@ export function CaseStudyExperience({
             </div>
           </section>
 
+          <section
+            id="architecture"
+            data-case-section
+            className={styles.paperSection}
+          >
+            <SectionHeading
+              number={sectionNumber("architecture")}
+              eyebrow={labels.systemMap}
+              title={labels.architecture}
+            />
+            <ArchitectureMap
+              architecture={study.architecture}
+              locale={locale}
+              flowLabel={labels.architectureFlow}
+            />
+          </section>
+
           {study.challenges?.length ? (
             <section
               id="challenges"
@@ -627,15 +655,17 @@ export function CaseStudyExperience({
               className={`${styles.paperSection} ${styles.challengeSection}`}
             >
               <SectionHeading
-                number="07"
-                eyebrow="DIAGNOSTIC NOTES"
+                number={sectionNumber("challenges")}
+                eyebrow={labels.diagnosticNotes}
                 title={labels.challenges}
               />
               <div className={styles.challengeList}>
                 {study.challenges.map((challenge, index) => (
                   <article key={challenge.title.en} data-reveal>
                     <div>
-                      <span>ISSUE {String(index + 1).padStart(2, "0")}</span>
+                      <span>
+                        {labels.issue} {String(index + 1).padStart(2, "0")}
+                      </span>
                       <h3>{localized(challenge.title, locale)}</h3>
                       <p>{localized(challenge.detail, locale)}</p>
                     </div>
@@ -656,8 +686,8 @@ export function CaseStudyExperience({
               className={styles.paperSection}
             >
               <SectionHeading
-                number="08"
-                eyebrow="QUALITY GATES"
+                number={sectionNumber("quality")}
+                eyebrow={labels.qualityGates}
                 title={labels.quality}
               />
               <div className={styles.qualityGrid}>
@@ -677,12 +707,14 @@ export function CaseStudyExperience({
             className={styles.paperSection}
           >
             <SectionHeading
-              number="09"
-              eyebrow="OWNERSHIP RECORD"
+              number={sectionNumber("contribution")}
+              eyebrow={labels.ownershipRecord}
               title={labels.contribution}
             />
             <div className={styles.contributionSheet} data-reveal>
-              <span className={styles.ownerStamp}>NOUR / VERIFIED SCOPE</span>
+              <span className={styles.ownerStamp}>
+                {locale === "ar" ? "نطاق مساهمتي المؤكد" : "MY VERIFIED SCOPE"}
+              </span>
               <p>{project.contribution[locale]}</p>
               <dl>
                 <div>
@@ -703,8 +735,8 @@ export function CaseStudyExperience({
             className={styles.paperSection}
           >
             <SectionHeading
-              number="10"
-              eyebrow="CLOSING RECORD"
+              number={sectionNumber("outcome")}
+              eyebrow={labels.closingRecord}
               title={labels.outcome}
             />
             <div className={styles.outcomeGrid}>
@@ -736,8 +768,8 @@ export function CaseStudyExperience({
               className={styles.paperSection}
             >
               <SectionHeading
-                number="11"
-                eyebrow="CURATED REPOSITORY MEDIA"
+                number={sectionNumber("evidence")}
+                eyebrow={labels.curatedMedia}
                 title={labels.evidence}
               />
               <div className={styles.evidenceGrid}>
@@ -778,9 +810,6 @@ export function CaseStudyExperience({
         </nav>
         <div>
           <Link href={`/${locale}?focus=projects`}>{labels.back}</Link>
-          <Link href={`/${locale}/projects/${project.slug}`}>
-            {labels.visual}
-          </Link>
         </div>
       </footer>
     </main>

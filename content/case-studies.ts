@@ -3,14 +3,6 @@ import type { Locale } from "@/i18n/routing";
 
 export type LocalizedCaseStudyText = Record<Locale, string>;
 
-export type CaseStudyDecision = {
-  title: LocalizedCaseStudyText;
-  decision: LocalizedCaseStudyText;
-  rationale: LocalizedCaseStudyText;
-  tradeoff: LocalizedCaseStudyText;
-  alternatives?: LocalizedCaseStudyText[];
-};
-
 export type CaseStudyArchitecture = {
   summary: LocalizedCaseStudyText;
   nodes: Array<{
@@ -53,7 +45,6 @@ export type CaseStudy = {
   audience: LocalizedCaseStudyText;
   constraints: LocalizedCaseStudyText[];
   investigation: DetailedPoint[];
-  decisions?: CaseStudyDecision[];
   architecture: CaseStudyArchitecture;
   features: FeatureStory[];
   challenges?: ChallengeStory[];
@@ -74,8 +65,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
     ),
     teamContext: text("Individual project", "مشروع فردي"),
     role: text(
-      "Product design, Angular interfaces, Express API, ingestion worker, compatibility rules, and shared Nx packages.",
-      "تصميم المنتج وواجهات Angular وواجهة Express وعامل جمع البيانات وقواعد التوافق وحزم Nx المشتركة.",
+      "I designed the product and built its Angular interfaces, Express API, ingestion worker, compatibility rules, and shared Nx packages.",
+      "صممت المنتج وبنيت واجهات Angular وواجهة Express وعامل جمع البيانات وقواعد التوافق وحزم Nx المشتركة.",
     ),
     problem: text(
       "Egyptian PC shoppers had to reconcile fragmented retailer catalogs, duplicate product listings, uneven specifications, and uncertain part compatibility on their own.",
@@ -103,8 +94,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Identity before aggregation", "الهوية قبل التجميع"),
         detail: text(
-          "Cross-store offers need exact product identity evidence before they can be presented as the same component.",
-          "تحتاج عروض المتاجر المختلفة إلى دليل دقيق على هوية المنتج قبل عرضها كمكوّن واحد.",
+          "I compared retailer naming and specification patterns to determine which facts could prove that two offers represented the same component.",
+          "قارنت أنماط التسمية والمواصفات بين المتاجر لأحدد الحقائق التي تثبت أن عرضين يمثلان المكوّن نفسه.",
         ),
       },
       {
@@ -113,8 +104,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "عدم اليقين حالة داخل المنتج",
         ),
         detail: text(
-          "Missing sockets, dimensions, wattage, or interface facts must remain visible instead of being interpreted as compatibility.",
-          "يجب أن تظل حقائق المقابس والأبعاد والطاقة والواجهات الناقصة ظاهرة بدلاً من تفسيرها كتوافق.",
+          "I traced compatibility rules back to their required sockets, dimensions, wattage, and interfaces, then treated every missing prerequisite as an explicit unknown.",
+          "تتبعت قواعد التوافق حتى بيانات المقابس والأبعاد والطاقة والواجهات المطلوبة، ثم عاملت كل متطلب ناقص كحالة غير معروفة صريحة.",
         ),
       },
       {
@@ -123,46 +114,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "فصل الطلبات عن جمع البيانات",
         ),
         detail: text(
-          "Catalog requests and long-running store ingestion have different reliability and execution needs.",
-          "تختلف احتياجات الاعتمادية والتنفيذ بين طلبات الكتالوج وعمليات جمع بيانات المتاجر الطويلة.",
-        ),
-      },
-    ],
-    decisions: [
-      {
-        title: text("Evidence-gated compatibility", "توافق مشروط بالأدلة"),
-        decision: text(
-          "Return compatible, warning, incompatible, or unknown with rule reasons and missing facts.",
-          "إرجاع متوافق أو تحذير أو غير متوافق أو غير معروف مع أسباب القاعدة والحقائق الناقصة.",
-        ),
-        rationale: text(
-          "Unknown preserves user trust when source coverage or verified precision is insufficient.",
-          "تحافظ حالة غير معروف على ثقة المستخدم عندما تكون تغطية المصادر أو دقتها غير كافية.",
-        ),
-        tradeoff: text(
-          "The interface exposes incomplete data rather than producing a simpler but misleading answer.",
-          "تعرض الواجهة نقص البيانات بدلاً من تقديم إجابة أبسط لكنها مضللة.",
-        ),
-        alternatives: [
-          text(
-            "Treat absent facts as compatible, rejected because absence is not evidence.",
-            "اعتبار الحقائق الغائبة متوافقة، وتم رفضه لأن الغياب ليس دليلاً.",
-          ),
-        ],
-      },
-      {
-        title: text("Dedicated ingestion worker", "عامل مستقل لجمع البيانات"),
-        decision: text(
-          "Keep discovery, capture, parsing, publishing, and fact extraction outside HTTP requests.",
-          "إبقاء الاكتشاف والالتقاط والتحليل والنشر واستخراج الحقائق خارج طلبات HTTP.",
-        ),
-        rationale: text(
-          "Store-scoped runs can be resumed and background jobs can be claimed independently by the worker.",
-          "يمكن استئناف عمليات كل متجر ومعالجة المهام الخلفية بشكل مستقل بواسطة العامل.",
-        ),
-        tradeoff: text(
-          "The system gains an additional runtime application and operational boundary.",
-          "يضيف النظام تطبيق تشغيل وحداً تشغيلياً إضافياً.",
+          "I separated interactive catalog requests from long-running store ingestion after mapping their different timeout, retry, and recovery needs.",
+          "فصلت طلبات الكتالوج التفاعلية عن جمع بيانات المتاجر الطويل بعد تحديد اختلاف احتياجات المهلة وإعادة المحاولة والاسترداد.",
         ),
       },
     ],
@@ -221,34 +174,34 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Persistent PC builder", "أداة تجميع مستمرة"),
         detail: text(
-          "Eight component slots retain a public build and its compatibility state.",
-          "تحتفظ ثمانية مواضع للمكونات بتجميعة عامة وحالة توافقها.",
+          "I built eight persistent component slots that retain a public build and its compatibility state.",
+          "بنيت ثمانية مواضع مستمرة للمكونات تحتفظ بالتجميعة العامة وحالة توافقها.",
         ),
         implementation: text(
-          "Candidate search, offer comparison, rule reasons, and missing facts are connected to each slot.",
-          "يرتبط البحث عن المرشحين ومقارنة العروض وأسباب القواعد والحقائق الناقصة بكل موضع.",
+          "I connected candidate search, offer comparison, rule reasons, and missing facts to each slot.",
+          "ربطت البحث عن المرشحين ومقارنة العروض وأسباب القواعد والحقائق الناقصة بكل موضع.",
         ),
       },
       {
         title: text("Multi-store catalog", "كتالوج متعدد المتاجر"),
         detail: text(
-          "Product pages combine verified specifications with known retailer offers.",
-          "تجمع صفحات المنتجات بين المواصفات المتحققة وعروض المتاجر المعروفة.",
+          "I combined verified specifications and known retailer offers on one product page.",
+          "جمعت المواصفات المتحققة وعروض المتاجر المعروفة في صفحة منتج واحدة.",
         ),
         implementation: text(
-          "Immutable snapshots, normalization, identity matching, and idempotent offer publishing preserve provenance.",
-          "تحافظ اللقطات غير القابلة للتغيير والتوحيد ومطابقة الهوية والنشر المتكرر بأمان على مصدر البيانات.",
+          "I preserved provenance with immutable snapshots, normalization, identity matching, and idempotent offer publishing.",
+          "حافظت على مصدر البيانات باستخدام لقطات غير قابلة للتغيير والتوحيد ومطابقة الهوية والنشر الآمن المتكرر للعروض.",
         ),
       },
       {
         title: text("Purchase plan", "خطة شراء"),
         detail: text(
-          "A completed build becomes a store-by-store purchase checklist.",
-          "تتحول التجميعة المكتملة إلى قائمة شراء منظمة حسب المتجر.",
+          "I turned a completed build into a store-by-store purchase checklist.",
+          "حوّلت التجميعة المكتملة إلى قائمة شراء منظمة حسب المتجر.",
         ),
         implementation: text(
-          "The plan includes quantities, retailer links, estimated total, JSON export, and print-to-PDF support.",
-          "تشمل الخطة الكميات وروابط المتاجر والإجمالي التقديري وتصدير JSON والطباعة إلى PDF.",
+          "I included quantities, retailer links, an estimated total, JSON export, and print-to-PDF support.",
+          "أضفت الكميات وروابط المتاجر والإجمالي التقديري وتصدير JSON والطباعة إلى PDF.",
         ),
       },
     ],
@@ -260,8 +213,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "تشابه الأسماء لا يثبت أن قائمتين من متجرين تمثلان المكوّن نفسه.",
         ),
         response: text(
-          "The pipeline requires exact identity evidence before offers are linked.",
-          "تتطلب المنظومة دليلاً دقيقاً على الهوية قبل ربط العروض.",
+          "I require exact identity evidence before the pipeline links offers.",
+          "أشترط دليلاً دقيقاً على الهوية قبل أن تربط المنظومة العروض.",
         ),
       },
       {
@@ -271,8 +224,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "لا يدعم كل مصدر اكتشافاً موثوقاً عبر HTTP مباشرة.",
         ),
         response: text(
-          "Specific adapters accept approved browser-capture manifests while retaining the same snapshot pipeline.",
-          "تقبل موصلات محددة قوائم لقطات متصفح معتمدة مع الحفاظ على مسار اللقطات نفسه.",
+          "I gave specific adapters an approved browser-capture input while retaining the same snapshot pipeline.",
+          "أضفت لموصلات محددة مدخل لقطات متصفح معتمدة مع الحفاظ على مسار اللقطات نفسه.",
         ),
       },
     ],
@@ -280,32 +233,32 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Security", "الأمان"),
         detail: text(
-          "Helmet, CORS, scrypt, opaque sessions, CSRF, and origin validation protect the administration surface.",
-          "تحمي Helmet وCORS وscrypt والجلسات غير الشفافة وCSRF والتحقق من المصدر واجهة الإدارة.",
+          "I protected the administration surface with Helmet, CORS, scrypt, opaque sessions, CSRF, and origin validation.",
+          "حميت واجهة الإدارة باستخدام Helmet وCORS وscrypt والجلسات غير الشفافة وCSRF والتحقق من المصدر.",
         ),
       },
       {
         title: text("Reliability", "الاعتمادية"),
         detail: text(
-          "Immutable snapshots, idempotent publishing, resumable runs, request IDs, and readiness/liveness endpoints make failures inspectable.",
-          "تجعل اللقطات غير القابلة للتغيير والنشر الآمن والاستئناف ومعرفات الطلب ونقاط الجاهزية الأعطال قابلة للفحص.",
+          "I made failures inspectable with immutable snapshots, idempotent publishing, resumable runs, request IDs, and readiness/liveness endpoints.",
+          "جعلت الأعطال قابلة للفحص باستخدام اللقطات غير القابلة للتغيير والنشر الآمن والاستئناف ومعرفات الطلب ونقاط الجاهزية.",
         ),
       },
       {
         title: text("Validation", "التحقق"),
         detail: text(
-          "The repository includes Vitest, MongoDB Memory Server, Playwright, axe-core, CI, and strict TypeScript.",
-          "يتضمن المستودع Vitest وMongoDB Memory Server وPlaywright وaxe-core وCI وTypeScript الصارم.",
+          "I configured Vitest, MongoDB Memory Server, Playwright, axe-core, CI, and strict TypeScript across the workspace.",
+          "أعددت Vitest وMongoDB Memory Server وPlaywright وaxe-core وCI وTypeScript الصارم عبر مساحة العمل.",
         ),
       },
     ],
     outcome: text(
-      "A public decision-support catalog, eight-slot builder, compatibility engine, purchase plan, admin console, and multi-store ingestion pipeline are implemented and documented.",
-      "تم تنفيذ وتوثيق كتالوج عام لدعم القرار وأداة تجميع بثمانية مواضع ومحرك توافق وخطة شراء ووحدة إدارة ومنظومة جمع متعددة المتاجر.",
+      "I implemented a public decision-support catalog, eight-slot builder, compatibility engine, purchase plan, admin console, and multi-store ingestion pipeline.",
+      "نفذت كتالوجاً عاماً لدعم القرار وأداة تجميع بثمانية مواضع ومحرك توافق وخطة شراء ووحدة إدارة ومنظومة جمع متعددة المتاجر.",
     ),
     nextStep: text(
-      "Compatibility remains evidence-gated; expanding reliable source facts is more important than presenting unsupported certainty.",
-      "يظل التوافق مشروطاً بالأدلة؛ وتوسيع الحقائق الموثوقة من المصادر أهم من تقديم يقين غير مدعوم.",
+      "My next step is to expand reliable source coverage while keeping every compatibility result gated by verified facts.",
+      "خطوتي التالية هي توسيع تغطية المصادر الموثوقة مع إبقاء كل نتيجة توافق مشروطة بحقائق متحققة.",
     ),
     evidence: [
       {
@@ -353,6 +306,30 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
         ),
         kind: "workflow",
       },
+      {
+        src: "/projects/buildsense/details/product-details.webp",
+        alt: text(
+          "BuildSense product details and offers",
+          "تفاصيل المنتج وعروض المتاجر في BuildSense",
+        ),
+        caption: text(
+          "Exhibit E / normalized product evidence",
+          "الدليل هـ / أدلة المنتج الموحدة",
+        ),
+        kind: "product",
+      },
+      {
+        src: "/projects/buildsense/details/comparison.webp",
+        alt: text(
+          "BuildSense component comparison",
+          "مقارنة المكونات في BuildSense",
+        ),
+        caption: text(
+          "Exhibit F / side-by-side component analysis",
+          "الدليل و / تحليل المكونات جنباً إلى جنب",
+        ),
+        kind: "workflow",
+      },
     ],
   },
   bookify: {
@@ -362,12 +339,12 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       "مشروع جماعي / .NET متكامل",
     ),
     teamContext: text(
-      "Six-person university team; Nour was team leader and backend contributor.",
-      "فريق جامعي من ستة أشخاص؛ كان نور قائد الفريق ومطوراً للباك إند.",
+      "I led a six-person university team and contributed to the backend.",
+      "قدت فريقاً جامعياً من ستة أشخاص وساهمت في تطوير الباك إند.",
     ),
     role: text(
-      "Backend, booking and payment flows, identity and security, backend architecture, and frontend leadership.",
-      "الباك إند وتدفقات الحجز والدفع والهوية والأمان وهندسة الباك إند وقيادة الواجهة الأمامية.",
+      "I owned the backend, booking and payment flows, identity and security, backend architecture, and frontend leadership.",
+      "توليت الباك إند وتدفقات الحجز والدفع والهوية والأمان وهندسة الباك إند وقيادة الواجهة الأمامية.",
     ),
     problem: text(
       "Customers need trustworthy date-based room availability and payment, while hotel staff need one controlled surface for rooms, bookings, refunds, and users.",
@@ -395,54 +372,22 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Booking integrity", "سلامة الحجز"),
         detail: text(
-          "Date-range search, availability checks, checkout, and payment confirmation must agree on the same room state.",
-          "يجب أن تتفق نتائج البحث حسب التاريخ وفحوصات التوفر وإتمام الحجز وتأكيد الدفع على حالة الغرفة نفسها.",
+          "I traced room state from date-range search through availability, checkout, and payment confirmation to identify every point where overlapping requests could diverge.",
+          "تتبعت حالة الغرفة من البحث حسب التاريخ مروراً بالتوفر وإتمام الحجز حتى تأكيد الدفع لتحديد كل نقطة قد تختلف فيها الطلبات المتداخلة.",
         ),
       },
       {
         title: text("Boundary security", "أمان الحدود"),
         detail: text(
-          "Forms, cookies, uploads, roles, and payment callbacks each require explicit validation and authorization.",
-          "تحتاج النماذج وملفات الارتباط والرفع والأدوار واستدعاءات الدفع إلى تحقق وصلاحيات صريحة.",
+          "I mapped forms, cookies, uploads, role boundaries, and payment callbacks separately because each crosses the application boundary differently.",
+          "حللت النماذج وملفات الارتباط والرفع وحدود الأدوار واستدعاءات الدفع بشكل منفصل لأن كل منها يعبر حدود التطبيق بطريقة مختلفة.",
         ),
       },
       {
         title: text("Operational visibility", "وضوح التشغيل"),
         detail: text(
-          "Database, email, and payment dependencies need independent health checks and structured logs.",
-          "تحتاج قاعدة البيانات والبريد والدفع إلى فحوصات صحة مستقلة وسجلات منظمة.",
-        ),
-      },
-    ],
-    decisions: [
-      {
-        title: text("N-tier boundaries", "حدود متعددة الطبقات"),
-        decision: text(
-          "Separate MVC presentation, services, and EF Core data access with repositories and Unit of Work.",
-          "فصل عرض MVC والخدمات والوصول للبيانات عبر EF Core باستخدام Repository وUnit of Work.",
-        ),
-        rationale: text(
-          "Business rules and integrations remain outside controllers while transactions coordinate repository work.",
-          "تظل قواعد الأعمال والتكاملات خارج وحدات التحكم بينما تنسق المعاملات عمل المستودعات.",
-        ),
-        tradeoff: text(
-          "More explicit layers and contracts increase project structure and navigation cost.",
-          "تزيد الطبقات والعقود الصريحة من حجم البنية وتكلفة التنقل داخل المشروع.",
-        ),
-      },
-      {
-        title: text("Stripe Payment Intents", "Stripe Payment Intents"),
-        decision: text(
-          "Use Payment Intents with confirmation and refund support rather than treating checkout as a local status change.",
-          "استخدام Payment Intents مع التأكيد والاسترداد بدلاً من معاملة الدفع كتغيير حالة محلي.",
-        ),
-        rationale: text(
-          "Payment lifecycle and idempotency remain aligned with the payment provider.",
-          "تظل دورة حياة الدفع والتكرار الآمن متوافقين مع مزود الدفع.",
-        ),
-        tradeoff: text(
-          "The booking workflow must handle an external state machine and configuration dependency.",
-          "يجب أن يتعامل تدفق الحجز مع آلة حالات خارجية واعتماد على الإعدادات.",
+          "I separated database, email, and payment readiness so one healthy web process could not hide a failed dependency.",
+          "فصلت جاهزية قاعدة البيانات والبريد والدفع حتى لا تخفي عملية ويب سليمة فشل أحد الاعتمادات.",
         ),
       },
     ],
@@ -498,34 +443,34 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Availability-led discovery", "اكتشاف قائم على التوفر"),
         detail: text(
-          "Guests search rooms by date range, type, price, and occupancy.",
-          "يبحث الضيوف عن الغرف حسب التاريخ والنوع والسعر والإشغال.",
+          "I built room discovery around date range, type, price, and occupancy instead of showing inventory that could not be booked.",
+          "بنيت اكتشاف الغرف حول التاريخ والنوع والسعر والإشغال بدلاً من عرض مخزون لا يمكن حجزه.",
         ),
         implementation: text(
-          "RoomAvailabilityService centralizes checks before room selection and booking.",
-          "تجمع RoomAvailabilityService فحوصات التوفر قبل اختيار الغرفة والحجز.",
+          "I centralized availability checks in RoomAvailabilityService before room selection and booking.",
+          "جمعت فحوصات التوفر داخل RoomAvailabilityService قبل اختيار الغرفة والحجز.",
         ),
       },
       {
         title: text("Booking and payment", "الحجز والدفع"),
         detail: text(
-          "A booking summary leads into Stripe payment and confirmation email.",
-          "يقود ملخص الحجز إلى الدفع عبر Stripe وبريد التأكيد.",
+          "I connected the booking summary to Stripe payment and confirmation email.",
+          "ربطت ملخص الحجز بالدفع عبر Stripe وبريد التأكيد.",
         ),
         implementation: text(
-          "Payment intents, idempotency support, booking status, payment history, and refund operations preserve the lifecycle.",
-          "تحافظ Payment Intents ودعم التكرار الآمن وحالة الحجز وسجل الدفع والاسترداد على دورة الحياة.",
+          "I preserved the lifecycle with Payment Intents, idempotency support, booking status, payment history, and refund operations.",
+          "حافظت على دورة الحياة باستخدام Payment Intents ودعم التكرار الآمن وحالة الحجز وسجل الدفع وعمليات الاسترداد.",
         ),
       },
       {
         title: text("Hotel administration", "إدارة الفندق"),
         detail: text(
-          "Staff manage rooms, room types, bookings, refunds, users, and operational summaries.",
-          "يدير الموظفون الغرف وأنواعها والحجوزات والاسترداد والمستخدمين والملخصات التشغيلية.",
+          "I gave staff one surface for rooms, room types, bookings, refunds, users, and operational summaries.",
+          "وفرت للموظفين واجهة واحدة للغرف وأنواعها والحجوزات والاسترداد والمستخدمين والملخصات التشغيلية.",
         ),
         implementation: text(
-          "Role-protected admin controllers use services and ViewModels rather than exposing entities directly.",
-          "تستخدم وحدات الإدارة المحمية بالأدوار الخدمات وViewModels بدلاً من كشف الكيانات مباشرة.",
+          "I protected admin controllers by role and passed ViewModels through services instead of exposing entities directly.",
+          "حميت وحدات تحكم الإدارة حسب الدور ومررت ViewModels عبر الخدمات بدلاً من كشف الكيانات مباشرة.",
         ),
       },
     ],
@@ -537,8 +482,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "قد تتغير حالة الغرفة بين البحث عن التوفر وإتمام الحجز.",
         ),
         response: text(
-          "The documented design uses RowVersion optimistic concurrency and coordinated transactions.",
-          "يستخدم التصميم الموثق RowVersion للتزامن التفاؤلي ومعاملات منسقة.",
+          "I used RowVersion optimistic concurrency and coordinated transactions to reject stale booking updates.",
+          "استخدمت RowVersion للتزامن التفاؤلي ومعاملات منسقة لرفض تحديثات الحجز القديمة.",
         ),
       },
       {
@@ -548,8 +493,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "تشغيل عملية الويب لا يضمن جاهزية قاعدة البيانات أو SendGrid أو Stripe.",
         ),
         response: text(
-          "Dedicated health checks report each dependency independently through a health UI.",
-          "تعرض فحوصات صحة مخصصة حالة كل اعتماد بشكل مستقل عبر واجهة الصحة.",
+          "I added dedicated health checks that report each dependency independently through a health UI.",
+          "أضفت فحوصات صحة مخصصة تعرض حالة كل اعتماد بشكل مستقل عبر واجهة الصحة.",
         ),
       },
     ],
@@ -557,32 +502,32 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Security", "الأمان"),
         detail: text(
-          "ASP.NET Identity, RBAC, lockout, secure cookies, antiforgery validation, Razor encoding, and upload validation protect account and admin workflows.",
-          "تحمي ASP.NET Identity وRBAC والقفل وملفات الارتباط الآمنة وAntiforgery وترميز Razor والتحقق من الرفع تدفقات الحساب والإدارة.",
+          "I protected account and admin workflows with ASP.NET Identity, RBAC, lockout, secure cookies, antiforgery validation, Razor encoding, and upload validation.",
+          "حميت تدفقات الحساب والإدارة باستخدام ASP.NET Identity وRBAC والقفل وملفات الارتباط الآمنة وAntiforgery وترميز Razor والتحقق من الرفع.",
         ),
       },
       {
         title: text("Data integrity", "سلامة البيانات"),
         detail: text(
-          "EF Core parameterization, ViewModels, RowVersion, Unit of Work, and migrations keep input and persistence boundaries explicit.",
-          "تجعل معلمات EF Core وViewModels وRowVersion وUnit of Work والترحيلات حدود الإدخال والتخزين صريحة.",
+          "I kept input and persistence boundaries explicit with EF Core parameterization, ViewModels, RowVersion, Unit of Work, and migrations.",
+          "أبقيت حدود الإدخال والتخزين صريحة باستخدام معلمات EF Core وViewModels وRowVersion وUnit of Work والترحيلات.",
         ),
       },
       {
         title: text("Operations", "التشغيل"),
         detail: text(
-          "Serilog rolling logs and database, payment, and email health checks expose system state.",
-          "تكشف سجلات Serilog الدورية وفحوصات قاعدة البيانات والدفع والبريد حالة النظام.",
+          "I exposed system state through Serilog rolling logs and database, payment, and email health checks.",
+          "أظهرت حالة النظام من خلال سجلات Serilog الدورية وفحوصات قاعدة البيانات والدفع والبريد.",
         ),
       },
     ],
     outcome: text(
-      "The team delivered customer booking and payment journeys plus an administration surface for rooms, bookings, refunds, users, and operational views.",
-      "سلّم الفريق تدفقات الحجز والدفع للعملاء إلى جانب واجهة إدارة للغرف والحجوزات والاسترداد والمستخدمين والمشاهد التشغيلية.",
+      "Our team delivered customer booking and payment journeys plus an administration surface for rooms, bookings, refunds, users, and operational views.",
+      "سلّم فريقنا تدفقات الحجز والدفع للعملاء إلى جانب واجهة إدارة للغرف والحجوزات والاسترداد والمستخدمين والمشاهد التشغيلية.",
     ),
     nextStep: text(
-      "The previously listed deployment was unreachable during review, so the repository remains the verified delivery evidence.",
-      "تعذر الوصول إلى النسخة المنشورة المذكورة سابقاً أثناء المراجعة، لذلك يظل المستودع هو دليل التسليم المتحقق منه.",
+      "My next technical step is to add automated integration coverage for overlapping bookings, payment confirmation, and refund recovery.",
+      "خطوتي التقنية التالية هي إضافة اختبارات تكامل آلية للحجوزات المتداخلة وتأكيد الدفع واسترداد المبالغ.",
     ),
     evidence: [
       {
@@ -604,23 +549,47 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
         kind: "workflow",
       },
       {
-        src: "/case-studies/bookify/database-erd.webp",
-        alt: text(
-          "Bookify database relationship diagram",
-          "مخطط علاقات قاعدة بيانات Bookify",
-        ),
-        caption: text(
-          "Exhibit C / persistent domain",
-          "الدليل ج / نطاق البيانات الدائم",
-        ),
-        kind: "architecture",
-      },
-      {
         src: "/case-studies/bookify/admin-dashboard.webp",
         alt: text("Bookify administration dashboard", "لوحة إدارة Bookify"),
         caption: text(
-          "Exhibit D / staff operations",
-          "الدليل د / عمليات الموظفين",
+          "Exhibit C / staff operations",
+          "الدليل ج / عمليات الموظفين",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/bookify/details/06-managebooking.webp",
+        alt: text("Bookify booking management", "إدارة الحجوزات في Bookify"),
+        caption: text(
+          "Exhibit D / booking operations",
+          "الدليل د / عمليات الحجز",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/bookify/details/07-managerooms.webp",
+        alt: text("Bookify room management", "إدارة الغرف في Bookify"),
+        caption: text(
+          "Exhibit E / room inventory controls",
+          "الدليل هـ / التحكم في مخزون الغرف",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/bookify/details/09-paymentconfrimation.webp",
+        alt: text("Bookify payment confirmation", "تأكيد الدفع في Bookify"),
+        caption: text(
+          "Exhibit F / payment completion",
+          "الدليل و / إتمام الدفع",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/bookify/details/14-usermanagment.webp",
+        alt: text("Bookify user management", "إدارة المستخدمين في Bookify"),
+        caption: text(
+          "Exhibit G / role-controlled accounts",
+          "الدليل ز / حسابات محكومة بالأدوار",
         ),
         kind: "workflow",
       },
@@ -633,12 +602,12 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       "مشروع جامعي جماعي / عمليات مكتبية",
     ),
     teamContext: text(
-      "Two contributors are listed in the public repository.",
-      "يذكر المستودع العام مساهمين اثنين.",
+      "I built this university project with one teammate.",
+      "بنيت هذا المشروع الجامعي مع زميل واحد.",
     ),
     role: text(
-      "Nour reports implementing most of the system; sole ownership is not claimed.",
-      "يذكر نور أنه نفذ معظم النظام ولا يدعي الملكية الفردية الكاملة.",
+      "I implemented most of the system as part of the team; responsibility was shared.",
+      "نفذت معظم النظام ضمن الفريق؛ وكانت المسؤولية مشتركة.",
     ),
     problem: text(
       "Blood-bank staff need one traceable workflow for donors, units, tests, inventory, patients, transfusions, and employee access.",
@@ -662,35 +631,22 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Unit lifecycle", "دورة حياة الوحدة"),
         detail: text(
-          "A blood unit must remain traceable from donation through testing, inventory, transfusion, or disposal.",
-          "يجب أن تظل وحدة الدم قابلة للتتبع من التبرع عبر الفحص والمخزون ونقل الدم أو التخلص منها.",
+          "I mapped every blood-unit transition from donation through testing, inventory, transfusion, or disposal so no screen could bypass its lifecycle.",
+          "رسمت كل انتقال لوحدة الدم من التبرع عبر الفحص والمخزون ونقل الدم أو التخلص منها حتى لا تتجاوز أي شاشة دورة حياتها.",
         ),
       },
       {
         title: text("Operational roles", "الأدوار التشغيلية"),
         detail: text(
-          "Staff accounts need controlled access to donor, patient, inventory, and reporting capabilities.",
-          "تحتاج حسابات الموظفين إلى وصول محكوم لوظائف المتبرعين والمرضى والمخزون والتقارير.",
+          "I separated donor, patient, inventory, and reporting capabilities to identify the access each staff role actually needed.",
+          "فصلت وظائف المتبرعين والمرضى والمخزون والتقارير لأحدد الوصول الذي يحتاجه كل دور وظيفي فعلياً.",
         ),
       },
-    ],
-    decisions: [
       {
-        title: text(
-          "Three-tier desktop architecture",
-          "بنية مكتبية ثلاثية الطبقات",
-        ),
-        decision: text(
-          "Separate Windows Forms presentation, business rules, and SQL Server data access.",
-          "فصل عرض Windows Forms وقواعد الأعمال والوصول إلى SQL Server.",
-        ),
-        rationale: text(
-          "Compatibility, expiration, validation, and allocation rules stay outside form event handlers.",
-          "تبقى قواعد التوافق والصلاحية والتحقق والتخصيص خارج معالجات أحداث النماذج.",
-        ),
-        tradeoff: text(
-          "The solution carries explicit projects and mappings across each layer.",
-          "يحمل الحل مشاريع وربطاً صريحاً عبر كل طبقة.",
+        title: text("Safe allocation rules", "قواعد التخصيص الآمن"),
+        detail: text(
+          "I traced matching from patient request to compatibility, test result, expiry, availability, and final unit allocation.",
+          "تتبعت المطابقة من طلب المريض إلى التوافق ونتيجة الفحص والصلاحية والتوفر ثم التخصيص النهائي للوحدة.",
         ),
       },
     ],
@@ -731,23 +687,64 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Donation and inventory", "التبرع والمخزون"),
         detail: text(
-          "Staff register donors, process donations, test units, and monitor stock and expiry.",
-          "يسجل الموظفون المتبرعين ويعالجون التبرعات ويفحصون الوحدات ويراقبون المخزون والصلاحية.",
+          "I connected donor registration, donation processing, unit testing, stock monitoring, and expiry in one workflow.",
+          "ربطت تسجيل المتبرع ومعالجة التبرع وفحص الوحدة ومراقبة المخزون والصلاحية في تدفق واحد.",
         ),
         implementation: text(
-          "Business rules cover compatibility, automatic expiry detection, test results, low-stock alerts, and unit status.",
-          "تغطي قواعد الأعمال التوافق واكتشاف انتهاء الصلاحية ونتائج الفحص وتنبيهات المخزون وحالة الوحدة.",
+          "I kept compatibility, automatic expiry detection, test results, low-stock alerts, and unit status in the business layer.",
+          "أبقيت التوافق واكتشاف انتهاء الصلاحية ونتائج الفحص وتنبيهات المخزون وحالة الوحدة داخل طبقة الأعمال.",
         ),
       },
       {
         title: text("Transfusion workflow", "تدفق نقل الدم"),
         detail: text(
-          "Patient requests connect to matching and blood-unit allocation.",
-          "ترتبط طلبات المرضى بالمطابقة وتخصيص وحدات الدم.",
+          "I connected patient requests to matching and blood-unit allocation.",
+          "ربطت طلبات المرضى بالمطابقة وتخصيص وحدات الدم.",
         ),
         implementation: text(
-          "The system records request, match, allocation, and transfusion history through the same operational domain.",
-          "يسجل النظام الطلب والمطابقة والتخصيص وسجل نقل الدم داخل النطاق التشغيلي نفسه.",
+          "I recorded the request, match, allocation, and transfusion history in the same operational domain.",
+          "سجلت الطلب والمطابقة والتخصيص وسجل نقل الدم داخل النطاق التشغيلي نفسه.",
+        ),
+      },
+    ],
+    challenges: [
+      {
+        title: text(
+          "Blood-unit lifecycle integrity",
+          "سلامة دورة حياة وحدة الدم",
+        ),
+        detail: text(
+          "Testing, expiry, allocation, transfusion, and disposal can all change whether a unit is usable.",
+          "يمكن للفحص والصلاحية والتخصيص ونقل الدم والتخلص أن تغيّر جميعها صلاحية استخدام الوحدة.",
+        ),
+        response: text(
+          "I centralized these transitions in business-layer rules and retained the unit history instead of deriving state from individual forms.",
+          "جمعت هذه الانتقالات في قواعد طبقة الأعمال واحتفظت بسجل الوحدة بدلاً من اشتقاق حالتها من النماذج الفردية.",
+        ),
+      },
+      {
+        title: text(
+          "Compatible does not mean available",
+          "التوافق لا يعني التوفر",
+        ),
+        detail: text(
+          "A compatible unit can still be expired, untested, allocated, or unavailable.",
+          "قد تكون الوحدة المتوافقة منتهية أو غير مفحوصة أو مخصصة أو غير متاحة.",
+        ),
+        response: text(
+          "I required compatibility, accepted test results, valid expiry, and available status before allocation.",
+          "اشترطت التوافق ونتائج فحص مقبولة وصلاحية سارية وحالة متاحة قبل التخصيص.",
+        ),
+      },
+      {
+        title: text("Role-sensitive records", "سجلات حساسة حسب الدور"),
+        detail: text(
+          "Donor medical data, patient requests, employee records, and reports should not share unrestricted access.",
+          "لا ينبغي أن تتشارك بيانات المتبرعين الطبية وطلبات المرضى وسجلات الموظفين والتقارير وصولاً غير مقيد.",
+        ),
+        response: text(
+          "I combined authentication, role-based access, input sanitization, and audit logging around critical operations.",
+          "جمعت المصادقة والصلاحيات حسب الدور وتنقية المدخلات وسجل التدقيق حول العمليات الحرجة.",
         ),
       },
     ],
@@ -755,25 +752,25 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Security", "الأمان"),
         detail: text(
-          "The repository documents authentication, role-based access, sanitization, and audit logging for critical operations.",
-          "يوثق المستودع المصادقة والصلاحيات حسب الدور وتنقية البيانات وسجل التدقيق للعمليات الحرجة.",
+          "I applied authentication, role-based access, input sanitization, and audit logging to critical operations.",
+          "طبقت المصادقة والصلاحيات حسب الدور وتنقية المدخلات وسجل التدقيق على العمليات الحرجة.",
         ),
       },
       {
         title: text("Reliability", "الاعتمادية"),
         detail: text(
-          "Expiration detection and unit traceability keep inventory state connected to operational history.",
-          "يربط اكتشاف انتهاء الصلاحية وتتبع الوحدات حالة المخزون بالسجل التشغيلي.",
+          "I connected inventory state to operational history through automatic expiry detection and unit traceability.",
+          "ربطت حالة المخزون بالسجل التشغيلي من خلال اكتشاف انتهاء الصلاحية تلقائياً وتتبع الوحدات.",
         ),
       },
     ],
     outcome: text(
-      "The team delivered a three-tier desktop system covering donor, patient, employee, unit, donation, transfusion, matching, and reporting workflows.",
-      "سلّم الفريق نظاماً مكتبياً ثلاثي الطبقات يغطي تدفقات المتبرعين والمرضى والموظفين والوحدات والتبرع ونقل الدم والمطابقة والتقارير.",
+      "Our team delivered a three-tier desktop system covering donor, patient, employee, unit, donation, transfusion, matching, and reporting workflows.",
+      "سلّم فريقنا نظاماً مكتبياً ثلاثي الطبقات يغطي تدفقات المتبرعين والمرضى والموظفين والوحدات والتبرع ونقل الدم والمطابقة والتقارير.",
     ),
     nextStep: text(
-      "Exact teammate attribution, test coverage, and a code-verified cross-platform architecture diagram remain documentation gaps.",
-      "ما زال توثيق مساهمات أعضاء الفريق وتغطية الاختبارات ومخطط بنية متعدد المنصات متحقق منه من الكود غير مكتمل.",
+      "My next technical step is to add automated lifecycle tests for compatibility, expiry, allocation, transfusion, and disposal transitions.",
+      "خطوتي التقنية التالية هي إضافة اختبارات آلية لدورة الحياة تشمل التوافق والصلاحية والتخصيص ونقل الدم والتخلص.",
     ),
     evidence: [
       {
@@ -788,6 +785,51 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
         ),
         kind: "workflow",
       },
+      {
+        src: "/projects/blood-bank-desktop/details/03-donate.webp",
+        alt: text(
+          "Blood Bank donation workflow",
+          "تدفق التبرع في نظام بنك الدم",
+        ),
+        caption: text(
+          "Exhibit B / donation processing",
+          "الدليل ب / معالجة التبرع",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/blood-bank-desktop/details/05-findamatch.webp",
+        alt: text(
+          "Blood Bank compatibility matching",
+          "مطابقة التوافق في نظام بنك الدم",
+        ),
+        caption: text(
+          "Exhibit C / compatible-unit search",
+          "الدليل ج / البحث عن وحدة متوافقة",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/blood-bank-desktop/details/07-managedonors.webp",
+        alt: text(
+          "Blood Bank donor management",
+          "إدارة المتبرعين في نظام بنك الدم",
+        ),
+        caption: text(
+          "Exhibit D / donor records",
+          "الدليل د / سجلات المتبرعين",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/blood-bank-desktop/details/08-matchfound.webp",
+        alt: text("Blood Bank matched unit result", "نتيجة مطابقة وحدة دم"),
+        caption: text(
+          "Exhibit E / allocation candidate",
+          "الدليل هـ / وحدة مرشحة للتخصيص",
+        ),
+        kind: "workflow",
+      },
     ],
   },
   "blood-bank-mobile": {
@@ -797,12 +839,12 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       "مشروع جامعي جماعي / موبايل وAPI",
     ),
     teamContext: text(
-      "Part of the wider university Blood Bank platform.",
-      "جزء من منصة بنك الدم الجامعية الأوسع.",
+      "I built this with my university team as part of the wider Blood Bank platform.",
+      "بنيت هذا الجزء مع فريقي الجامعي ضمن منصة بنك الدم الأوسع.",
     ),
     role: text(
-      "Nour reports implementing most of the wider platform; module ownership percentages are not published.",
-      "يذكر نور أنه نفذ معظم المنصة الأوسع ولا تُنشر نسب ملكية الوحدات.",
+      "I implemented most of the wider platform as part of the team; responsibility was shared across modules.",
+      "نفذت معظم المنصة الأوسع ضمن الفريق؛ وكانت المسؤولية مشتركة عبر الوحدات.",
     ),
     problem: text(
       "Donors need mobile access to registration, appointments, history, and updates that remains connected to staff operations.",
@@ -829,15 +871,15 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "حالة الموعد من البداية للنهاية",
         ),
         detail: text(
-          "A mobile booking becomes staff-visible work, then a processed donation and donor update.",
-          "يتحول الحجز عبر الموبايل إلى عمل ظاهر للموظف ثم تبرع معالج وتحديث للمتبرع.",
+          "I traced a booking from the donor's phone to staff-visible work, donation processing, history, and the final donor update.",
+          "تتبعت الحجز من هاتف المتبرع إلى العمل الظاهر للموظف ومعالجة التبرع والسجل والتحديث النهائي للمتبرع.",
         ),
       },
       {
         title: text("Mobile service boundary", "حد خدمات الموبايل"),
         detail: text(
-          "Screens and Provider state should consume structured REST services rather than database concerns.",
-          "يجب أن تستهلك الشاشات وحالة Provider خدمات REST منظمة بدلاً من تفاصيل قاعدة البيانات.",
+          "I separated screen state, Provider responsibilities, REST services, and persistence concerns before mapping the mobile flows.",
+          "فصلت حالة الشاشات ومسؤوليات Provider وخدمات REST واهتمامات التخزين قبل رسم تدفقات الموبايل.",
         ),
       },
     ],
@@ -878,34 +920,34 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Donor account", "حساب المتبرع"),
         detail: text(
-          "Registration, login, profile, blood details, and donation history are available on mobile.",
-          "يتوفر التسجيل والدخول والملف وبيانات الدم وسجل التبرع على الموبايل.",
+          "I connected registration, login, profile, blood details, and donation history in the donor account experience.",
+          "ربطت التسجيل والدخول والملف وبيانات الدم وسجل التبرع داخل تجربة حساب المتبرع.",
         ),
         implementation: text(
-          "Flutter organizes models, routes, screens, services, widgets, and Provider state around REST responses.",
-          "ينظم Flutter النماذج والمسارات والشاشات والخدمات والعناصر وحالة Provider حول استجابات REST.",
+          "I organized Flutter models, routes, screens, services, widgets, and Provider state around structured REST responses.",
+          "نظمت نماذج Flutter والمسارات والشاشات والخدمات والعناصر وحالة Provider حول استجابات REST منظمة.",
         ),
       },
       {
         title: text("Appointment workflow", "تدفق الموعد"),
         detail: text(
-          "Donors select a date, time, and location and receive a confirmation state.",
-          "يختار المتبرع التاريخ والوقت والموقع ويحصل على حالة تأكيد.",
+          "I built a scheduling flow for selecting a date, time, and location and receiving a confirmation state.",
+          "بنيت تدفق جدولة لاختيار التاريخ والوقت والموقع والحصول على حالة تأكيد.",
         ),
         implementation: text(
-          "The API persists the appointment for staff processing against the shared database.",
-          "تحفظ API الموعد لمعالجته بواسطة الموظفين في قاعدة البيانات المشتركة.",
+          "I persisted the appointment through the API so staff could process the same record from the shared database.",
+          "حفظت الموعد عبر API حتى يعالج الموظفون السجل نفسه من قاعدة البيانات المشتركة.",
         ),
       },
       {
         title: text("Notifications", "الإشعارات"),
         detail: text(
-          "The interface includes appointment, request, and system notification states.",
-          "تتضمن الواجهة حالات إشعارات المواعيد والطلبات والنظام.",
+          "I included appointment, request, and system notification states in the interface.",
+          "أضفت حالات إشعارات المواعيد والطلبات والنظام إلى الواجهة.",
         ),
         implementation: text(
-          "Published documentation describes notification flows, while deployment behavior remains an evidence gap.",
-          "يصف التوثيق المنشور تدفقات الإشعارات بينما يظل سلوك النشر فجوة في الأدلة.",
+          "The notification models and screens keep those update types distinct in the donor experience.",
+          "تحافظ نماذج الإشعارات وشاشاتها على فصل أنواع التحديث داخل تجربة المتبرع.",
         ),
       },
     ],
@@ -917,8 +959,30 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "يجب أن يتحول إجراء المتبرع إلى عمل متسق داخل تطبيق مكتبي منفصل.",
         ),
         response: text(
-          "Both clients connect through the documented API/shared SQL Server workflow instead of maintaining isolated records.",
-          "يتصل العميلان عبر تدفق API وSQL Server المشترك الموثق بدلاً من الاحتفاظ بسجلات معزولة.",
+          "I connected both clients to the API and shared SQL Server workflow instead of maintaining isolated records.",
+          "ربطت العميلين بواجهة API وتدفق SQL Server المشترك بدلاً من الاحتفاظ بسجلات معزولة.",
+        ),
+      },
+      {
+        title: text("Network authentication state", "حالة المصادقة عبر الشبكة"),
+        detail: text(
+          "Login, profile, and protected donor data must remain coherent when requests fail or sessions expire.",
+          "يجب أن تظل بيانات الدخول والملف وبيانات المتبرع المحمية متسقة عند فشل الطلبات أو انتهاء الجلسة.",
+        ),
+        response: text(
+          "I kept authentication in the API boundary with JWT, CORS policy, structured errors, and explicit client service handling.",
+          "أبقيت المصادقة عند حدود API باستخدام JWT وسياسة CORS وأخطاء منظمة ومعالجة صريحة داخل خدمات العميل.",
+        ),
+      },
+      {
+        title: text("Growing mobile state", "نمو حالة تطبيق الموبايل"),
+        detail: text(
+          "Accounts, appointments, history, and notifications can couple screens directly to transport code.",
+          "قد تربط الحسابات والمواعيد والسجل والإشعارات الشاشات مباشرة بكود النقل.",
+        ),
+        response: text(
+          "I separated models, Provider state, services, routes, screens, and reusable widgets by responsibility.",
+          "فصلت النماذج وحالة Provider والخدمات والمسارات والشاشات والعناصر القابلة لإعادة الاستخدام حسب المسؤولية.",
         ),
       },
     ],
@@ -926,25 +990,25 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("API security", "أمان API"),
         detail: text(
-          "The repository documents JWT authentication, CORS support, Swagger, and structured error handling.",
-          "يوثق المستودع مصادقة JWT ودعم CORS وSwagger ومعالجة الأخطاء المنظمة.",
+          "I used JWT authentication, CORS policy, Swagger contracts, and structured error handling at the API boundary.",
+          "استخدمت مصادقة JWT وسياسة CORS وعقود Swagger ومعالجة الأخطاء المنظمة عند حدود API.",
         ),
       },
       {
         title: text("Maintainability", "قابلية الصيانة"),
         detail: text(
-          "Models, providers, routes, screens, services, utilities, and widgets have explicit Flutter responsibilities.",
-          "للنماذج وProvider والمسارات والشاشات والخدمات والأدوات والعناصر مسؤوليات Flutter صريحة.",
+          "I assigned explicit Flutter responsibilities to models, providers, routes, screens, services, utilities, and widgets.",
+          "حددت مسؤوليات Flutter صريحة للنماذج وProvider والمسارات والشاشات والخدمات والأدوات والعناصر.",
         ),
       },
     ],
     outcome: text(
-      "The repository delivers a donor-facing Flutter application, ASP.NET Core API, shared database setup, and documented appointment-to-donation workflow.",
-      "يقدم المستودع تطبيق Flutter للمتبرعين وواجهة ASP.NET Core وإعداد قاعدة بيانات مشتركة وتدفقاً موثقاً من الموعد إلى التبرع.",
+      "Our platform includes a donor-facing Flutter application, ASP.NET Core API, shared database, and an appointment-to-donation workflow connected to staff operations.",
+      "تتضمن منصتنا تطبيق Flutter للمتبرعين وواجهة ASP.NET Core وقاعدة بيانات مشتركة وتدفقاً من الموعد إلى التبرع متصلاً بعمليات الموظفين.",
     ),
     nextStep: text(
-      "Notification behavior, deployment status, automated tests, and the exact desktop/API/mobile data flow need stronger published evidence.",
-      "تحتاج الإشعارات وحالة النشر والاختبارات الآلية وتدفق البيانات الدقيق بين سطح المكتب وAPI والموبايل إلى أدلة منشورة أقوى.",
+      "My next technical step is to add automated API and client-state tests for authentication expiry and appointment transitions across both clients.",
+      "خطوتي التقنية التالية هي إضافة اختبارات آلية لواجهة API وحالة العميل لانتهاء المصادقة وانتقالات المواعيد عبر العميلين.",
     ),
     evidence: [
       {
@@ -980,6 +1044,39 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
         kind: "workflow",
         portrait: true,
       },
+      {
+        src: "/projects/blood-bank-mobile/details/02-login.webp",
+        alt: text("Blood Bank mobile login", "تسجيل الدخول في تطبيق بنك الدم"),
+        caption: text(
+          "Exhibit D / donor authentication",
+          "الدليل د / مصادقة المتبرع",
+        ),
+        kind: "workflow",
+        portrait: true,
+      },
+      {
+        src: "/projects/blood-bank-mobile/details/03-register.webp",
+        alt: text(
+          "Blood Bank donor registration",
+          "تسجيل المتبرع في تطبيق بنك الدم",
+        ),
+        caption: text(
+          "Exhibit E / account registration",
+          "الدليل هـ / تسجيل الحساب",
+        ),
+        kind: "workflow",
+        portrait: true,
+      },
+      {
+        src: "/projects/blood-bank-mobile/details/06-profile.webp",
+        alt: text("Blood Bank donor profile", "ملف المتبرع في تطبيق بنك الدم"),
+        caption: text(
+          "Exhibit F / donor profile state",
+          "الدليل و / حالة ملف المتبرع",
+        ),
+        kind: "product",
+        portrait: true,
+      },
     ],
   },
   dvld: {
@@ -989,12 +1086,12 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       "نظام مكتبي / نطاق كثيف القواعد",
     ),
     teamContext: text(
-      "Contributor breakdown is not published.",
-      "لا ينشر المستودع توزيعاً للمساهمين.",
+      "I developed this as a supporting .NET desktop project.",
+      "طورت هذا النظام كمشروع مكتبي داعم باستخدام .NET.",
     ),
     role: text(
-      "The repository verifies implementation scope but not detailed individual attribution.",
-      "يثبت المستودع نطاق التنفيذ دون إسناد فردي تفصيلي.",
+      "I implemented the Windows Forms workflows, business rules, ADO.NET data access, and SQL Server integration.",
+      "نفذت تدفقات Windows Forms وقواعد الأعمال والوصول للبيانات عبر ADO.NET والتكامل مع SQL Server.",
     ),
     problem: text(
       "A licensing department must coordinate people, applications, staged tests, fees, license states, users, and enforcement history without losing domain rules.",
@@ -1018,32 +1115,22 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Lifecycle before screens", "دورة الحياة قبل الشاشات"),
         detail: text(
-          "New licenses, renewals, replacements, international permits, and detainment share records but enforce different prerequisites.",
-          "تشترك الرخص الجديدة والتجديد والاستبدال والرخص الدولية والحجز في السجلات مع متطلبات مختلفة.",
+          "I compared new licenses, renewals, replacements, international permits, and detainment to identify their shared records and different prerequisites before building forms.",
+          "قارنت الرخص الجديدة والتجديد والاستبدال والرخص الدولية والحجز لأحدد السجلات المشتركة والمتطلبات المختلفة قبل بناء النماذج.",
         ),
       },
       {
         title: text("Staged test progression", "تقدم الاختبارات المرحلي"),
         detail: text(
-          "Vision, theory, and practical tests require appointments, results, retakes, and ordered eligibility.",
-          "تحتاج اختبارات النظر والنظري والعملي إلى مواعيد ونتائج وإعادات وأهلية مرتبة.",
+          "I traced vision, theory, and practical tests through appointments, results, retakes, fees, and ordered eligibility.",
+          "تتبعت اختبارات النظر والنظري والعملي عبر المواعيد والنتائج والإعادات والرسوم والأهلية المرتبة.",
         ),
       },
-    ],
-    decisions: [
       {
-        title: text("Three-tier rule separation", "فصل القواعد عبر ثلاث طبقات"),
-        decision: text(
-          "Keep Windows Forms, business rules, and ADO.NET persistence in separate projects.",
-          "إبقاء Windows Forms وقواعد الأعمال والتخزين عبر ADO.NET في مشاريع منفصلة.",
-        ),
-        rationale: text(
-          "Licensing prerequisites and state transitions remain reusable across forms.",
-          "تظل متطلبات الترخيص وانتقالات الحالة قابلة لإعادة الاستخدام عبر النماذج.",
-        ),
-        tradeoff: text(
-          "Mappings and calls cross explicit layer boundaries for each workflow.",
-          "تعبر عمليات الربط والاستدعاء حدود طبقات صريحة لكل تدفق.",
+        title: text("History as a rule input", "السجل كمدخل للقواعد"),
+        detail: text(
+          "I examined how prior applications, active licenses, detainment, and driver history affect whether a new service can proceed.",
+          "فحصت كيف تؤثر الطلبات السابقة والرخص النشطة والحجز وسجل السائق على إمكانية تنفيذ خدمة جديدة.",
         ),
       },
     ],
@@ -1087,49 +1174,87 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("License application pipeline", "مسار طلب الرخصة"),
         detail: text(
-          "Applications move through eligibility, fees, vision, theory, practical testing, and issuance.",
-          "تمر الطلبات عبر الأهلية والرسوم واختبارات النظر والنظري والعملي والإصدار.",
+          "I built an application pipeline that moves through eligibility, fees, vision, theory, practical testing, and issuance.",
+          "بنيت مسار طلب يمر عبر الأهلية والرسوم واختبارات النظر والنظري والعملي والإصدار.",
         ),
         implementation: text(
-          "Business rules coordinate appointments, results, retakes, license classes, validity, and applicant history.",
-          "تنسق قواعد الأعمال المواعيد والنتائج والإعادات وفئات الرخص والصلاحية وسجل المتقدم.",
+          "I coordinated appointments, results, retakes, license classes, validity, and applicant history in the business layer.",
+          "نسقت المواعيد والنتائج والإعادات وفئات الرخص والصلاحية وسجل المتقدم داخل طبقة الأعمال.",
         ),
       },
       {
         title: text("License services", "خدمات الرخص"),
         detail: text(
-          "The system supports renewals, international permits, lost/damaged replacements, detainment, and release.",
-          "يدعم النظام التجديد والرخص الدولية واستبدال المفقود أو التالف والحجز والإفراج.",
+          "I implemented renewals, international permits, lost or damaged replacements, detainment, and release.",
+          "نفذت التجديد والرخص الدولية واستبدال المفقود أو التالف والحجز والإفراج.",
         ),
         implementation: text(
-          "Each service checks the documented prerequisites and preserves the driver and license history.",
-          "تتحقق كل خدمة من المتطلبات الموثقة وتحافظ على سجل السائق والرخصة.",
+          "Each service checks its prerequisites and preserves the driver and license history before changing state.",
+          "تتحقق كل خدمة من متطلباتها وتحافظ على سجل السائق والرخصة قبل تغيير الحالة.",
+        ),
+      },
+    ],
+    challenges: [
+      {
+        title: text("Ordered test eligibility", "أهلية الاختبارات المرتبة"),
+        detail: text(
+          "Applicants cannot skip from vision to practical testing, and failed attempts require a new appointment and fee path.",
+          "لا يمكن للمتقدم تجاوز اختبار النظر إلى العملي، وتتطلب المحاولة الفاشلة موعداً ومسار رسوم جديداً.",
+        ),
+        response: text(
+          "I enforced the vision, theory, and practical sequence in business rules and checked prior results before creating each appointment.",
+          "فرضت تسلسل النظر والنظري والعملي داخل قواعد الأعمال وفحصت النتائج السابقة قبل إنشاء كل موعد.",
+        ),
+      },
+      {
+        title: text("One driver, multiple services", "سائق واحد وخدمات متعددة"),
+        detail: text(
+          "Renewal, replacement, international licensing, detainment, and release all modify related license history differently.",
+          "يعدل التجديد والاستبدال والرخصة الدولية والحجز والإفراج سجل الرخصة المرتبط بطرق مختلفة.",
+        ),
+        response: text(
+          "I gave each service its own prerequisite checks while preserving shared person, driver, application, and license records.",
+          "خصصت لكل خدمة فحوصات متطلبات مستقلة مع الحفاظ على سجلات الشخص والسائق والطلب والرخصة المشتركة.",
+        ),
+      },
+      {
+        title: text(
+          "Eligibility depends on history",
+          "الأهلية تعتمد على السجل",
+        ),
+        detail: text(
+          "Age, license class, active licenses, prior applications, validity, and detainment can block an operation.",
+          "قد يمنع العمر وفئة الرخصة والرخص النشطة والطلبات السابقة والصلاحية والحجز تنفيذ العملية.",
+        ),
+        response: text(
+          "I resolved these checks in the business layer before sending parameterized ADO.NET commands to persistence.",
+          "نفذت هذه الفحوصات داخل طبقة الأعمال قبل إرسال أوامر ADO.NET ذات المعلمات إلى التخزين.",
         ),
       },
     ],
     quality: [
       {
-        title: text("Maintainability", "قابلية الصيانة"),
+        title: text("Rule isolation", "عزل القواعد"),
         detail: text(
-          "Presentation, business, and data access responsibilities are separated across the solution.",
-          "تفصل المسؤوليات بين العرض والأعمال والوصول للبيانات عبر الحل.",
+          "I separated Windows Forms event handling, business rules, and ADO.NET data access so lifecycle checks stay reusable across services.",
+          "فصلت معالجة أحداث Windows Forms وقواعد الأعمال والوصول للبيانات عبر ADO.NET حتى تظل فحوصات دورة الحياة قابلة لإعادة الاستخدام عبر الخدمات.",
         ),
       },
       {
-        title: text("Reporting", "التقارير"),
+        title: text("Controlled persistence", "تخزين محكوم"),
         detail: text(
-          "Crystal Reports complements operational records with printable reporting.",
-          "تكمل Crystal Reports السجلات التشغيلية بتقارير قابلة للطباعة.",
+          "I used parameterized ADO.NET queries and commands against SQL Server, then exposed printable operational records through Crystal Reports.",
+          "استخدمت استعلامات وأوامر ADO.NET ذات معلمات مع SQL Server، ثم عرضت السجلات التشغيلية القابلة للطباعة عبر Crystal Reports.",
         ),
       },
     ],
     outcome: text(
-      "The desktop solution implements people, users, license classes, applications, staged tests, issuance, renewals, international permits, replacements, and detainment workflows.",
-      "ينفذ الحل المكتبي الأشخاص والمستخدمين وفئات الرخص والطلبات والاختبارات المرحلية والإصدار والتجديد والرخص الدولية والاستبدال والحجز.",
+      "I implemented people, users, license classes, applications, staged tests, issuance, renewals, international permits, replacements, and detainment workflows in one desktop system.",
+      "نفذت تدفقات الأشخاص والمستخدمين وفئات الرخص والطلبات والاختبارات المرحلية والإصدار والتجديد والرخص الدولية والاستبدال والحجز داخل نظام مكتبي واحد.",
     ),
     nextStep: text(
-      "Validation results, deployment, and detailed ownership evidence are not presented as verified claims.",
-      "لا تُعرض نتائج تحقق أو نشر أو أدلة ملكية تفصيلية على أنها حقائق مؤكدة.",
+      "My next technical step is to add automated tests around ordered eligibility, duplicate applications, renewal validity, and detainment transitions.",
+      "خطوتي التقنية التالية هي إضافة اختبارات آلية للأهلية المرتبة والطلبات المكررة وصلاحية التجديد وانتقالات الحجز.",
     ),
     evidence: [
       {
@@ -1138,6 +1263,57 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
         caption: text(
           "Exhibit A / licensing operations entry point",
           "الدليل أ / نقطة دخول عمليات الترخيص",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/dvld/details/localdrivinglicense.webp",
+        alt: text(
+          "DVLD local license applications",
+          "طلبات الرخص المحلية في DVLD",
+        ),
+        caption: text(
+          "Exhibit B / application pipeline",
+          "الدليل ب / مسار الطلب",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/dvld/details/test.webp",
+        alt: text(
+          "DVLD staged test management",
+          "إدارة الاختبارات المرحلية في DVLD",
+        ),
+        caption: text(
+          "Exhibit C / ordered tests and results",
+          "الدليل ج / الاختبارات والنتائج المرتبة",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/dvld/details/intlicense.webp",
+        alt: text("DVLD international licenses", "الرخص الدولية في DVLD"),
+        caption: text(
+          "Exhibit D / international permit service",
+          "الدليل د / خدمة الرخصة الدولية",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/dvld/details/detain.webp",
+        alt: text("DVLD detained licenses", "الرخص المحجوزة في DVLD"),
+        caption: text(
+          "Exhibit E / detainment history",
+          "الدليل هـ / سجل الحجز",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/dvld/details/people.webp",
+        alt: text("DVLD people records", "سجلات الأشخاص في DVLD"),
+        caption: text(
+          "Exhibit F / identity records",
+          "الدليل و / سجلات الهوية",
         ),
         kind: "workflow",
       },
@@ -1150,12 +1326,12 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       "مشروع جماعي / باك إند .NET",
     ),
     teamContext: text(
-      "Three-person team: two backend contributors and one frontend contributor.",
-      "فريق من ثلاثة أشخاص: مطوران للباك إند ومطور للواجهة الأمامية.",
+      "I worked in a three-person team with one other backend contributor and one frontend contributor.",
+      "عملت ضمن فريق من ثلاثة أشخاص مع مطور باك إند آخر ومطور للواجهة الأمامية.",
     ),
     role: text(
-      "Backend architecture, booking and ticketing, and payments; backend ownership was shared.",
-      "هندسة الباك إند والحجز والتذاكر والمدفوعات؛ وكانت ملكية الباك إند مشتركة.",
+      "I worked on backend architecture, booking and ticketing, and payments; backend responsibility was shared.",
+      "عملت على هندسة الباك إند والحجز والتذاكر والمدفوعات؛ وكانت مسؤولية الباك إند مشتركة.",
     ),
     problem: text(
       "Cinema customers need a connected path from discovery to seat selection, payment, and ticket validation while staff manage branches, halls, showtimes, and bookings.",
@@ -1183,57 +1359,22 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Booking lifecycle", "دورة حياة الحجز"),
         detail: text(
-          "Movie, showtime, seat availability, payment, QR ticket, and check-in states form one chain.",
-          "تشكل حالات الفيلم والعرض وتوفر المقعد والدفع وتذكرة QR والدخول سلسلة واحدة.",
+          "I traced movie discovery, showtime selection, seat availability, payment, QR ticket generation, and check-in as one booking state chain.",
+          "تتبعت اكتشاف الفيلم واختيار العرض وتوفر المقعد والدفع وإنشاء تذكرة QR والدخول كسلسلة واحدة لحالة الحجز.",
         ),
       },
       {
         title: text("Scheduled state changes", "تغييرات الحالة المجدولة"),
         detail: text(
-          "Unpaid bookings expire and upcoming shows generate reminders without an active user request.",
-          "تنتهي الحجوزات غير المدفوعة وتُرسل تذكيرات العروض القادمة دون طلب مستخدم نشط.",
+          "I identified unpaid-booking expiry and upcoming-show reminders as time-driven work that cannot depend on an active request.",
+          "حددت انتهاء الحجوزات غير المدفوعة وتذكيرات العروض القادمة كعمل مرتبط بالوقت لا يمكن أن يعتمد على طلب نشط.",
         ),
       },
       {
         title: text("Administrative conflicts", "تعارضات الإدارة"),
         detail: text(
-          "Showtime scheduling must detect conflicts across halls and movies.",
-          "يجب أن تكتشف جدولة العروض التعارضات بين القاعات والأفلام.",
-        ),
-      },
-    ],
-    decisions: [
-      {
-        title: text(
-          "Service and repository backend",
-          "باك إند قائم على الخدمات والمستودعات",
-        ),
-        decision: text(
-          "Controllers delegate business work to services over EF Core repositories.",
-          "تفوض وحدات التحكم أعمال النطاق إلى خدمات فوق مستودعات EF Core.",
-        ),
-        rationale: text(
-          "Booking, payment, ticketing, and administration rules stay out of transport code.",
-          "تبقى قواعد الحجز والدفع والتذاكر والإدارة خارج كود النقل.",
-        ),
-        tradeoff: text(
-          "DTOs, mappers, interfaces, services, and repositories add explicit coordination.",
-          "تضيف DTOs وعمليات الربط والواجهات والخدمات والمستودعات تنسيقاً صريحاً.",
-        ),
-      },
-      {
-        title: text("Hangfire background jobs", "مهام Hangfire الخلفية"),
-        decision: text(
-          "Expire pending bookings every minute and send show reminders every fifteen minutes.",
-          "إنهاء الحجوزات المعلقة كل دقيقة وإرسال تذكيرات العروض كل خمس عشرة دقيقة.",
-        ),
-        rationale: text(
-          "Time-driven booking work remains independent from incoming HTTP requests.",
-          "يبقى العمل المرتبط بالوقت مستقلاً عن طلبات HTTP الواردة.",
-        ),
-        tradeoff: text(
-          "The system depends on a job processor and durable SQL Server job storage.",
-          "يعتمد النظام على معالج مهام وتخزين دائم للمهام في SQL Server.",
+          "I mapped showtime duration, hall occupancy, and branch schedules to find where administrative edits could create conflicts.",
+          "ربطت مدة العرض وإشغال القاعة وجداول الفروع لاكتشاف أين قد تنشئ تعديلات الإدارة تعارضات.",
         ),
       },
     ],
@@ -1286,34 +1427,34 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "من الاكتشاف إلى اختيار المقعد",
         ),
         detail: text(
-          "Customers browse movies, filter listings, inspect showtimes, and choose from an interactive seat grid.",
-          "يتصفح العملاء الأفلام ويرشحون القوائم ويفحصون العروض ويختارون من شبكة مقاعد تفاعلية.",
+          "I connected movie discovery and showtimes to an interactive seat grid for the booking handoff.",
+          "ربطت اكتشاف الأفلام ومواعيد العرض بشبكة مقاعد تفاعلية لبدء الحجز.",
         ),
         implementation: text(
-          "Angular user features consume public movie and seat endpoints before authenticated booking work.",
-          "تستهلك ميزات Angular للمستخدم نقاط الأفلام والمقاعد العامة قبل أعمال الحجز المحمية.",
+          "I exposed public movie and seat endpoints before moving the user into authenticated booking work.",
+          "وفرت نقاط API عامة للأفلام والمقاعد قبل انتقال المستخدم إلى أعمال الحجز المحمية.",
         ),
       },
       {
         title: text("Payment and ticketing", "الدفع والتذاكر"),
         detail: text(
-          "Bookings connect Stripe payment to QR ticket generation and check-in lookup.",
-          "تربط الحجوزات دفع Stripe بإنشاء تذكرة QR والبحث عند الدخول.",
+          "I connected booking state to Stripe payment, QR ticket generation, email, and check-in lookup.",
+          "ربطت حالة الحجز بالدفع عبر Stripe وإنشاء تذكرة QR والبريد والبحث عند الدخول.",
         ),
         implementation: text(
-          "Backend services coordinate payment, booking, ticket, and email concerns across documented endpoints.",
-          "تنسق خدمات الباك إند الدفع والحجز والتذكرة والبريد عبر نقاط API الموثقة.",
+          "I coordinated payment, booking, ticket, and email concerns through backend services behind stable API contracts.",
+          "نسقت الدفع والحجز والتذكرة والبريد عبر خدمات الباك إند خلف عقود API ثابتة.",
         ),
       },
       {
         title: text("Cinema administration", "إدارة السينما"),
         detail: text(
-          "Admins manage movies, media, branches, halls, seat layouts, showtimes, users, bookings, payments, and tickets.",
-          "يدير المسؤولون الأفلام والوسائط والفروع والقاعات والمقاعد والعروض والمستخدمين والحجوزات والمدفوعات والتذاكر.",
+          "I supported administration for movies, media, branches, halls, seat layouts, showtimes, users, bookings, payments, and tickets.",
+          "دعمت إدارة الأفلام والوسائط والفروع والقاعات والمقاعد والعروض والمستخدمين والحجوزات والمدفوعات والتذاكر.",
         ),
         implementation: text(
-          "Role-protected admin features use the same service and repository boundaries as customer booking.",
-          "تستخدم وظائف الإدارة المحمية بالأدوار حدود الخدمات والمستودعات نفسها المستخدمة في حجز العميل.",
+          "I kept role-protected admin features behind the same service and repository boundaries as customer booking.",
+          "أبقيت وظائف الإدارة المحمية بالأدوار خلف حدود الخدمات والمستودعات نفسها المستخدمة في حجز العميل.",
         ),
       },
     ],
@@ -1328,8 +1469,8 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "لا يمكن أن تظل الحجوزات غير المدفوعة نشطة بلا نهاية.",
         ),
         response: text(
-          "A Hangfire job expires pending bookings every minute according to the published schedule.",
-          "تنهي مهمة Hangfire الحجوزات المعلقة كل دقيقة حسب الجدول المنشور.",
+          "I used a Hangfire job to expire pending bookings every minute and persist job state in SQL Server.",
+          "استخدمت مهمة Hangfire لإنهاء الحجوزات المعلقة كل دقيقة وحفظ حالة المهام في SQL Server.",
         ),
       },
       {
@@ -1339,8 +1480,33 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
           "تعد نقاط الدخول والتجديد والخروج مداخل عامة حساسة.",
         ),
         response: text(
-          "The documented API rate-limits those endpoints to five requests per minute per IP.",
-          "تحدد API الموثقة تلك النقاط بخمسة طلبات في الدقيقة لكل عنوان IP.",
+          "I rate-limited those endpoints to five requests per minute per IP.",
+          "حددت تلك النقاط بخمسة طلبات في الدقيقة لكل عنوان IP.",
+        ),
+      },
+      {
+        title: text("Showtime conflicts", "تعارضات مواعيد العرض"),
+        detail: text(
+          "Overlapping schedules can assign one hall to incompatible showtimes.",
+          "قد تسند الجداول المتداخلة قاعة واحدة إلى عروض متعارضة.",
+        ),
+        response: text(
+          "I validated hall and time ranges through the service layer before persisting administrative schedule changes.",
+          "تحققت من القاعة والنطاقات الزمنية عبر طبقة الخدمات قبل حفظ تغييرات جدول الإدارة.",
+        ),
+      },
+      {
+        title: text(
+          "Payment-to-ticket handoff",
+          "الانتقال من الدفع إلى التذكرة",
+        ),
+        detail: text(
+          "A booking should not produce a valid QR ticket before payment state is accepted.",
+          "لا ينبغي أن ينتج الحجز تذكرة QR صالحة قبل قبول حالة الدفع.",
+        ),
+        response: text(
+          "I coordinated payment confirmation, booking state, ticket generation, and email in backend services instead of the controller.",
+          "نسقت تأكيد الدفع وحالة الحجز وإنشاء التذكرة والبريد داخل خدمات الباك إند بدلاً من وحدة التحكم.",
         ),
       },
     ],
@@ -1348,32 +1514,32 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
       {
         title: text("Security", "الأمان"),
         detail: text(
-          "JWT access/refresh tokens, BCrypt, RBAC, rate limiting, and admin-only job visibility protect system boundaries.",
-          "تحمي رموز JWT والتجديد وBCrypt وRBAC وتحديد المعدل وعرض المهام للإدارة فقط حدود النظام.",
+          "I protected system boundaries with JWT access and refresh tokens, BCrypt, RBAC, rate limiting, and admin-only job visibility.",
+          "حميت حدود النظام باستخدام رموز JWT والوصول والتجديد وBCrypt وRBAC وتحديد المعدل وعرض المهام للإدارة فقط.",
         ),
       },
       {
         title: text("Reliability", "الاعتمادية"),
         detail: text(
-          "Hangfire persists scheduled expiry and reminder jobs in SQL Server; Serilog supports structured application logging.",
-          "يحفظ Hangfire مهام الانتهاء والتذكير المجدولة في SQL Server ويدعم Serilog السجلات المنظمة.",
+          "I persisted scheduled expiry and reminder jobs through Hangfire in SQL Server and used Serilog for structured application logging.",
+          "حفظت مهام الانتهاء والتذكير المجدولة عبر Hangfire في SQL Server واستخدمت Serilog للسجلات المنظمة.",
         ),
       },
       {
         title: text("Contract clarity", "وضوح العقود"),
         detail: text(
-          "The README documents standard success, pagination, and problem-detail response shapes across 94 endpoints.",
-          "يوثق README أشكال النجاح والتقسيم ومشكلات الاستجابة عبر 94 نقطة API.",
+          "I kept standard success, pagination, and problem-detail response shapes consistent across 94 API endpoints.",
+          "حافظت على اتساق أشكال النجاح والتقسيم وتفاصيل المشكلات عبر 94 نقطة API.",
         ),
       },
     ],
     outcome: text(
-      "The team delivered customer discovery, seat booking, payment, QR tickets, check-in, and broad cinema administration across Angular and .NET.",
-      "سلّم الفريق اكتشاف الأفلام وحجز المقاعد والدفع وتذاكر QR والدخول وإدارة سينما واسعة عبر Angular و.NET.",
+      "Our team delivered customer discovery, seat booking, payment, QR tickets, check-in, and broad cinema administration across Angular and .NET.",
+      "سلّم فريقنا اكتشاف الأفلام وحجز المقاعد والدفع وتذاكر QR والدخول وإدارة سينما واسعة عبر Angular و.NET.",
     ),
     nextStep: text(
-      "Commit-level ownership, seat-concurrency behavior, payment-flow evidence, and automated test coverage remain publication gaps.",
-      "تظل ملكية الالتزامات وسلوك تزامن المقاعد وأدلة تدفق الدفع وتغطية الاختبارات الآلية فجوات في النشر.",
+      "My next technical step is to add automated concurrency and integration tests for seat holds, payment confirmation, booking expiry, and ticket issuance.",
+      "خطوتي التقنية التالية هي إضافة اختبارات آلية للتزامن والتكامل لحجز المقاعد وتأكيد الدفع وانتهاء الحجز وإصدار التذكرة.",
     ),
     evidence: [
       {
@@ -1421,6 +1587,27 @@ export const caseStudies: Partial<Record<ProjectSlug, CaseStudy>> = {
         ),
         kind: "workflow",
       },
+      {
+        src: "/projects/cinemaverse/details/movie-management.webp",
+        alt: text(
+          "CinemaVerse movie management",
+          "إدارة الأفلام في CinemaVerse",
+        ),
+        caption: text(
+          "Exhibit E / movie administration",
+          "الدليل هـ / إدارة الأفلام",
+        ),
+        kind: "workflow",
+      },
+      {
+        src: "/projects/cinemaverse/details/admin-dashboard.webp",
+        alt: text("CinemaVerse admin dashboard", "لوحة إدارة CinemaVerse"),
+        caption: text(
+          "Exhibit F / cinema operations overview",
+          "الدليل و / نظرة عامة على عمليات السينما",
+        ),
+        kind: "workflow",
+      },
     ],
   },
 };
@@ -1434,4 +1621,3 @@ export function hasCaseStudy(slug: string): boolean {
 }
 
 export const caseStudySlugs = Object.keys(caseStudies) as ProjectSlug[];
-

@@ -20,11 +20,7 @@ export const projectSlugs = [
 export type ProjectSlug = (typeof projectSlugs)[number];
 
 export type CategoryId =
-  | "web"
-  | "game-development"
-  | "desktop"
-  | "mobile-applications"
-  | "summaries";
+  "web" | "game-development" | "desktop" | "mobile-applications" | "summaries";
 
 /**
  * Product — a system, application, or service with a defined problem and users.
@@ -102,20 +98,20 @@ export const projects: Project[] = [
       ar: "منتج أصلي فردي يحوّل بيانات المتاجر المحلية المتفرقة إلى كتالوج موحد يدعم قرار الشراء.",
     },
     contribution: {
-      en: "Nour designed and built the product, its Angular interfaces, Express API, ingestion worker, compatibility rules, and shared Nx packages.",
-      ar: "صمّم نور المنتج وبناه، بما يشمل واجهات Angular وواجهة Express والعامل الخاص بجمع البيانات وقواعد التوافق وحزم Nx المشتركة.",
+      en: "I designed and built the product, its Angular interfaces, Express API, ingestion worker, compatibility rules, and shared Nx packages.",
+      ar: "صممت المنتج وبنيته، بما يشمل واجهات Angular وواجهة Express وعامل جمع البيانات وقواعد التوافق وحزم Nx المشتركة.",
     },
     engineering: {
       en: "The system separates public web, API, and ingestion worker responsibilities. It preserves source evidence, links offers for the same product, and reports unknown compatibility facts instead of guessing.",
       ar: "يفصل النظام بين واجهة الويب العامة وواجهة API وعامل جمع البيانات، ويحفظ أدلة المصادر ويربط عروض المنتج نفسه ويعرض حقائق التوافق المجهولة بدلاً من التخمين.",
     },
     evidence: {
-      en: "Public repository, deployed catalog, architecture documentation, automated tests, CI, and operational tooling are available.",
-      ar: "يتوفر مستودع عام ونسخة منشورة ووثائق هندسية واختبارات آلية وCI وأدوات تشغيلية.",
+      en: "I publish the source, live catalog, architecture documentation, automated tests, CI, and operational tooling.",
+      ar: "أنشر الكود والكتالوج الحي ووثائق البنية والاختبارات الآلية وCI وأدوات التشغيل.",
     },
     limitation: {
-      en: "Compatibility remains evidence-gated: missing source facts are shown as unknown, and verified usage metrics are not published.",
-      ar: "يظل التوافق مرتبطاً بجودة الأدلة؛ تظهر الحقائق الناقصة كغير معروفة، ولا توجد مقاييس استخدام منشورة تم التحقق منها.",
+      en: "I keep compatibility evidence-gated: missing source facts appear as unknown rather than a guessed result.",
+      ar: "أبقي التوافق مشروطاً بالأدلة؛ تظهر حقائق المصدر الناقصة كغير معروفة بدلاً من نتيجة مخمنة.",
     },
     stack: ["Angular 19", "TypeScript", "Node.js", "Express", "MongoDB", "Nx"],
     highlights: [
@@ -144,24 +140,24 @@ export const projects: Project[] = [
       ar: "منصة لتذاكر السينما تشمل الاستكشاف والمقاعد والحجوزات والمدفوعات والتذاكر والإدارة.",
     },
     context: {
-      en: "A team project and supporting .NET backend case study. Nour's public repository is a fork of the team repository.",
-      ar: "مشروع جماعي ودراسة حالة داعمة للباك إند باستخدام .NET، ومستودع نور العام نسخة متفرعة من مستودع الفريق.",
+      en: "I built CinemaVerse with a three-person team as a full cinema booking platform and .NET backend case study.",
+      ar: "بنيت CinemaVerse مع فريق من ثلاثة أشخاص كمنصة متكاملة لحجز السينما ودراسة حالة للباك إند باستخدام .NET.",
     },
     contribution: {
-      en: "Nour worked on backend architecture, booking and ticketing, and payments. Backend work was shared with a teammate and is not presented as sole ownership.",
-      ar: "عمل نور على هندسة الباك إند والحجز والتذاكر والمدفوعات، وشارك زميلاً في الباك إند ولا يُعرض العمل كملكية فردية.",
+      en: "I worked on backend architecture, booking and ticketing, and payments. I shared backend responsibility with a teammate.",
+      ar: "عملت على هندسة الباك إند والحجز والتذاكر والمدفوعات، وشاركت مسؤولية الباك إند مع زميل.",
     },
     engineering: {
-      en: "Angular communicates with an ASP.NET Core service and repository stack. The documented platform includes JWT, Stripe, QR tickets, Hangfire jobs, email, rate limiting, and an admin surface.",
-      ar: "يتواصل Angular مع طبقات الخدمة والمستودعات في ASP.NET Core، وتشمل المنصة الموثقة JWT وStripe وتذاكر QR ومهام Hangfire والبريد وتحديد المعدل وواجهة الإدارة.",
+      en: "Angular communicates with an ASP.NET Core service and repository stack that integrates JWT, Stripe, QR tickets, Hangfire jobs, email, rate limiting, and an admin surface.",
+      ar: "يتواصل Angular مع طبقات الخدمة والمستودعات في ASP.NET Core التي تتكامل مع JWT وStripe وتذاكر QR ومهام Hangfire والبريد وتحديد المعدل وواجهة الإدارة.",
     },
     evidence: {
-      en: "The repository README documents the full stack, 94 API endpoints, user and admin workflows, authentication behavior, and background jobs.",
-      ar: "يوثق README التقنيات و94 نقطة API وتدفقات المستخدم والإدارة وسلوك المصادقة والمهام الخلفية.",
+      en: "Our project includes the full stack, 94 API endpoints, customer and admin workflows, authentication, and background jobs.",
+      ar: "يتضمن مشروعنا التقنيات الكاملة و94 نقطة API وتدفقات العميل والإدارة والمصادقة والمهام الخلفية.",
     },
     limitation: {
-      en: "Commit-level ownership, seat-concurrency behavior, payment-flow evidence, and automated test coverage remain publication gaps.",
-      ar: "ما زالت ملكية الالتزامات وسلوك تزامن المقاعد وأدلة تدفق الدفع وتغطية الاختبارات الآلية فجوات في النشر.",
+      en: "I present my backend scope as shared; the next technical work is automated coverage for seat concurrency, payment, expiry, and ticket issuance.",
+      ar: "أعرض نطاق عملي في الباك إند كمسؤولية مشتركة؛ والعمل التقني التالي هو تغطية آلية لتزامن المقاعد والدفع والانتهاء وإصدار التذاكر.",
     },
     stack: [
       "Angular 21",
@@ -196,24 +192,24 @@ export const projects: Project[] = [
       ar: "تطبيق لحجز الفنادق يغطي التوفر والحجز والدفع والهوية والإدارة.",
     },
     context: {
-      en: "A team project and the clearest flagship evidence for Nour's .NET full-stack work.",
-      ar: "مشروع جماعي وأوضح دليل رئيسي على عمل نور المتكامل باستخدام .NET.",
+      en: "I led this team project as my flagship .NET full-stack case study.",
+      ar: "قدت هذا المشروع الجماعي كدراسة الحالة الرئيسية لعملي المتكامل باستخدام .NET.",
     },
     contribution: {
-      en: "Nour states that he owned the backend work, booking and payment flows, identity and security, backend architecture, and frontend leadership.",
-      ar: "يوضح نور أنه تولى أعمال الباك إند وتدفقات الحجز والدفع والهوية والأمان وهندسة الباك إند وقيادة الواجهة الأمامية.",
+      en: "I owned the backend work, booking and payment flows, identity and security, backend architecture, and frontend leadership.",
+      ar: "توليت أعمال الباك إند وتدفقات الحجز والدفع والهوية والأمان وهندسة الباك إند وقيادة الواجهة الأمامية.",
     },
     engineering: {
       en: "The application uses an N-tier structure with presentation, service, and data-access layers, plus Repository and Unit of Work patterns around EF Core and SQL Server.",
       ar: "يستخدم التطبيق بنية متعددة الطبقات تشمل العرض والخدمات والوصول إلى البيانات، مع نمطي Repository وUnit of Work حول EF Core وSQL Server.",
     },
     evidence: {
-      en: "The repository documents customer and admin workflows, Stripe payment intents, SendGrid email, role-based access, health checks, and concurrency controls.",
-      ar: "يوثق المستودع تدفقات العملاء والإدارة وStripe Payment Intents والبريد عبر SendGrid والصلاحيات والفحوصات الصحية والتحكم في التزامن.",
+      en: "I implemented customer and admin workflows, Stripe Payment Intents, SendGrid email, role-based access, health checks, and concurrency controls.",
+      ar: "نفذت تدفقات العملاء والإدارة وStripe Payment Intents والبريد عبر SendGrid والصلاحيات وفحوصات الصحة والتحكم في التزامن.",
     },
     limitation: {
-      en: "The previously listed deployment was unreachable during review, so this portfolio links to the repository rather than presenting an unverified live demo.",
-      ar: "تعذر الوصول إلى النسخة المنشورة المذكورة سابقاً أثناء المراجعة، لذلك يرتبط المعرض بالمستودع بدلاً من عرض نسخة حية غير مؤكدة.",
+      en: "I currently present the source and product evidence rather than a live demo; automated booking and payment integration coverage is the next technical step.",
+      ar: "أعرض حالياً الكود وأدلة المنتج بدلاً من نسخة حية؛ وإضافة تغطية تكامل آلية للحجز والدفع هي الخطوة التقنية التالية.",
     },
     stack: [
       ".NET 9",
@@ -531,20 +527,20 @@ export const projects: Project[] = [
       ar: "جزء من منصة جامعية جماعية تضم عمليات الموظفين وتطبيق المتبرعين وواجهة API ونطاق بيانات موحداً على SQL Server.",
     },
     contribution: {
-      en: "Nour describes this as a university team project in which he implemented most of the system; the portfolio does not claim sole ownership.",
-      ar: "يصف نور المشروع بأنه عمل جامعي جماعي نفذ فيه معظم النظام، ولا يدعي المعرض ملكيته الفردية الكاملة.",
+      en: "I implemented most of this university team system while sharing responsibility with my teammate.",
+      ar: "نفذت معظم هذا النظام الجامعي الجماعي مع مشاركة المسؤولية مع زميلي.",
     },
     engineering: {
       en: "The desktop application follows presentation, business, and data-access tiers and supports donor records, blood units, testing, matching, transfusion, reporting, and role-based access.",
       ar: "يتبع التطبيق المكتبي طبقات العرض ومنطق الأعمال والوصول إلى البيانات، ويدعم سجلات المتبرعين ووحدات الدم والفحوصات والمطابقة ونقل الدم والتقارير والصلاحيات.",
     },
     evidence: {
-      en: "The public repository includes source code, setup instructions, operational screenshots, and the documented three-tier structure.",
-      ar: "يتضمن المستودع العام الكود وتعليمات التشغيل وصور العمليات وتوثيق البنية ثلاثية الطبقات.",
+      en: "I publish the source, setup instructions, operational screenshots, and three-tier structure.",
+      ar: "أنشر الكود وتعليمات التشغيل وصور العمليات والبنية ثلاثية الطبقات.",
     },
     limitation: {
-      en: "Exact teammate attribution, test coverage, and a code-verified cross-platform architecture diagram remain documentation gaps.",
-      ar: "ما زال توثيق مساهمات أعضاء الفريق وتغطية الاختبارات ومخطط البنية متعدد المنصات المتحقق منه من الكود غير مكتمل.",
+      en: "I present this as shared team work; automated lifecycle coverage for compatibility, expiry, allocation, and transfusion is the next technical step.",
+      ar: "أعرض هذا كعمل جماعي مشترك؛ وإضافة تغطية آلية لدورة حياة التوافق والصلاحية والتخصيص ونقل الدم هي الخطوة التقنية التالية.",
     },
     stack: [".NET Framework", "WinForms", "C#", "SQL Server", "Guna UI2"],
     highlights: [
@@ -575,20 +571,20 @@ export const projects: Project[] = [
       ar: "مشروع مكتبي داعم باستخدام .NET يركز على نطاق حكومي كثيف القواعد لإدارة التراخيص.",
     },
     contribution: {
-      en: "The public repository establishes the implementation and feature scope, but it does not publish a detailed contributor breakdown.",
-      ar: "يثبت المستودع العام نطاق التنفيذ والخصائص، لكنه لا ينشر توزيعاً تفصيلياً لمساهمات المطورين.",
+      en: "I implemented the Windows Forms workflows, business rules, ADO.NET data access, and SQL Server integration.",
+      ar: "نفذت تدفقات Windows Forms وقواعد الأعمال والوصول للبيانات عبر ADO.NET والتكامل مع SQL Server.",
     },
     engineering: {
       en: "The solution separates Windows Forms presentation, business rules, and ADO.NET data access. It covers license classes, staged tests, renewals, replacements, international permits, and detainment.",
       ar: "يفصل الحل بين عرض Windows Forms وقواعد الأعمال والوصول للبيانات عبر ADO.NET، ويغطي فئات الرخص والاختبارات المرحلية والتجديد والاستبدال والرخص الدولية والحجز.",
     },
     evidence: {
-      en: "The repository includes the solution, database backup instructions, feature documentation, and interface screenshots.",
-      ar: "يتضمن المستودع الحل وتعليمات استعادة قاعدة البيانات وتوثيق الخصائص وصور الواجهة.",
+      en: "I publish the solution, database backup instructions, workflow details, and interface screenshots.",
+      ar: "أنشر الحل وتعليمات استعادة قاعدة البيانات وتفاصيل التدفقات وصور الواجهة.",
     },
     limitation: {
-      en: "This is supporting work: validation results, deployment, and detailed ownership evidence are not presented as verified claims.",
-      ar: "هذا عمل داعم؛ لا تُعرض نتائج تحقق أو نشر أو أدلة ملكية تفصيلية على أنها حقائق مؤكدة.",
+      en: "I use this supporting project to demonstrate rules-heavy desktop design; automated lifecycle tests are the next technical step.",
+      ar: "أستخدم هذا المشروع الداعم لإظهار تصميم نظام مكتبي كثيف القواعد؛ واختبارات دورة الحياة الآلية هي الخطوة التقنية التالية.",
     },
     stack: ["C#", ".NET Framework", "Windows Forms", "ADO.NET", "SQL Server"],
     highlights: [
@@ -621,20 +617,20 @@ export const projects: Project[] = [
       ar: "الجزء الموجه للمتبرعين من منصة بنك الدم الجامعية، ويربط المواعيد وسجل التبرع بعمليات الموظفين.",
     },
     contribution: {
-      en: "It belongs to the same team system in which Nour reports implementing most of the platform; individual module ownership is not published as a percentage.",
-      ar: "ينتمي إلى النظام الجماعي نفسه الذي يذكر نور أنه نفذ معظمه، ولا تُنشر ملكية الوحدات الفردية كنسب مئوية.",
+      en: "I implemented most of the wider team platform while sharing responsibility across the mobile, API, desktop, and database modules.",
+      ar: "نفذت معظم منصة الفريق الأوسع مع مشاركة المسؤولية عبر وحدات الموبايل وAPI وسطح المكتب وقاعدة البيانات.",
     },
     engineering: {
       en: "Flutter uses Provider state management and REST services to support authentication, profiles, appointments, donation history, and notifications through an ASP.NET Core API.",
       ar: "يستخدم Flutter إدارة الحالة عبر Provider وخدمات REST لدعم تسجيل الدخول والملفات والمواعيد وسجل التبرع والإشعارات من خلال ASP.NET Core API.",
     },
     evidence: {
-      en: "The repository documents the Flutter application, ASP.NET Core API, shared database setup, Swagger access, and the end-to-end appointment workflow.",
-      ar: "يوثق المستودع تطبيق Flutter وASP.NET Core API وإعداد قاعدة البيانات المشتركة وSwagger وتدفق المواعيد الكامل.",
+      en: "Our project includes the Flutter application, ASP.NET Core API, shared database setup, Swagger access, and end-to-end appointment workflow.",
+      ar: "يتضمن مشروعنا تطبيق Flutter وASP.NET Core API وإعداد قاعدة البيانات المشتركة وSwagger وتدفق المواعيد الكامل.",
     },
     limitation: {
-      en: "Notification behavior, deployment status, automated tests, and the exact desktop/API/mobile data flow still need stronger published evidence.",
-      ar: "ما زالت الإشعارات وحالة النشر والاختبارات الآلية وتدفق البيانات الدقيق بين سطح المكتب وAPI والموبايل بحاجة إلى أدلة منشورة أقوى.",
+      en: "I present the mobile, API, and desktop integration as shared team work; automated cross-client appointment tests are the next technical step.",
+      ar: "أعرض تكامل الموبايل وAPI وسطح المكتب كعمل جماعي مشترك؛ واختبارات المواعيد الآلية عبر العميلين هي الخطوة التقنية التالية.",
     },
     stack: [
       "Flutter",

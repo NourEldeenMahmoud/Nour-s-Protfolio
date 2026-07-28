@@ -770,105 +770,6 @@
   line-height: 1.6;
 }
 
-.decisionGrid {
-  display: grid;
-  gap: 1.2rem;
-}
-
-.decisionCard {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.9fr);
-  gap: 1.7rem;
-  padding: clamp(1.4rem, 3vw, 2.4rem);
-  border: 1px solid rgb(68 60 49 / 20%);
-  background:
-    linear-gradient(90deg, transparent, rgb(255 255 255 / 28%)), #dfd0b4;
-  box-shadow: 0 1rem 2rem rgb(55 39 22 / 10%);
-  transition:
-    box-shadow 220ms ease,
-    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.decisionCard:hover {
-  box-shadow: 0 1.4rem 2.8rem rgb(55 39 22 / 15%);
-  transform: translateY(-3px);
-}
-
-.decisionCard h3 {
-  grid-column: 1;
-  margin: 1.5rem 0 0;
-  color: #2d2922;
-  font-size: clamp(1.4rem, 2.4vw, 2rem);
-}
-
-.decisionLead {
-  grid-column: 1;
-  margin: 0;
-  color: #4c4438;
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.decisionStamp {
-  position: absolute;
-  top: 1.1rem;
-  right: 1.1rem;
-  padding: 0.35rem 0.55rem;
-  border: 2px solid rgb(70 120 122 / 55%);
-  color: #426f72;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 750;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  transform: rotate(2deg);
-}
-
-.alternatives {
-  grid-column: 1;
-  padding-top: 1rem;
-  border-top: 1px dashed rgb(61 54 44 / 22%);
-}
-
-.alternatives ul {
-  margin: 0;
-  padding-inline-start: 1.1rem;
-  color: #665a4d;
-  font-size: 0.8rem;
-  line-height: 1.55;
-}
-
-.decisionCard dl {
-  grid-column: 2;
-  grid-row: 1 / span 4;
-  margin: 0;
-  border-inline-start: 1px solid rgb(65 57 46 / 18%);
-  padding-inline-start: 1.7rem;
-}
-
-.decisionCard dl div + div {
-  margin-top: 1.4rem;
-  padding-top: 1.4rem;
-  border-top: 1px solid rgb(65 57 46 / 14%);
-}
-
-.decisionCard dt {
-  color: #85633f;
-  font-family: var(--font-mono);
-  font-size: 0.61rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
-.decisionCard dd {
-  margin: 0.55rem 0 0;
-  color: #4f493f;
-  font-size: 0.84rem;
-  line-height: 1.62;
-}
-
 .architectureMap {
   margin: 0;
   padding: clamp(1.2rem, 3vw, 2rem);
@@ -889,78 +790,72 @@
   line-height: 1.6;
 }
 
-.architectureNodes {
+.architectureCanvas {
+  overflow-x: auto;
+  padding: 0.35rem;
+  border: 1px solid rgb(103 172 174 / 18%);
+  background: rgb(8 14 14 / 38%);
+  scrollbar-color: #5c8f90 #182020;
+}
+
+.architectureCanvas svg {
+  display: block;
+  width: max(100%, 56rem);
+  height: auto;
+}
+
+.architectureConnections path {
+  fill: none;
+  stroke: #c89256;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.architectureCanvas marker path {
+  fill: #c89256;
+  stroke: none;
+}
+
+.architectureNode {
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: 2.1rem 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  width: 100%;
+  height: 100%;
+  padding: 0.85rem;
+  border: 1px solid rgb(103 172 174 / 45%);
+  background: #101919;
+  box-shadow: inset 0 0 1.6rem rgb(79 143 145 / 7%);
+  color: #dcd0b8;
 }
 
-.architectureNodes article {
-  min-height: 8.5rem;
-  padding: 0.9rem;
-  border: 1px solid rgb(103 172 174 / 30%);
-  background: rgb(8 14 14 / 56%);
-}
-
-.architectureNodes article > span {
+.architectureNode > span {
+  display: grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  place-items: center;
+  border: 1px solid rgb(214 157 93 / 50%);
   color: #d69d5d;
   font-family: var(--font-mono);
   font-size: 0.58rem;
 }
 
-.architectureNodes h3 {
-  margin: 1.5rem 0 0;
+.architectureNode h3 {
+  margin: 0;
   color: #f0e1c5;
   font-size: 0.92rem;
+  line-height: 1.2;
 }
 
-.architectureNodes p {
+.architectureNode p {
   margin: 0.35rem 0 0;
   color: #8ca7a5;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
-  line-height: 1.45;
-}
-
-.architectureLinks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin: 1rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.architectureLinks li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.38rem 0.5rem;
-  border: 1px solid rgb(103 172 174 / 18%);
-  color: #9ab4b2;
-  font-family: var(--font-mono);
-  font-size: 0.56rem;
-}
-
-.architectureLinks i {
-  width: 1.4rem;
-  border-top: 1px solid #c89256;
-}
-
-.architectureLinks i::after {
-  display: block;
-  width: 0.3rem;
-  height: 0.3rem;
-  margin-top: -0.2rem;
-  margin-inline-start: auto;
-  border-top: 1px solid #c89256;
-  border-inline-end: 1px solid #c89256;
-  content: "";
-  transform: rotate(45deg);
-}
-
-[dir="rtl"] .architectureLinks i::after {
-  transform: rotate(-135deg);
+  font-size: 0.61rem;
+  line-height: 1.42;
 }
 
 .featureFiles {
@@ -1330,11 +1225,6 @@
   letter-spacing: -0.025em;
 }
 
-[dir="rtl"] .decisionStamp {
-  right: auto;
-  left: 1.1rem;
-}
-
 @media (max-width: 1040px) {
   .investigationLayout {
     grid-template-columns: 1fr;
@@ -1473,7 +1363,6 @@
   }
 
   .contextGrid,
-  .decisionCard,
   .challengeList article,
   .outcomeGrid {
     grid-template-columns: 1fr;
@@ -1523,17 +1412,6 @@
     transform: translateX(50%);
   }
 
-  .decisionCard {
-    display: block;
-  }
-
-  .decisionCard dl {
-    margin-top: 1.5rem;
-    padding: 1.3rem 0 0;
-    border-top: 1px solid rgb(65 57 46 / 18%);
-    border-inline-start: 0;
-  }
-
   .featureFiles article {
     min-height: 20rem;
     transform: none;
@@ -1577,7 +1455,6 @@
 :global(html[data-motion="reduced"]) .coverActions a,
 :global(html[data-motion="reduced"]) .coverTopbar a span,
 :global(html[data-motion="reduced"]) .notePath article,
-:global(html[data-motion="reduced"]) .decisionCard,
 :global(html[data-motion="reduced"]) .featureFiles article,
 :global(html[data-motion="reduced"]) .evidenceGrid figure,
 :global(html[data-motion="reduced"]) .coverImage img,
@@ -1588,7 +1465,6 @@
 :global(html[data-motion="reduced"]) .coverEvidence:hover,
 :global(html[data-motion="reduced"]) .coverActions a:hover,
 :global(html[data-motion="reduced"]) .notePath article:hover,
-:global(html[data-motion="reduced"]) .decisionCard:hover,
 :global(html[data-motion="reduced"]) .featureFiles article:hover,
 :global(html[data-motion="reduced"]) .evidenceGrid figure:hover {
   transform: none;
