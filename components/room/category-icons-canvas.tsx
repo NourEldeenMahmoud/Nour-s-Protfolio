@@ -131,19 +131,64 @@ class IconLoadError extends Error {
 
 function createIconMaterial(sourceName: string): MaterialBinding {
   const isSide = sourceName.includes("IconSide");
+  const isLine = sourceName.includes("IconLine");
+  const isRing = sourceName.includes("IconRing");
+
+  let color: number;
+  let metalness: number;
+  let roughness: number;
+  let emissive: number;
+  let emissiveIntensity: number;
+  let emissiveFactor: number;
+  let roughnessOffset: number;
+
+  if (isRing) {
+    // Metallic spiral rings
+    color = 0xb3a68c;
+    metalness = 0.72;
+    roughness = 0.22;
+    emissive = 0x6b5a42;
+    emissiveIntensity = 0.06;
+    emissiveFactor = 0.4;
+    roughnessOffset = 0.02;
+  } else if (isLine) {
+    // Dark graphite page lines
+    color = 0x272523;
+    metalness = 0.0;
+    roughness = 0.85;
+    emissive = 0x0a0908;
+    emissiveIntensity = 0.02;
+    emissiveFactor = 0.15;
+    roughnessOffset = 0.08;
+  } else if (isSide) {
+    // Page block (cream)
+    color = 0xebe8e2;
+    metalness = 0.0;
+    roughness = 0.7;
+    emissive = 0xc66c35;
+    emissiveIntensity = 0.035;
+    emissiveFactor = 0.28;
+    roughnessOffset = 0.055;
+  } else {
+    // Cover (matte ivory)
+    color = 0xffedc9;
+    metalness = 0.54;
+    roughness = 0.26;
+    emissive = 0xc66c35;
+    emissiveIntensity = 0.12;
+    emissiveFactor = 1;
+    roughnessOffset = -0.025;
+  }
+
   const material = new THREE.MeshStandardMaterial({
-    color: isSide ? 0x29343c : 0xffedc9,
-    metalness: isSide ? 0.44 : 0.54,
-    roughness: isSide ? 0.33 : 0.26,
-    emissive: isSide ? 0x4c2a20 : 0xc66c35,
-    emissiveIntensity: isSide ? 0.035 : 0.12,
+    color,
+    metalness,
+    roughness,
+    emissive,
+    emissiveIntensity,
   });
   material.name = sourceName;
-  return {
-    material,
-    emissiveFactor: isSide ? 0.28 : 1,
-    roughnessOffset: isSide ? 0.055 : -0.025,
-  };
+  return { material, emissiveFactor, roughnessOffset };
 }
 
 function createShadowMaterial() {
@@ -249,15 +294,17 @@ function IconMesh({
         const bounds = new THREE.Box3().setFromObject(cloned);
         const dimensions = bounds.getSize(new THREE.Vector3());
         const normalization = dimensions.y || 1;
-        const normalized = dimensions.clone().divideScalar(normalization);
+
+        cloned.scale.setScalar(1 / normalization);
+        cloned.updateMatrixWorld(true);
 
         if (CATEGORY_ICONS_DIAGNOSTICS_ENABLED && !diagnosedModels.has(path)) {
           diagnosedModels.add(path);
           console.info(`[CategoryIcons] loaded ${path}`, {
             normalizedBoundingBox: {
-              width: Number(normalized.x.toFixed(4)),
-              height: Number(normalized.y.toFixed(4)),
-              depth: Number(normalized.z.toFixed(4)),
+              width: Number((dimensions.x / normalization).toFixed(4)),
+              height: Number((dimensions.y / normalization).toFixed(4)),
+              depth: Number((dimensions.z / normalization).toFixed(4)),
             },
             meshCount,
             vertexCount,
