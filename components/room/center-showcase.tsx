@@ -13,6 +13,7 @@ import styles from "./center-showcase.module.css";
 
 export type ShowcaseCopy = ProjectMediaPlayerCopy & {
   categoriesLabel: string;
+  projectsLabel: string;
   projectCount: string;
   emptyState: string;
 };
@@ -85,6 +86,15 @@ export function CenterShowcase({
     [hasMultipleProjects, projects.length],
   );
 
+  const selectProject = useCallback(
+    (index: number) => {
+      if (index === projectIndex) return;
+      setSlideDirection(index > projectIndex ? "next" : "prev");
+      setProjectIndex(index);
+    },
+    [projectIndex],
+  );
+
   function handleTabKeyDown(
     event: React.KeyboardEvent<HTMLButtonElement>,
     index: number,
@@ -119,8 +129,7 @@ export function CenterShowcase({
     void import("gsap").then(({ gsap }) => {
       if (cancelled) return;
       contextRef.current = gsap.context(() => {
-        if (reducedMotion)
-          return;
+        if (reducedMotion) return;
         gsap.fromTo(
           screenRef.current!,
           { autoAlpha: 0.2, x: slideDirection === "next" ? 22 : -22 },
@@ -187,14 +196,41 @@ export function CenterShowcase({
         role="tabpanel"
         aria-labelledby={`tab-${activeCategoryId}`}
         className={styles.screen}
+        data-showcase-screen="true"
         data-testid="showcase-screen"
       >
+        {projects.length ? (
+          <nav
+            className={styles.projectStrip}
+            aria-label={copy.projectsLabel.replace(
+              "{category}",
+              activeCategory.label[locale],
+            )}
+          >
+            <div>
+              {projects.map((project, index) => {
+                const isActive = index === projectIndex;
+                return (
+                  <button
+                    key={project.slug}
+                    type="button"
+                    className={isActive ? styles.projectStripActive : undefined}
+                    aria-current={isActive ? "true" : undefined}
+                    onClick={() => selectProject(index)}
+                  >
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    {project.shortTitle}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+        ) : null}
         {currentProject ? (
           <ProjectMediaPlayer
             key={currentProject.slug}
             project={currentProject}
             locale={locale}
-            categoryLabel={activeCategory.label[locale]}
             copy={copy}
             detailHref={`/${locale}/projects/${currentProject.slug}`}
             projectCount={projects.length}

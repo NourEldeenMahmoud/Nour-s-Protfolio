@@ -17,6 +17,7 @@ vi.mock("gsap", () => ({
 
 const copy: ShowcaseCopy = {
   categoriesLabel: "Project categories",
+  projectsLabel: "Projects in {category}",
   previousProject: "Previous project",
   nextProject: "Next project",
   previousMedia: "Previous image",
@@ -28,22 +29,15 @@ const copy: ShowcaseCopy = {
   elapsed: "Elapsed time",
   mediaCount: "{current} of {total} scenes",
   viewProject: "Explore project",
-  repository: "Repository",
   currentScene: "Scene",
   mediaUnavailable: "Media unavailable",
   emptyState: "No published case study currently available.",
 };
 
-/** Return a desktop project arrow button (inside the screen panel, disambiguated by data-project-arrow). */
-function getDesktopProjectArrow(name: string) {
-  const panel = screen.getByRole("tabpanel");
-  return within(panel)
-    .getAllByRole("button")
-    .find(
-      (element) =>
-        element.getAttribute("data-project-arrow") === "desktop" &&
-        element.getAttribute("aria-label")?.startsWith(name),
-    )!;
+function getProjectButton(name: string, category = "Web") {
+  return within(
+    screen.getByRole("navigation", { name: `Projects in ${category}` }),
+  ).getByRole("button", { name: new RegExp(name) });
 }
 
 /** Return the desktop project counter (inside the screen panel). */
@@ -62,6 +56,8 @@ describe("CenterShowcase", () => {
         removeEventListener: vi.fn(),
       }),
     );
+    vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
+    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -121,59 +117,92 @@ describe("CenterShowcase", () => {
     ).toHaveAttribute("href", "/en/projects/blood-bank-desktop");
   });
 
-  it("cycles through projects within a category", async () => {
+  it("lists every project in the active category and supports direct selection", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    expect(
-      screen.getByRole("heading", { name: "BuildSense" }),
-    ).toBeInTheDocument();
+    const projectStrip = screen.getByRole("navigation", {
+      name: "Projects in Web",
+    });
+    expect(within(projectStrip).getAllByRole("button")).toHaveLength(4);
+    for (const projectName of [
+      "BuildSense",
+      "CinemaVerse",
+      "Bookify",
+      "Frontend Mini",
+    ]) {
+      expect(
+        within(projectStrip).getByRole("button", {
+          name: new RegExp(projectName),
+        }),
+      ).toBeInTheDocument();
+    }
 
-    // Use desktop arrow to navigate
-    await user.click(getDesktopProjectArrow("Next project"));
+    await user.click(getProjectButton("CinemaVerse"));
     expect(
       screen.getByRole("heading", { name: "CinemaVerse" }),
     ).toBeInTheDocument();
 
-    await user.click(getDesktopProjectArrow("Next project"));
+    await user.click(getProjectButton("Bookify"));
     expect(
       screen.getByRole("heading", { name: "Bookify Hotel Reservation System" }),
     ).toBeInTheDocument();
 
-    await user.click(getDesktopProjectArrow("Next project"));
+    await user.click(getProjectButton("Frontend Mini"));
     expect(
       screen.getByRole("heading", { name: "Frontend Mini Projects" }),
     ).toBeInTheDocument();
-
-    // Wraps around
-    await user.click(getDesktopProjectArrow("Next project"));
-    expect(
-      screen.getByRole("heading", { name: "BuildSense" }),
-    ).toBeInTheDocument();
   });
 
-  it("navigates backward through projects", async () => {
+  it("marks the selected project in the top strip", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    await user.click(getDesktopProjectArrow("Previous project"));
+    expect(getProjectButton("BuildSense")).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    await user.click(getProjectButton("CinemaVerse"));
+    expect(getProjectButton("CinemaVerse")).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(getProjectButton("BuildSense")).not.toHaveAttribute("aria-current");
+  });
+
+  it("keeps previous and next project arrows over the media", async () => {
+    const user = userEvent.setup();
+    render(<CenterShowcase locale="en" copy={copy} />);
+
     expect(
-      screen.getByRole("heading", { name: "Frontend Mini Projects" }),
+      screen.getByRole("button", {
+        name: "Previous project: Frontend Mini",
+      }),
+    ).toBeInTheDocument();
+    const nextProject = screen.getByRole("button", {
+      name: "Next project: CinemaVerse",
+    });
+    expect(nextProject).toBeInTheDocument();
+
+    await user.click(nextProject);
+    expect(
+      screen.getByRole("heading", { name: "CinemaVerse" }),
     ).toBeInTheDocument();
   });
 
-  it("does not show project arrows for a single-project category", async () => {
+  it("shows one project selector for a single-project category", async () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
     await user.click(screen.getByRole("tab", { name: "Mobile" }));
 
-    expect(
-      screen.queryByRole("button", { name: "Previous project" }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "Next project" }),
-    ).not.toBeInTheDocument();
+    const projectStrip = screen.getByRole("navigation", {
+      name: "Projects in Mobile",
+    });
+    expect(within(projectStrip).getAllByRole("button")).toHaveLength(1);
+    expect(within(projectStrip).getByRole("button")).toHaveTextContent(
+      "BBMS Mobile",
+    );
   });
 
   it("replaces media dots with one continuous playback timeline", () => {
@@ -285,7 +314,7 @@ describe("CenterShowcase", () => {
     const user = userEvent.setup();
     render(<CenterShowcase locale="en" copy={copy} />);
 
-    await user.click(getDesktopProjectArrow("Next project"));
+    await user.click(getProjectButton("CinemaVerse"));
     expect(
       screen.getByRole("heading", { name: "CinemaVerse" }),
     ).toBeInTheDocument();
@@ -312,7 +341,7 @@ describe("CenterShowcase", () => {
     await user.keyboard("{ArrowRight}");
     expect(timeline).toHaveValue("5");
 
-    await user.click(getDesktopProjectArrow("Next project"));
+    await user.click(getProjectButton("Sharp Shooter", "Game Dev"));
 
     expect(
       screen.getByRole("slider", { name: "Project playback timeline" }),
@@ -323,9 +352,10 @@ describe("CenterShowcase", () => {
     const arCopy: ShowcaseCopy = {
       ...copy,
       categoriesLabel: "فئات المشاريع",
-      viewProject: "استكشف المشروع",
+      projectsLabel: "مشاريع فئة {category}",
       previousProject: "المشروع السابق",
       nextProject: "المشروع التالي",
+      viewProject: "استكشف المشروع",
       previousMedia: "الصورة السابقة",
       nextMedia: "الصورة التالية",
       projectCount: "{current} من {total}",
@@ -342,55 +372,9 @@ describe("CenterShowcase", () => {
     expect(
       screen.getAllByRole("link", { name: "استكشف المشروع" })[0],
     ).toHaveAttribute("href", "/ar/projects/buildsense");
-  });
-
-  /* ── Arrow SVG and direction tests ── */
-
-  it("project buttons contain SVGs and no Unicode triangle text", () => {
-    render(<CenterShowcase locale="en" copy={copy} />);
-
-    const prevBtn = getDesktopProjectArrow("Previous project");
-    const nextBtn = getDesktopProjectArrow("Next project");
-
-    // Both buttons must contain SVG elements
-    expect(prevBtn.querySelector("svg")).toBeInTheDocument();
-    expect(nextBtn.querySelector("svg")).toBeInTheDocument();
-
-    // No Unicode triangles should remain in button text
-    expect(prevBtn.textContent).not.toMatch(/[◀▶◁▷►▿▴◂]/);
-    expect(nextBtn.textContent).not.toMatch(/[◀▶◁▷►▿▴◂]/);
-  });
-
-  it("English project directions: prev=left, next=right via data-direction", () => {
-    render(<CenterShowcase locale="en" copy={copy} />);
-
-    const prevBtn = getDesktopProjectArrow("Previous project");
-    const nextBtn = getDesktopProjectArrow("Next project");
-
-    const prevSvg = prevBtn.querySelector("svg");
-    const nextSvg = nextBtn.querySelector("svg");
-
-    expect(prevSvg).toHaveAttribute("data-direction", "left");
-    expect(nextSvg).toHaveAttribute("data-direction", "right");
-  });
-
-  it("Arabic project directions: prev=right, next=left via data-direction", () => {
-    const arCopy: ShowcaseCopy = {
-      ...copy,
-      previousProject: "المشروع السابق",
-      nextProject: "المشروع التالي",
-    };
-
-    render(<CenterShowcase locale="ar" copy={arCopy} />);
-
-    const prevBtn = getDesktopProjectArrow("المشروع السابق");
-    const nextBtn = getDesktopProjectArrow("المشروع التالي");
-
-    const prevSvg = prevBtn.querySelector("svg");
-    const nextSvg = nextBtn.querySelector("svg");
-
-    expect(prevSvg).toHaveAttribute("data-direction", "right");
-    expect(nextSvg).toHaveAttribute("data-direction", "left");
+    expect(
+      screen.getByRole("navigation", { name: "مشاريع فئة ويب" }),
+    ).toBeInTheDocument();
   });
 
   it("has an aria-live region for screen reader announcements", () => {
@@ -409,21 +393,17 @@ describe("CenterShowcase", () => {
 
     expect(getDesktopProjectCounter()).toHaveTextContent("1 / 4");
 
-    await user.click(getDesktopProjectArrow("Next project"));
+    await user.click(getProjectButton("CinemaVerse"));
     expect(getDesktopProjectCounter()).toHaveTextContent("2 / 4");
   });
 
-  it("desktop project arrows are inside role=tabpanel", () => {
+  it("places the project selector inside the category panel", () => {
     render(<CenterShowcase locale="en" copy={copy} />);
 
     const panel = screen.getByRole("tabpanel");
-    const prevBtn = getDesktopProjectArrow("Previous project");
-    const nextBtn = getDesktopProjectArrow("Next project");
-
-    expect(panel).toContainElement(prevBtn);
-    expect(panel).toContainElement(nextBtn);
-    expect(prevBtn).toHaveAttribute("data-project-arrow", "desktop");
-    expect(nextBtn).toHaveAttribute("data-project-arrow", "desktop");
+    expect(panel).toContainElement(
+      screen.getByRole("navigation", { name: "Projects in Web" }),
+    );
   });
 
   /* ── Correction pass tests ── */

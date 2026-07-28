@@ -23,6 +23,93 @@
   border: 1px solid rgb(116 212 223 / 12%);
   background: #070c12;
   box-shadow: inset 0 0 2rem rgb(0 0 0 / 38%);
+  container-type: inline-size;
+}
+
+.projectStrip {
+  position: absolute;
+  z-index: 12;
+  top: clamp(0.35rem, 1.1cqi, 0.75rem);
+  left: 50%;
+  max-width: calc(100% - 2rem);
+  opacity: 0;
+  transform: translate(-50%, -0.6rem) scale(0.985);
+  pointer-events: none;
+  transition:
+    opacity 140ms ease-in,
+    transform 140ms ease-in;
+}
+
+.screen:hover .projectStrip,
+.screen:focus-within .projectStrip {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+  pointer-events: auto;
+  transition:
+    opacity 240ms ease-out,
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.projectStrip > div {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: 100%;
+  padding: 0.22rem;
+  overflow-x: auto;
+  border: 1px solid rgb(116 212 223 / 14%);
+  border-radius: 0.25rem;
+  background: linear-gradient(90deg, rgb(4 9 14 / 86%), rgb(9 17 24 / 74%));
+  box-shadow: 0 0.7rem 1.8rem rgb(0 0 0 / 26%);
+  scrollbar-width: none;
+  backdrop-filter: blur(12px);
+}
+
+.projectStrip > div::-webkit-scrollbar {
+  display: none;
+}
+
+.projectStrip button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: clamp(1.45rem, 4cqi, 2rem);
+  padding: 0.25rem clamp(0.45rem, 1.2cqi, 0.72rem);
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgb(247 241 231 / 56%);
+  font-family: var(--font-mono);
+  font-size: clamp(0.35rem, 0.9cqi, 0.54rem);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.projectStrip button span {
+  color: rgb(116 212 223 / 48%);
+  font-size: 0.82em;
+}
+
+.projectStrip button:hover,
+.projectStrip button:focus-visible {
+  border-color: rgb(239 197 126 / 38%);
+  background: rgb(239 197 126 / 8%);
+  color: #fff;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.projectStrip .projectStripActive {
+  border-color: rgb(116 212 223 / 52%);
+  background: rgb(116 212 223 / 12%);
+  color: #fff;
+  box-shadow: inset 0 -2px #74d4df;
 }
 
 .tabs {
@@ -137,9 +224,19 @@
 
 [dir="rtl"] .tabLabel,
 [dir="rtl"] .emptyCategory,
-[dir="rtl"] .emptyMessage {
+[dir="rtl"] .emptyMessage,
+[dir="rtl"] .projectStrip button {
   font-family: var(--font-arabic);
   letter-spacing: 0;
+}
+
+[dir="rtl"] .projectStrip {
+  transform: translate(50%, -0.6rem) scale(0.985);
+}
+
+[dir="rtl"] .screen:hover .projectStrip,
+[dir="rtl"] .screen:focus-within .projectStrip {
+  transform: translate(50%, 0) scale(1);
 }
 
 @media (max-width: 780px) {
@@ -203,8 +300,32 @@
     margin: 0.4rem auto 0;
     border-radius: 4px;
   }
+
+  .projectStrip {
+    top: 0.45rem;
+    max-width: calc(100% - 1rem);
+  }
+
+  .projectStrip button {
+    min-height: 44px;
+    font-size: 0.68rem;
+  }
 }
 
-:global(html[data-motion="reduced"]) .tab {
+@media (hover: none), (pointer: coarse) {
+  .projectStrip {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    pointer-events: auto;
+  }
+
+  [dir="rtl"] .projectStrip {
+    transform: translate(50%, 0) scale(1);
+  }
+}
+
+:global(html[data-motion="reduced"]) .tab,
+:global(html[data-motion="reduced"]) .projectStrip,
+:global(html[data-motion="reduced"]) .projectStrip button {
   transition: none;
 }

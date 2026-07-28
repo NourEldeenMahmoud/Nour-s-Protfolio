@@ -2,8 +2,6 @@
   --player-amber: #efc57e;
   --player-cyan: #74d4df;
   position: relative;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -18,21 +16,6 @@
   box-shadow: inset 0 0 0 2px rgb(116 212 223 / 75%);
 }
 
-.topBar {
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(0.4rem, 1.2cqi, 0.85rem);
-  min-height: clamp(2rem, 7cqi, 3.35rem);
-  padding: clamp(0.3rem, 1cqi, 0.6rem) clamp(0.45rem, 1.4cqi, 0.9rem);
-  border-block-end: 1px solid rgb(239 197 126 / 18%);
-  background: linear-gradient(180deg, rgb(7 12 18 / 96%), rgb(7 12 18 / 82%));
-  backdrop-filter: blur(10px);
-}
-
-.identity,
-.topActions,
 .transportRow,
 .transportButtons,
 .titleRow {
@@ -40,44 +23,16 @@
   align-items: center;
 }
 
-.identity {
-  min-width: 0;
-  gap: clamp(0.3rem, 1cqi, 0.65rem);
-}
-
-.wordmark {
-  color: var(--player-amber);
-  font-family: var(--font-sans);
-  font-size: clamp(0.62rem, 1.8cqi, 1rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  white-space: nowrap;
-}
-
-.identityRule {
-  width: 1px;
-  height: 1rem;
-  background: linear-gradient(transparent, rgb(239 197 126 / 60%), transparent);
-}
-
-.category,
 .scene {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: rgb(247 241 231 / 58%);
   font-family: var(--font-mono);
   font-size: clamp(0.34rem, 0.92cqi, 0.56rem);
   letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.category {
-  color: rgb(116 212 223 / 88%);
-}
-
-.scene {
-  min-width: 0;
-  max-width: 19rem;
-  overflow: hidden;
-  color: rgb(247 241 231 / 58%);
   text-overflow: ellipsis;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -86,13 +41,6 @@
   color: rgb(247 241 231 / 30%);
 }
 
-.topActions {
-  flex-shrink: 0;
-  gap: 0.35rem;
-}
-
-.repositoryLink,
-.topProjectLink,
 .primaryAction {
   display: inline-flex;
   align-items: center;
@@ -100,26 +48,6 @@
   text-decoration: none;
 }
 
-.repositoryLink,
-.topProjectLink {
-  min-height: clamp(1.45rem, 4.5cqi, 2.2rem);
-  padding-inline: clamp(0.38rem, 1.1cqi, 0.65rem);
-  border: 1px solid rgb(247 241 231 / 14%);
-  color: rgb(247 241 231 / 72%);
-  font-family: var(--font-mono);
-  font-size: clamp(0.34rem, 0.85cqi, 0.52rem);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.topProjectLink {
-  gap: 0.3rem;
-  border-color: rgb(239 197 126 / 40%);
-  background: rgb(239 197 126 / 10%);
-  color: var(--player-amber);
-}
-
-.topProjectLink svg,
 .primaryAction svg,
 .projectNav svg,
 .iconButton svg {
@@ -133,8 +61,8 @@
 }
 
 .stage {
-  position: relative;
-  min-height: 0;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 40%, rgb(36 71 83 / 22%), transparent 52%),
@@ -157,8 +85,6 @@
 
 .mediaImage {
   object-fit: contain;
-  will-change: transform;
-  transition: transform 90ms linear;
 }
 
 .imageFramePortrait .mediaImage {
@@ -188,91 +114,129 @@
 
 .stageShade {
   position: absolute;
+  z-index: 2;
   inset: 0;
   background:
     linear-gradient(
       90deg,
-      rgb(3 7 11 / 42%),
-      transparent 13%,
-      transparent 87%,
-      rgb(3 7 11 / 42%)
+      rgb(3 7 11 / 92%) 0,
+      rgb(3 7 11 / 48%) 8%,
+      transparent 24%,
+      transparent 76%,
+      rgb(3 7 11 / 48%) 92%,
+      rgb(3 7 11 / 92%) 100%
     ),
-    linear-gradient(0deg, rgb(3 7 11 / 38%), transparent 24%);
+    linear-gradient(0deg, rgb(3 7 11 / 34%), transparent 19%);
   pointer-events: none;
+}
+
+.projectMeta {
+  position: absolute;
+  z-index: 5;
+  top: 64%;
+  inset-inline-start: 0;
+  width: clamp(8.5rem, 22cqi, 15rem);
+  padding: clamp(0.65rem, 1.7cqi, 1.15rem) clamp(0.55rem, 1.5cqi, 1rem);
+  background: linear-gradient(90deg, rgb(4 9 14 / 96%) 0 58%, transparent);
+  opacity: 0;
+  transform: translate3d(-0.7rem, -50%, 0);
+  pointer-events: none;
+  transition:
+    opacity 140ms ease-in,
+    transform 140ms ease-in;
 }
 
 .projectNav {
   position: absolute;
+  z-index: 7;
   top: 50%;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-width: clamp(2rem, 5cqi, 2.8rem);
-  min-height: clamp(2rem, 5cqi, 2.8rem);
-  padding: 0.35rem;
+  display: grid;
+  width: clamp(2rem, 5cqi, 2.8rem);
+  height: clamp(2rem, 5cqi, 2.8rem);
+  padding: 0;
+  place-items: center;
   border: 1px solid rgb(239 197 126 / 34%);
-  border-radius: 999px;
+  border-radius: 50%;
   background: rgb(5 10 16 / 82%);
   color: rgb(247 241 231 / 88%);
   box-shadow: 0 0.4rem 1.2rem rgb(0 0 0 / 28%);
+  opacity: 0;
   cursor: pointer;
-  transform: translateY(-50%);
+  transform: translateY(-50%) scale(0.9);
+  pointer-events: none;
   transition:
+    opacity 140ms ease-in,
     border-color 180ms ease,
     background 180ms ease,
-    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 140ms ease-in;
 }
 
-.projectNav span {
-  max-width: 0;
-  overflow: hidden;
-  font-family: var(--font-mono);
-  font-size: clamp(0.35rem, 0.9cqi, 0.52rem);
-  opacity: 0;
-  white-space: nowrap;
-  transition:
-    max-width 280ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 180ms ease;
+.projectNavPrevious {
+  inset-inline-start: clamp(0.4rem, 1.2cqi, 0.8rem);
 }
 
-.projectNav:hover span,
-.projectNav:focus-visible span {
-  max-width: 10rem;
-  opacity: 1;
+.projectNavNext {
+  inset-inline-end: clamp(0.4rem, 1.2cqi, 0.8rem);
 }
 
 .projectNav:hover,
 .projectNav:focus-visible {
-  border-color: rgb(239 197 126 / 70%);
+  border-color: rgb(239 197 126 / 72%);
   background: rgb(11 19 28 / 96%);
+  color: #fff;
   outline: none;
 }
 
-.projectNavPrev {
-  inset-inline-start: clamp(0.35rem, 1.2cqi, 0.8rem);
-}
-
-.projectNavNext {
-  inset-inline-end: clamp(0.35rem, 1.2cqi, 0.8rem);
-}
-
-.controlDeck {
-  z-index: 5;
-  display: grid;
-  grid-template-columns: minmax(9rem, 0.8fr) minmax(13rem, 1.25fr) auto;
-  align-items: center;
-  gap: clamp(0.5rem, 1.5cqi, 1rem);
-  min-height: clamp(4.4rem, 14cqi, 7rem);
-  padding: clamp(0.42rem, 1.25cqi, 0.85rem) clamp(0.5rem, 1.5cqi, 1rem);
-  border-block-start: 1px solid rgb(116 212 223 / 16%);
+.transportOverlay {
+  position: absolute;
+  z-index: 7;
+  right: clamp(7.5rem, 19cqi, 13rem);
+  bottom: clamp(0.45rem, 1.2cqi, 0.8rem);
+  left: clamp(7.5rem, 19cqi, 13rem);
+  padding: clamp(0.38rem, 0.9cqi, 0.62rem) clamp(0.5rem, 1.2cqi, 0.8rem);
+  border: 1px solid rgb(116 212 223 / 18%);
+  border-radius: 0.25rem;
   background:
-    linear-gradient(90deg, rgb(15 24 34 / 98%), rgb(7 12 18 / 98%)), #070c12;
-  box-shadow: 0 -0.8rem 2rem rgb(0 0 0 / 24%);
+    linear-gradient(90deg, rgb(12 22 31 / 92%), rgb(4 9 14 / 94%)), #070c12;
+  box-shadow: 0 0.65rem 1.8rem rgb(0 0 0 / 38%);
+  opacity: 0;
+  transform: translateY(0.7rem) scale(0.985);
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  transition:
+    opacity 140ms ease-in,
+    transform 140ms ease-in;
 }
 
-.projectMeta {
-  min-width: 0;
+:global([data-showcase-screen]:hover) .transportOverlay,
+:global([data-showcase-screen]:focus-within) .transportOverlay {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  transition:
+    opacity 240ms ease-out,
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-showcase-screen]:hover) .projectMeta,
+:global([data-showcase-screen]:focus-within) .projectMeta {
+  opacity: 1;
+  transform: translate3d(0, -50%, 0);
+  transition:
+    opacity 240ms ease-out,
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-showcase-screen]:hover) .projectNav,
+:global([data-showcase-screen]:focus-within) .projectNav {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+  pointer-events: auto;
+  transition:
+    opacity 240ms ease-out,
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .titleRow {
@@ -331,10 +295,6 @@
   font-family: var(--font-mono);
   font-size: clamp(0.3rem, 0.72cqi, 0.44rem);
   letter-spacing: 0.03em;
-}
-
-.transport {
-  min-width: 0;
 }
 
 .transportRow {
@@ -487,6 +447,10 @@
 }
 
 .primaryAction {
+  position: absolute;
+  z-index: 6;
+  top: 64%;
+  inset-inline-end: clamp(0.45rem, 1.3cqi, 0.9rem);
   gap: 0.45rem;
   min-width: clamp(6.8rem, 14cqi, 9.6rem);
   min-height: clamp(2.1rem, 5.5cqi, 2.8rem);
@@ -504,11 +468,22 @@
   box-shadow:
     inset 0 1px rgb(255 255 255 / 8%),
     0 0.55rem 1.25rem rgb(0 0 0 / 20%);
+  opacity: 0;
+  transform: translateY(-50%) scale(0.96);
+  pointer-events: none;
+  backdrop-filter: blur(10px);
   transition:
     background 180ms ease,
     border-color 180ms ease,
     color 180ms ease,
     transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-showcase-screen]:hover) .primaryAction,
+:global([data-showcase-screen]:focus-within) .primaryAction {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+  pointer-events: auto;
 }
 
 .primaryAction svg {
@@ -525,33 +500,19 @@
   );
   color: #fff;
   outline: none;
-  transform: translateY(-2px);
+  transform: translateY(-50%) scale(1.025);
 }
 
 .primaryAction:hover svg,
-.primaryAction:focus-visible svg,
-.topProjectLink:hover svg,
-.topProjectLink:focus-visible svg {
+.primaryAction:focus-visible svg {
   transform: translateX(3px);
-}
-
-.repositoryLink:hover,
-.repositoryLink:focus-visible,
-.topProjectLink:hover,
-.topProjectLink:focus-visible {
-  border-color: rgb(116 212 223 / 62%);
-  color: #fff;
-  outline: none;
 }
 
 [dir="rtl"] .player {
   font-family: var(--font-arabic);
 }
 
-[dir="rtl"] .category,
 [dir="rtl"] .scene,
-[dir="rtl"] .repositoryLink,
-[dir="rtl"] .topProjectLink,
 [dir="rtl"] .projectOrdinal,
 [dir="rtl"] .timeReadout,
 [dir="rtl"] .mediaCount {
@@ -559,96 +520,90 @@
   letter-spacing: 0;
 }
 
+[dir="rtl"] .projectMeta {
+  background: linear-gradient(-90deg, rgb(4 9 14 / 96%) 0 58%, transparent);
+  transform: translate3d(0.7rem, -50%, 0);
+}
+
+[dir="rtl"] :global([data-showcase-screen]:hover) .projectMeta,
+[dir="rtl"] :global([data-showcase-screen]:focus-within) .projectMeta {
+  transform: translate3d(0, -50%, 0);
+}
+
+[dir="rtl"] .primaryAction svg {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .primaryAction:hover svg,
+[dir="rtl"] .primaryAction:focus-visible svg {
+  transform: translateX(-3px) scaleX(-1);
+}
+
 [dir="rtl"] .timelinePreview {
   transform: translateX(50%);
 }
 
 @container (max-width: 650px) {
-  .scene,
-  .repositoryLink,
-  .projectMeta p,
-  .projectMeta ul,
-  .projectNav span {
+  .scene {
     display: none;
   }
 
-  .controlDeck {
-    grid-template-columns: minmax(7rem, 0.75fr) minmax(9rem, 1.25fr) auto;
+  .projectMeta {
+    width: clamp(7.5rem, 28cqi, 10.5rem);
   }
 
   .primaryAction {
-    min-width: auto;
+    min-width: clamp(6.5rem, 21cqi, 8rem);
   }
 
-  .primaryAction span {
-    display: none;
+  .transportOverlay {
+    right: clamp(5.8rem, 17cqi, 8rem);
+    left: clamp(5.8rem, 17cqi, 8rem);
   }
 }
 
 @container (max-width: 440px) {
-  .topProjectLink,
   .projectOrdinal,
   .mediaCount {
     display: none;
   }
 
-  .controlDeck {
-    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr) auto;
-    gap: 0.3rem;
+  .projectMeta {
+    width: min(44cqi, 8.5rem);
+    padding-inline-end: 1.5rem;
   }
 
   .projectMeta h3 {
     font-size: clamp(0.52rem, 2.6cqi, 0.72rem);
   }
+
+  .projectMeta p {
+    font-size: clamp(0.38rem, 1.9cqi, 0.5rem);
+  }
+
+  .projectMeta li:nth-child(n + 3) {
+    display: none;
+  }
+
+  .primaryAction {
+    min-width: 5.6rem;
+    padding-inline: 0.55rem;
+  }
+
+  .transportOverlay {
+    right: 0.4rem;
+    bottom: 0.4rem;
+    left: 0.4rem;
+  }
 }
 
 @media (max-width: 780px) {
-  .topBar {
-    min-height: 3rem;
-    padding: 0.45rem 0.6rem;
-  }
-
-  .wordmark {
-    font-size: 0.78rem;
-  }
-
-  .category {
-    font-size: 0.52rem;
-  }
-
-  .stage {
-    min-height: min(50vh, 27rem);
-  }
-
-  .projectNav {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  .controlDeck {
-    grid-template-columns: 1fr auto;
-    gap: 0.55rem;
-    padding: 0.65rem;
-  }
-
-  .projectMeta {
-    grid-column: 1 / -1;
+  .player {
+    min-height: inherit;
   }
 
   .projectMeta h3 {
-    font-size: 0.9rem;
-  }
-
-  .projectMeta p {
-    display: none;
-  }
-
-  .projectMeta ul {
-    display: none;
-  }
-
-  .transport {
-    min-width: 0;
+    font-size: clamp(0.68rem, 2.8vw, 0.9rem);
   }
 
   .iconButton {
@@ -657,8 +612,31 @@
   }
 
   .primaryAction {
-    min-width: 44px;
     min-height: 44px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .transportOverlay,
+  .projectMeta,
+  .projectNav,
+  .primaryAction {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .transportOverlay {
+    transform: translateY(0) scale(1);
+  }
+
+  .projectMeta {
+    transform: translate3d(0, -50%, 0);
+    pointer-events: none;
+  }
+
+  .projectNav,
+  .primaryAction {
+    transform: translateY(-50%) scale(1);
   }
 }
 
@@ -666,16 +644,12 @@
   animation: reducedReveal 180ms ease-out both;
 }
 
-:global(html[data-motion="reduced"]) .mediaImage {
-  transition: none;
-}
-
+:global(html[data-motion="reduced"]) .transportOverlay,
+:global(html[data-motion="reduced"]) .projectMeta,
 :global(html[data-motion="reduced"]) .projectNav,
-:global(html[data-motion="reduced"]) .projectNav span,
 :global(html[data-motion="reduced"]) .iconButton,
 :global(html[data-motion="reduced"]) .primaryAction,
-:global(html[data-motion="reduced"]) .primaryAction svg,
-:global(html[data-motion="reduced"]) .topProjectLink svg {
+:global(html[data-motion="reduced"]) .primaryAction svg {
   transition: none;
 }
 

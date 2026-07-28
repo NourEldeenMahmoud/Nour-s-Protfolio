@@ -77,6 +77,7 @@
     },
     "showcase": {
       "categoriesLabel": "فئات المشاريع",
+      "projectsLabel": "مشاريع فئة {category}",
       "previousProject": "المشروع السابق",
       "nextProject": "المشروع التالي",
       "previousMedia": "الصورة السابقة",
@@ -88,7 +89,6 @@
       "elapsed": "الوقت المنقضي",
       "mediaCount": "المشهد {current} من {total}",
       "viewProject": "استكشف المشروع",
-      "repository": "المستودع",
       "currentScene": "المشهد",
       "mediaUnavailable": "الوسائط غير متاحة",
       "emptyState": "لا توجد دراسة حالة منشورة متاحة حالياً."

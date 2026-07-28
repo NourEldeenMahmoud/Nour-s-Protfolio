@@ -50,6 +50,7 @@ export default async function EntryPage({
         },
         showcase: {
           categoriesLabel: t("showcase.categoriesLabel"),
+          projectsLabel: t.raw("showcase.projectsLabel"),
           previousProject: t("showcase.previousProject"),
           nextProject: t("showcase.nextProject"),
           previousMedia: t("showcase.previousMedia"),
@@ -61,7 +62,6 @@ export default async function EntryPage({
           elapsed: t("showcase.elapsed"),
           mediaCount: t.raw("showcase.mediaCount"),
           viewProject: t("showcase.viewProject"),
-          repository: t("showcase.repository"),
           currentScene: t("showcase.currentScene"),
           mediaUnavailable: t("showcase.mediaUnavailable"),
           emptyState: t("showcase.emptyState"),

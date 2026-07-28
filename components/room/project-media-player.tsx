@@ -37,7 +37,6 @@ export type ProjectMediaPlayerCopy = {
   previousProject: string;
   nextProject: string;
   viewProject: string;
-  repository: string;
   currentScene: string;
   mediaCount: string;
   mediaUnavailable: string;
@@ -71,17 +70,25 @@ function PlayIcon({ paused }: { paused: boolean }) {
   );
 }
 
-
-
 function useSaveData() {
   const [saveData, setSaveData] = useState(() => {
     if (typeof navigator === "undefined") return false;
-    return (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    return (
+      (navigator as unknown as { connection?: { saveData?: boolean } })
+        .connection?.saveData === true
+    );
   });
 
   useEffect(() => {
     if (typeof navigator === "undefined") return;
-    const conn = (navigator as unknown as { connection?: { saveData?: boolean; addEventListener?: (type: string, listener: () => void) => void } }).connection;
+    const conn = (
+      navigator as unknown as {
+        connection?: {
+          saveData?: boolean;
+          addEventListener?: (type: string, listener: () => void) => void;
+        };
+      }
+    ).connection;
     if (!conn) return;
     const update = () => setSaveData(conn.saveData === true);
     conn.addEventListener?.("change", update);
@@ -90,37 +97,16 @@ function useSaveData() {
   return saveData;
 }
 
-function mediaTransform(
-  index: number,
-  progress: number,
-  reducedMotion: boolean,
-) {
-  if (reducedMotion) return "scale(1)";
-  const paths: Array<[number, number, number, number]> = [
-    [-1.1, -0.5, 1.1, 0.5],
-    [1.2, -0.4, -0.8, 0.6],
-    [-0.4, 0.9, 0.7, -0.7],
-    [0.8, 0.6, -1, -0.4],
-  ];
-  const [fromX, fromY, toX, toY] = paths[index % paths.length]!;
-  const x = fromX + (toX - fromX) * progress;
-  const y = fromY + (toY - fromY) * progress;
-  const scale = 1.025 + progress * 0.035;
-  return `translate3d(${x}%, ${y}%, 0) scale(${scale})`;
-}
-
 function ImageSequenceFrame({
   media,
   locale,
   index,
-  progress,
   reducedMotion,
   onError,
 }: {
   media: ProjectMedia;
   locale: Locale;
   index: number;
-  progress: number;
   reducedMotion: boolean;
   onError: () => void;
 }) {
@@ -142,7 +128,6 @@ function ImageSequenceFrame({
         priority={index === 0}
         style={{
           objectPosition: media.focalPosition ?? "50% 50%",
-          transform: mediaTransform(index, progress, reducedMotion),
         }}
         onError={onError}
       />
@@ -153,7 +138,6 @@ function ImageSequenceFrame({
 export function ProjectMediaPlayer({
   project,
   locale,
-  categoryLabel,
   copy,
   detailHref,
   projectCount,
@@ -165,7 +149,6 @@ export function ProjectMediaPlayer({
 }: {
   project: Project;
   locale: Locale;
-  categoryLabel: string;
   copy: ProjectMediaPlayerCopy;
   detailHref: string;
   projectCount: number;
@@ -271,7 +254,14 @@ export function ProjectMediaPlayer({
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [isPlaying, documentVisible, isIntersecting, isInteracting, currentMedia, totalDuration]);
+  }, [
+    isPlaying,
+    documentVisible,
+    isIntersecting,
+    isInteracting,
+    currentMedia,
+    totalDuration,
+  ]);
 
   // Video element play/pause state synchronization
   useEffect(() => {
@@ -327,7 +317,9 @@ export function ProjectMediaPlayer({
       setTimelineTime(0);
       if (isPlaying && documentVisible && isIntersecting && !isInteracting) {
         if (videoRef.current) {
-          void Promise.resolve(videoRef.current.play()).catch(() => setIsPlaying(false));
+          void Promise.resolve(videoRef.current.play()).catch(() =>
+            setIsPlaying(false),
+          );
         }
       } else {
         setIsPlaying(false);
@@ -335,7 +327,15 @@ export function ProjectMediaPlayer({
     } else {
       goToMedia("next");
     }
-  }, [playlist.length, currentMedia?.type, isPlaying, documentVisible, isIntersecting, isInteracting, goToMedia]);
+  }, [
+    playlist.length,
+    currentMedia?.type,
+    isPlaying,
+    documentVisible,
+    isIntersecting,
+    isInteracting,
+    goToMedia,
+  ]);
 
   function handlePlayerKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget) return;
@@ -401,47 +401,21 @@ export function ProjectMediaPlayer({
     "--timeline-buffered": `${Math.max(bufferedProgress, progress)}%`,
   } as CSSProperties;
 
-  const isVideoFailed = currentMedia?.type === "video" && failedMedia.has(currentMedia.id);
-  const isPosterFailed = currentMedia?.type === "video" && currentMedia.poster && failedMedia.has(`${currentMedia.id}-poster`);
+  const isVideoFailed =
+    currentMedia?.type === "video" && failedMedia.has(currentMedia.id);
+  const isPosterFailed =
+    currentMedia?.type === "video" &&
+    currentMedia.poster &&
+    failedMedia.has(`${currentMedia.id}-poster`);
 
   return (
     <div
       ref={playerRef}
       className={styles.player}
-      data-playing={isPlaying ? "true" : "false"}
-      data-project={project.slug}
       tabIndex={0}
       aria-label={project.title}
       onKeyDown={handlePlayerKeyDown}
     >
-      <header className={styles.topBar}>
-        <div className={styles.identity}>
-          <span className={styles.wordmark} aria-hidden="true">
-            {project.shortTitle}
-          </span>
-          <span className={styles.identityRule} aria-hidden="true" />
-          <span className={styles.category}>{categoryLabel}</span>
-          <span className={styles.scene} title={sceneLabel}>
-            <span>{copy.currentScene}</span>
-            {sceneLabel}
-          </span>
-        </div>
-        <nav className={styles.topActions} aria-label={project.title}>
-          <a
-            className={styles.repositoryLink}
-            href={project.repository}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {copy.repository}
-          </a>
-          <Link className={styles.topProjectLink} href={detailHref}>
-            {copy.viewProject}
-            <ArrowIcon direction={nextDirection} />
-          </Link>
-        </nav>
-      </header>
-
       <div
         className={styles.stage}
         onPointerDown={handleSwipeStart}
@@ -456,29 +430,30 @@ export function ProjectMediaPlayer({
                 media={currentMedia}
                 locale={locale}
                 index={position.index}
-                progress={position.itemProgress}
                 reducedMotion={reducedMotion}
                 onError={() => markMediaFailed(currentMedia.id)}
               />
             ) : (
-              <div className={styles.mediaFallback}>{copy.mediaUnavailable}</div>
+              <div className={styles.mediaFallback}>
+                {copy.mediaUnavailable}
+              </div>
             )
           ) : (
-            /* Video Media Frame with Poster Fallback / Crossfade */
             <div className={styles.imageFrame}>
-              {/* Show poster before canplay or if video failed (unless poster also failed) */}
-              {(currentMedia.poster && (!videoCanPlay || isVideoFailed) && !isPosterFailed) && (
-                <Image
-                  className={styles.mediaImage}
-                  src={currentMedia.poster}
-                  alt={currentMedia.alt[locale]}
-                  fill
-                  sizes="(max-width: 780px) 100vw, 50vw"
-                  priority
-                  style={{ objectFit: "cover" }}
-                  onError={() => markMediaFailed(`${currentMedia.id}-poster`)}
-                />
-              )}
+              {currentMedia.poster &&
+                (!videoCanPlay || isVideoFailed) &&
+                !isPosterFailed && (
+                  <Image
+                    className={styles.mediaImage}
+                    src={currentMedia.poster}
+                    alt={currentMedia.alt[locale]}
+                    fill
+                    sizes="(max-width: 780px) 100vw, 50vw"
+                    priority
+                    style={{ objectFit: "contain" }}
+                    onError={() => markMediaFailed(`${currentMedia.id}-poster`)}
+                  />
+                )}
 
               {!isVideoFailed && (
                 <video
@@ -511,7 +486,9 @@ export function ProjectMediaPlayer({
               )}
 
               {isVideoFailed && (!currentMedia.poster || isPosterFailed) && (
-                <div className={styles.mediaFallback}>{copy.mediaUnavailable}</div>
+                <div className={styles.mediaFallback}>
+                  {copy.mediaUnavailable}
+                </div>
               )}
             </div>
           )
@@ -531,47 +508,46 @@ export function ProjectMediaPlayer({
         )}
         <div className={styles.stageShade} aria-hidden="true" />
 
-        {onPreviousProject && onNextProject && (
+        {onPreviousProject && onNextProject ? (
           <>
             <button
               type="button"
-              className={`${styles.projectNav} ${styles.projectNavPrev}`}
+              className={`${styles.projectNav} ${styles.projectNavPrevious}`}
               aria-label={`${copy.previousProject}: ${previousProjectTitle ?? ""}`}
-              data-project-arrow="desktop"
               onClick={onPreviousProject}
             >
               <ArrowIcon direction={prevDirection} />
-              <span>{previousProjectTitle}</span>
             </button>
             <button
               type="button"
               className={`${styles.projectNav} ${styles.projectNavNext}`}
               aria-label={`${copy.nextProject}: ${nextProjectTitle ?? ""}`}
-              data-project-arrow="desktop"
               onClick={onNextProject}
             >
-              <span>{nextProjectTitle}</span>
               <ArrowIcon direction={nextDirection} />
             </button>
           </>
-        )}
-      </div>
+        ) : null}
 
-      <section className={styles.controlDeck} aria-label={project.title}>
-        <div className={styles.projectMeta}>
+        <aside className={styles.projectMeta}>
           <div className={styles.titleRow}>
             <span className={styles.projectOrdinal}>{projectCounter}</span>
             <h3>{project.title}</h3>
           </div>
           <p>{project.summary[locale]}</p>
-          <ul aria-label="Stack">
+          <ul aria-label={locale === "ar" ? "التقنيات" : "Stack"}>
             {project.stack.slice(0, 4).map((technology) => (
               <li key={technology}>{technology}</li>
             ))}
           </ul>
-        </div>
+        </aside>
 
-        <div className={styles.transport}>
+        <Link className={styles.primaryAction} href={detailHref}>
+          <span>{copy.viewProject}</span>
+          <ArrowIcon direction={nextDirection} />
+        </Link>
+
+        <section className={styles.transportOverlay} aria-label={project.title}>
           <div className={styles.transportRow}>
             <div className={styles.transportButtons}>
               <button
@@ -603,6 +579,10 @@ export function ProjectMediaPlayer({
                 </>
               )}
             </div>
+            <span className={styles.scene} title={sceneLabel}>
+              <span>{copy.currentScene}</span>
+              {sceneLabel}
+            </span>
             <span className={styles.timeReadout}>
               <span className="sr-only">{copy.elapsed}: </span>
               {formatPlaybackTime(timelineTime)} /{" "}
@@ -668,13 +648,8 @@ export function ProjectMediaPlayer({
               </span>
             )}
           </div>
-        </div>
-
-        <Link className={styles.primaryAction} href={detailHref}>
-          <span>{copy.viewProject}</span>
-          <ArrowIcon direction={nextDirection} />
-        </Link>
-      </section>
+        </section>
+      </div>
 
       <div
         className="sr-only"

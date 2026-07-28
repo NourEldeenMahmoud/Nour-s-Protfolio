@@ -17,7 +17,6 @@ const copy: ProjectMediaPlayerCopy = {
   previousProject: "Previous project",
   nextProject: "Next project",
   viewProject: "Explore project",
-  repository: "Repository",
   currentScene: "Scene",
   mediaCount: "{current} of {total} scenes",
   mediaUnavailable: "Media unavailable",
@@ -30,7 +29,6 @@ function renderBuildSensePlayer() {
       <ProjectMediaPlayer
         project={buildsense}
         locale="en"
-        categoryLabel="Web"
         copy={copy}
         detailHref="/en/projects/buildsense"
         projectCount={1}
@@ -73,8 +71,13 @@ describe("ProjectMediaPlayer video playback & preferences", () => {
   it("uses native video metadata and time updates in the shared timeline", () => {
     renderBuildSensePlayer();
 
-    const video = screen.getByLabelText("BuildSense PC hardware discovery preview video");
-    expect(video).toHaveAttribute("src", "/projects/buildsense/preview/preview.mp4");
+    const video = screen.getByLabelText(
+      "BuildSense PC hardware discovery preview video",
+    );
+    expect(video).toHaveAttribute(
+      "src",
+      "/projects/buildsense/preview/preview.mp4",
+    );
     expect(video).toHaveAttribute("preload", "metadata");
     expect(video).toHaveProperty("muted", true);
     expect(video).toHaveProperty("playsInline", true);
@@ -97,20 +100,50 @@ describe("ProjectMediaPlayer video playback & preferences", () => {
     expect(screen.getByText("0:03 / 0:07")).toBeInTheDocument();
   });
 
+  it("keeps project information and the primary action in edge overlays", () => {
+    renderBuildSensePlayer();
+
+    expect(
+      screen.getByRole("heading", { name: "BuildSense" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "PC hardware discovery and compatibility for the Egyptian market.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Explore project/ }),
+    ).toHaveAttribute("href", "/en/projects/buildsense");
+    expect(
+      screen.queryByRole("link", { name: "Repository" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders poster image before video canplay", () => {
     renderBuildSensePlayer();
 
-    const posterImg = screen.getByAltText("BuildSense PC hardware discovery preview video");
+    const posterImg = screen.getByAltText(
+      "BuildSense PC hardware discovery preview video",
+    );
     expect(posterImg).toBeInTheDocument();
-    expect(posterImg).toHaveAttribute("src", expect.stringContaining("poster.webp"));
+    expect(posterImg).toHaveAttribute(
+      "src",
+      expect.stringContaining("poster.webp"),
+    );
   });
 
   it("resets currentTime and replays on single-video ended event", () => {
     renderBuildSensePlayer();
 
-    const video = screen.getByLabelText("BuildSense PC hardware discovery preview video") as HTMLVideoElement;
-    Object.defineProperty(video, "currentTime", { configurable: true, writable: true, value: 7 });
-    
+    const video = screen.getByLabelText(
+      "BuildSense PC hardware discovery preview video",
+    ) as HTMLVideoElement;
+    Object.defineProperty(video, "currentTime", {
+      configurable: true,
+      writable: true,
+      value: 7,
+    });
+
     fireEvent.ended(video);
     expect(video.currentTime).toBe(0);
   });
@@ -120,8 +153,12 @@ describe("ProjectMediaPlayer video playback & preferences", () => {
 
     renderBuildSensePlayer();
 
-    expect(screen.getByLabelText("BuildSense PC hardware discovery preview video")).toBeInTheDocument();
-    expect(screen.getByRole("slider", { name: copy.timeline })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("BuildSense PC hardware discovery preview video"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("slider", { name: copy.timeline }),
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: copy.play }) ??
         screen.queryByRole("button", { name: copy.pause }),
@@ -134,7 +171,9 @@ describe("ProjectMediaPlayer video playback & preferences", () => {
     });
 
     renderBuildSensePlayer();
-    const video = screen.getByLabelText("BuildSense PC hardware discovery preview video");
+    const video = screen.getByLabelText(
+      "BuildSense PC hardware discovery preview video",
+    );
     expect(video).toHaveAttribute("preload", "none");
     expect(screen.getByRole("button", { name: copy.play })).toBeInTheDocument();
   });
