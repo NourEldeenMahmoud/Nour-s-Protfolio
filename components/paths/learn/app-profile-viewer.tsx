@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/routing";
 import { applicationMap, learnNodeMap } from "@/content/learn";
 import { getProject } from "@/content/portfolio";
 import { buildAppPlainText } from "./copy-text";
+import { downloadTextFile } from "./download-file";
 import styles from "./learn.module.css";
 
 interface AppProfileViewerProps {
@@ -104,7 +105,7 @@ export function AppProfileViewer({
             <ul className={styles.docRelatedList}>
               {app.relatedSkillIds.map((sid) => {
                 const skill = learnNodeMap.get(sid);
-                if (!skill) return null;
+                if (!skill?.public) return null;
                 return (
                   <li key={sid} className={styles.docRelatedTag}>
                     {skill.name[locale]}
@@ -121,7 +122,7 @@ export function AppProfileViewer({
             <ul className={styles.docRelatedList}>
               {app.relatedFileIds.map((fid) => {
                 const file = learnNodeMap.get(fid);
-                if (!file) return null;
+                if (!file?.public) return null;
                 return (
                   <li key={fid} className={styles.docRelatedTag}>
                     {file.name[locale]}
@@ -167,6 +168,19 @@ export function AppProfileViewer({
             </ul>
           </div>
         )}
+
+        <div className={styles.docUtilityActions}>
+          <button
+            className={styles.docDownload}
+            type="button"
+            onClick={() =>
+              downloadTextFile(`${app.slug}.md`, buildAppPlainText(app))
+            }
+          >
+            <span aria-hidden="true">↓</span>
+            {locale === "ar" ? "تنزيل الملف" : "Download file"}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ export const widgetsV2: WidgetV2[] = [
     content:
       "A personal digital workspace for tools, technical knowledge, AI workflows, and continuous learning.",
     subtitle: ".NET-focused Software Engineer",
+    avatarSrc: "/profile/nour-eldeen.webp",
     avatarFallback: "NE",
     accentColor: "#0078d4",
     capsules: [
@@ -20,8 +21,7 @@ export const widgetsV2: WidgetV2[] = [
       { label: "Technical Skills" },
     ],
     footer: "Learn \u00B7 Build \u00B7 Validate",
-    openFolderId: "about",
-    openFileId: "about-profile",
+    openFileId: "about",
   },
   {
     id: "featured",
@@ -43,8 +43,7 @@ export const widgetsV2: WidgetV2[] = [
         description:
           "Reusable capabilities, specialized agents, and human-reviewed development workflows.",
         variant: "workflow",
-        openFolderId: "workflows",
-        openFileId: "ai-skills-overview",
+        openFolderId: "ai-skills-folder",
       },
       {
         id: "obsidian-vault",
@@ -53,7 +52,7 @@ export const widgetsV2: WidgetV2[] = [
           "An extended PARA system for capturing, connecting, reviewing, and retrieving knowledge.",
         variant: "learning",
         openFolderId: "obsidian-vault",
-        openFileId: "obsidian-vault-overview",
+        openFileId: "obsidian-vault-preview",
       },
     ],
   },

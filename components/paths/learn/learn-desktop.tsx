@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import {
-  desktopFolders,
+  desktopItems,
   applications,
   type LearnNode,
   type LearnApplication,
@@ -28,6 +28,7 @@ import styles from "./learn.module.css";
 interface LearnDesktopProps {
   locale: Locale;
   onOpenFolder: (id: string, name: string) => void;
+  onOpenFile: (id: string, name: string) => void;
   onOpenApp?: (appId: string, name: string) => void;
   onContextMenu?: (x: number, y: number, target: ContextMenuTarget) => void;
   onDragStart?: () => void;
@@ -39,6 +40,7 @@ interface LearnDesktopProps {
 export function LearnDesktop({
   locale,
   onOpenFolder,
+  onOpenFile,
   onOpenApp,
   onContextMenu,
   onDragStart,
@@ -55,15 +57,15 @@ export function LearnDesktop({
   });
 
   const allItemIds = useMemo(() => {
-    const folderIds = desktopFolders.map((f) => f.id);
+    const folderIds = desktopItems.map((item) => item.id);
     const appIds = applications.map((a) => a.id);
     return [...folderIds, ...appIds];
   }, []);
 
   const getLabel = useCallback(
     (id: string) => {
-      const folder = desktopFolders.find((f) => f.id === id);
-      if (folder) return folder.name[locale] ?? id;
+      const node = desktopItems.find((item) => item.id === id);
+      if (node) return node.name[locale] ?? id;
       const app = applications.find((a) => a.id === id);
       return app?.name ?? id;
     },
@@ -71,7 +73,8 @@ export function LearnDesktop({
   );
 
   const isFolder = useCallback(
-    (id: string) => desktopFolders.some((f) => f.id === id),
+    (id: string) =>
+      desktopItems.some((item) => item.id === id && item.type === "folder"),
     [],
   );
 
@@ -230,6 +233,17 @@ export function LearnDesktop({
     [locale, onOpenFolder],
   );
 
+  const handleOpenNode = useCallback(
+    (node: LearnNode) => {
+      if (node.type === "folder") {
+        handleOpenFolder(node);
+      } else {
+        onOpenFile(node.id, node.name[locale]);
+      }
+    },
+    [handleOpenFolder, locale, onOpenFile],
+  );
+
   const handleOpenApp = useCallback(
     (app: LearnApplication) => {
       onOpenApp?.(app.id, app.name);
@@ -385,16 +399,18 @@ export function LearnDesktop({
         )}
 
         {allItemIds.map((id) => {
-          const folder = desktopFolders.find((f) => f.id === id);
-          const app = !folder ? applications.find((a) => a.id === id) : null;
-          if (!folder && !app) return null;
+          const node = desktopItems.find((item) => item.id === id);
+          const app = !node
+            ? applications.find((item) => item.id === id)
+            : null;
+          if (!node && !app) return null;
 
           const layoutItem = layout.items.get(id);
           const pixelX = layoutItem?.x ?? 0;
           const pixelY = layoutItem?.y ?? 0;
           const style = getIconStyle(id, pixelX, pixelY);
           const isDragging = draggingId === id;
-          const label = folder ? folder.name[locale] : (app?.name ?? "");
+          const label = node ? node.name[locale] : (app?.name ?? "");
 
           return (
             <button
@@ -427,25 +443,33 @@ export function LearnDesktop({
                   e.stopPropagation();
                   return;
                 }
-                if (folder) handleOpenFolder(folder);
+                if (node) handleOpenNode(node);
                 else if (app) handleOpenApp(app);
               }}
               onKeyDown={(e) =>
                 handleKeyDown(e, () => {
-                  if (folder) handleOpenFolder(folder);
+                  if (node) handleOpenNode(node);
                   else if (app) handleOpenApp(app);
                 })
               }
               onContextMenu={(e) => {
                 handleSelect(id, false);
                 handleItemContextMenu(e, {
-                  type: folder ? "folder" : "app",
-                  id,
+                  ...(node?.type === "folder"
+                    ? { type: "folder" as const, id }
+                    : node
+                      ? {
+                          type: "file" as const,
+                          id,
+                          explorerWindowId: "",
+                          sourceFolderId: "this-pc",
+                        }
+                      : { type: "app" as const, id }),
                 });
               }}
             >
               <span className={styles.desktopIconImage}>
-                {folder ? (
+                {node ? (
                   <span className={styles.desktopSectionIcon}>
                     <NavIcon id={id} />
                   </span>

@@ -88,6 +88,36 @@ export function buildDocumentPlainText(
   return lines.join("\n").trimEnd();
 }
 
+export function buildDocumentMarkdown(node: LearnNode, locale: Locale): string {
+  const lines = [`# ${node.name[locale]}`, "", node.summary[locale], ""];
+  for (const section of node.sections ?? []) {
+    lines.push(`## ${section.heading[locale]}`, "");
+    if (section.kind === "code") {
+      lines.push("```text", section.content[locale], "```", "");
+      continue;
+    }
+    if (section.kind === "callout") {
+      lines.push(`> ${section.content[locale]}`, "");
+      continue;
+    }
+    lines.push(section.content[locale], "");
+    for (const [index, item] of (section.items ?? []).entries()) {
+      const prefix = section.kind === "steps" ? `${index + 1}.` : "-";
+      lines.push(`${prefix} ${item[locale]}`);
+    }
+    if (section.items?.length) lines.push("");
+  }
+  if (node.links?.length) {
+    lines.push("## Links", "");
+    for (const link of node.links) {
+      lines.push(`- [${link.label[locale]}](${link.href})`);
+    }
+    lines.push("");
+  }
+  if (node.tags.length) lines.push(`Tags: ${node.tags.join(", ")}`);
+  return lines.join("\n").trimEnd();
+}
+
 /**
  * Build structured plain text from a LearnApplication,
  * preserving name, category, summary, description,

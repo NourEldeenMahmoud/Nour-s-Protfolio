@@ -11,7 +11,7 @@ import type { Locale } from "@/i18n/routing";
 import {
   learnNodeMap,
   applicationMap,
-  desktopFolders,
+  desktopItems,
   applications,
 } from "@/content/learn";
 import { useLearnWindows } from "./use-learn-windows";
@@ -232,7 +232,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const handleRefresh = useCallback(() => {
     const allIds = [
-      ...desktopFolders.map((f) => f.id),
+      ...desktopItems.map((item) => item.id),
       ...applications.map((a) => a.id),
     ];
     const validIds = new Set(allIds);
@@ -258,6 +258,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const handleOpenFolder = useCallback(
     (id: string, name: string) => {
+      const node = learnNodeMap.get(id);
+      if (!node?.public || node.type !== "folder") return;
       openExplorer(id, name);
       setStartOpen(false);
     },
@@ -266,6 +268,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
   const handleOpenFile = useCallback(
     (id: string, name: string) => {
+      const node = learnNodeMap.get(id);
+      if (!node?.public || node.type !== "file") return;
       openDocument(id, name);
     },
     [openDocument],
@@ -282,17 +286,17 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
   const handleSortChange = useCallback(
     (mode: DesktopSortMode) => {
       const allIds = [
-        ...desktopFolders.map((f) => f.id),
+        ...desktopItems.map((item) => item.id),
         ...applications.map((a) => a.id),
       ];
       const getLabel = (id: string) => {
-        const folder = desktopFolders.find((f) => f.id === id);
-        if (folder) return folder.name[locale] ?? id;
+        const node = desktopItems.find((item) => item.id === id);
+        if (node) return node.name[locale] ?? id;
         const app = applications.find((a) => a.id === id);
         return app?.name ?? id;
       };
       const isFolderFn = (id: string) =>
-        desktopFolders.some((f) => f.id === id);
+        desktopItems.some((item) => item.id === id && item.type === "folder");
 
       const el = workspaceRef.current;
       if (!el) return;
@@ -642,12 +646,12 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
 
     if (folder) {
       const node = learnNodeMap.get(folder);
-      if (node) {
+      if (node?.public && node.type === "folder") {
         openExplorer(folder, node.name[locale]);
       }
     } else if (file) {
       const node = learnNodeMap.get(file);
-      if (node) {
+      if (node?.public && node.type === "file") {
         openDocument(file, node.name[locale]);
       }
     } else if (app) {
@@ -913,6 +917,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         <LearnDesktop
           locale={locale}
           onOpenFolder={handleOpenFolder}
+          onOpenFile={handleOpenFile}
           onOpenApp={handleOpenApp}
           onContextMenu={handleContextMenuOpen}
           onDragStart={() => closeContextMenu()}
@@ -1014,6 +1019,7 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
         <StartMenu
           locale={locale}
           onOpenFolder={handleOpenFolder}
+          onOpenFile={handleOpenFile}
           onOpenApp={handleOpenApp}
           onClose={() => setStartOpen(false)}
           copy={{ title: copy.startMenuTitle }}

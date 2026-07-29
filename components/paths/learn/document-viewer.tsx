@@ -4,7 +4,13 @@ import { useCallback, useState } from "react";
 import type { Locale } from "@/i18n/routing";
 import { learnNodeMap, getNodePath } from "@/content/learn";
 import { getProject } from "@/content/portfolio";
-import { copyTextToSystemClipboard, buildDocumentPlainText } from "./copy-text";
+import {
+  copyTextToSystemClipboard,
+  buildDocumentMarkdown,
+  buildDocumentPlainText,
+} from "./copy-text";
+import { DocumentVisual } from "./document-visual";
+import { downloadTextFile } from "./download-file";
 import styles from "./learn.module.css";
 
 interface DocumentViewerProps {
@@ -88,13 +94,31 @@ export function DocumentViewer({
 
         <p className={styles.docSectionContent}>{node.summary[locale]}</p>
 
+        <DocumentVisual node={node} locale={locale} />
+
+        {node.links && node.links.length > 0 && (
+          <div className={styles.docPrimaryActions}>
+            {node.links.map((link) => (
+              <a
+                key={link.href}
+                className={styles.docPrimaryLink}
+                href={link.href}
+                target={link.kind === "email" ? undefined : "_blank"}
+                rel={link.kind === "email" ? undefined : "noreferrer"}
+                data-kind={link.kind}
+              >
+                {link.label[locale]}
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        )}
+
         {node.media && node.media.length > 0 && (
           <div
             className={styles.docMediaGrid}
             role="list"
-            aria-label={
-              locale === "ar" ? "معرض الشهادات" : "Certificate gallery"
-            }
+            aria-label={locale === "ar" ? "معرض بصري" : "Visual gallery"}
           >
             {node.media.map((item) => (
               <figure
@@ -125,9 +149,17 @@ export function DocumentViewer({
             <h3 className={styles.docSectionHeading}>
               {section.heading[locale]}
             </h3>
-            <p className={styles.docSectionContent}>
-              {section.content[locale]}
-            </p>
+            {section.kind !== "callout" && section.kind !== "code" && (
+              <p className={styles.docSectionContent}>
+                {section.content[locale]}
+              </p>
+            )}
+
+            {section.kind === "code" && (
+              <pre className={styles.docCode}>
+                <code>{section.content[locale]}</code>
+              </pre>
+            )}
 
             {section.kind === "list" && section.items && (
               <ul className={styles.docList}>
@@ -195,7 +227,7 @@ export function DocumentViewer({
             <ul className={styles.docRelatedList}>
               {node.relatedFileIds.map((rid) => {
                 const related = learnNodeMap.get(rid);
-                if (!related) return null;
+                if (!related?.public) return null;
                 return (
                   <li key={rid}>
                     <button
@@ -212,7 +244,31 @@ export function DocumentViewer({
           </div>
         )}
 
-        <div style={{ marginTop: "1rem" }}>
+        <div className={styles.docUtilityActions}>
+          {node.downloadUrl ? (
+            <a
+              className={styles.docDownload}
+              href={node.downloadUrl}
+              download={node.downloadName}
+            >
+              <span aria-hidden="true">↓</span>
+              {locale === "ar" ? "تنزيل ملف المصدر" : "Download source file"}
+            </a>
+          ) : (
+            <button
+              className={styles.docDownload}
+              type="button"
+              onClick={() =>
+                downloadTextFile(
+                  node.downloadName ?? `${node.id}.md`,
+                  buildDocumentMarkdown(node, locale),
+                )
+              }
+            >
+              <span aria-hidden="true">↓</span>
+              {locale === "ar" ? "تنزيل الملف" : "Download file"}
+            </button>
+          )}
           <button
             className={styles.docCopyLink}
             type="button"

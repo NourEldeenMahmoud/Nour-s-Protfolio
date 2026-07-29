@@ -1,37 +1,49 @@
 "use client";
 
 import type { Locale } from "@/i18n/routing";
-import { desktopFolders, applications } from "@/content/learn";
+import { desktopItems, applications } from "@/content/learn";
 import { NavIcon, AppIcon } from "./learn-icons";
 import styles from "./learn.module.css";
 
 interface StartMenuProps {
   locale: Locale;
   onOpenFolder: (id: string, name: string) => void;
+  onOpenFile: (id: string, name: string) => void;
   onOpenApp?: (appId: string, name: string) => void;
   onClose: () => void;
   copy: { title: string };
 }
 
-export function StartMenu({ locale, onOpenFolder, onOpenApp, onClose, copy }: StartMenuProps) {
+export function StartMenu({
+  locale,
+  onOpenFolder,
+  onOpenFile,
+  onOpenApp,
+  onClose,
+  copy,
+}: StartMenuProps) {
   return (
     <div className={styles.startMenu} role="menu" aria-label={copy.title}>
       <p className={styles.startMenuTitle}>{copy.title}</p>
-      {desktopFolders.map((folder) => (
+      {desktopItems.map((item) => (
         <button
-          key={folder.id}
+          key={item.id}
           className={styles.startMenuItem}
           type="button"
           role="menuitem"
           onClick={() => {
-            onOpenFolder(folder.id, folder.name[locale]);
+            if (item.type === "folder") {
+              onOpenFolder(item.id, item.name[locale]);
+            } else {
+              onOpenFile(item.id, item.name[locale]);
+            }
             onClose();
           }}
         >
           <span className={styles.startMenuIcon}>
-            <NavIcon id={folder.id} />
+            <NavIcon id={item.id} />
           </span>
-          {folder.name[locale]}
+          {item.name[locale]}
         </button>
       ))}
 

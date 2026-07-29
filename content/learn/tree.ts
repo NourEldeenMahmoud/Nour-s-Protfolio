@@ -1,5 +1,11 @@
 import type { LearnNode } from "./types";
 import { certificateGallery } from "./certificates";
+import {
+  AI_AGENTS_FOLDER_ID,
+  AI_SKILLS_FOLDER_ID,
+  AI_WORKFLOWS_FOLDER_ID,
+  aiResourceNodes,
+} from "./ai-resources";
 
 export const learnNodes: LearnNode[] = [
   {
@@ -36,9 +42,9 @@ export const learnNodes: LearnNode[] = [
       ar: "ملخص للزوار الجدد.",
     },
     tags: ["orientation", "overview"],
-    relatedFileIds: ["about-profile", "knowledge-dotnet"],
+    relatedFileIds: ["about", "knowledge-dotnet"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "about",
     children: ["start-here-welcome"],
   },
@@ -99,9 +105,9 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["orientation", "start"],
-    relatedFileIds: ["about-profile"],
+    relatedFileIds: ["about"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "start-here",
     children: [],
   },
@@ -358,6 +364,55 @@ export const learnNodes: LearnNode[] = [
       en: "MET faculty course summaries published as a public knowledge destination.",
       ar: "ملخصات مقررات كلية هندسة الحاسوب المنشورة كوجهة معرفية عامة.",
     },
+    presentation: "summary",
+    downloadName: "met-summaries-overview.md",
+    links: [
+      {
+        label: { en: "Open summaries site", ar: "افتح موقع الملخصات" },
+        href: "https://noureldeenmahmoud.github.io/MET-Summaries/",
+        kind: "website",
+      },
+      {
+        label: { en: "View source repository", ar: "اعرض مستودع المصدر" },
+        href: "https://github.com/NourEldeenMahmoud/MET-Summaries",
+        kind: "repository",
+      },
+    ],
+    media: [
+      {
+        src: "/projects/met-summaries/details/hero-dark.webp",
+        alt: {
+          en: "MET Summaries dark home page",
+          ar: "الصفحة الرئيسية الداكنة لموقع MET Summaries",
+        },
+        caption: {
+          en: "Subject-led summary navigation",
+          ar: "تنقل الملخصات حسب المادة",
+        },
+      },
+      {
+        src: "/projects/met-summaries/details/lesson-example.webp",
+        alt: {
+          en: "A structured lesson summary",
+          ar: "مثال لملخص درس منظم",
+        },
+        caption: {
+          en: "Concepts, examples, and study context",
+          ar: "مفاهيم وأمثلة وسياق دراسي",
+        },
+      },
+      {
+        src: "/projects/met-summaries/details/knowledge-graph.webp",
+        alt: {
+          en: "Connected summary knowledge graph",
+          ar: "رسم معرفي مترابط للملخصات",
+        },
+        caption: {
+          en: "Cross-linked course knowledge",
+          ar: "معرفة المقررات المترابطة",
+        },
+      },
+    ],
     sections: [
       {
         heading: { en: "Collection overview", ar: "نظرة عامة على المجموعة" },
@@ -399,25 +454,98 @@ export const learnNodes: LearnNode[] = [
   {
     id: "about",
     name: { en: "05 About Me", ar: "05 عني" },
-    type: "folder",
-    kind: "folder",
+    type: "file",
+    kind: "document",
     summary: {
-      en: "Engineering identity, learning system, journey, and contact information.",
-      ar: "الهوية الهندسية ونظام التعلم والرحلة ومعلومات التواصل.",
+      en: ".NET backend and full-stack engineer building dependable products across web, desktop, mobile, and interactive systems.",
+      ar: "مهندس باك إند .NET وفل ستاك يبني منتجات موثوقة عبر الويب وسطح المكتب والموبايل والأنظمة التفاعلية.",
     },
+    presentation: "profile",
+    downloadName: "nour-eldeen-profile.md",
+    links: [
+      {
+        label: { en: "Email", ar: "البريد الإلكتروني" },
+        href: "mailto:noureldeendev@gmail.com",
+        kind: "email",
+      },
+      {
+        label: { en: "GitHub", ar: "GitHub" },
+        href: "https://github.com/NourEldeenMahmoud",
+        kind: "github",
+      },
+      {
+        label: { en: "LinkedIn", ar: "LinkedIn" },
+        href: "https://linkedin.com/in/nour-eldeen-eg",
+        kind: "linkedin",
+      },
+    ],
+    sections: [
+      {
+        heading: { en: "Profile", ar: "الملف الشخصي" },
+        content: {
+          en: "Nour Eldeen Mahmoud is a .NET-focused software engineer. His professional center is backend and full-stack development; Flutter, WinForms, Unity, and AI-assisted workflows demonstrate range across platforms and technical domains.",
+          ar: "نور الدين محمود مهندس برمجيات يركز على .NET. يتمحور تخصصه المهني حول الباك إند والفل ستاك، بينما توضح Flutter وWinForms وUnity وسير العمل بمساعدة الذكاء الاصطناعي قدرته عبر منصات ومجالات تقنية متعددة.",
+        },
+      },
+      {
+        heading: { en: "Target roles", ar: "الأدوار المستهدفة" },
+        content: {
+          en: "Open to junior .NET backend and full-stack roles, internships, and engineering opportunities centered on careful implementation and continued learning.",
+          ar: "متاح لأدوار باك إند .NET وفل ستاك للمبتدئين والتدريب والفرص الهندسية التي تركز على التنفيذ الدقيق والتعلم المستمر.",
+        },
+      },
+      {
+        heading: { en: "Engineering principles", ar: "المبادئ الهندسية" },
+        content: {
+          en: "Three principles guide the work.",
+          ar: "ثلاثة مبادئ توجه العمل.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Make systems legible through clear boundaries and evidence.",
+            ar: "اجعل الأنظمة مفهومة من خلال الحدود الواضحة والأدلة.",
+          },
+          {
+            en: "Treat platform, team, domain, and data constraints as design inputs.",
+            ar: "عامل قيود المنصة والفريق والنطاق والبيانات كمدخلات تصميم.",
+          },
+          {
+            en: "Validate claims with tests, review, repositories, and honest limitations.",
+            ar: "تحقق من الادعاءات بالاختبارات والمراجعة والمستودعات والقيود الصريحة.",
+          },
+        ],
+      },
+      {
+        heading: { en: "Learning loop", ar: "دورة التعلم" },
+        content: {
+          en: "Understand, design, build, then validate.",
+          ar: "افهم، ثم صمم، ثم ابنِ، ثم تحقق.",
+        },
+        kind: "steps",
+        items: [
+          {
+            en: "Understand the source and scope.",
+            ar: "افهم المصدر والنطاق.",
+          },
+          { en: "Design around a real constraint.", ar: "صمم حول قيد حقيقي." },
+          {
+            en: "Build with evidence and documentation.",
+            ar: "ابنِ مع الأدلة والتوثيق.",
+          },
+          {
+            en: "Validate behavior and limitations.",
+            ar: "تحقق من السلوك والقيود.",
+          },
+        ],
+      },
+    ],
     tags: ["about", "identity", "contact"],
-    relatedFileIds: ["start-here-welcome"],
+    relatedFileIds: [],
     relatedProjectSlugs: [],
     public: true,
     parentId: "this-pc",
-    children: [
-      "start-here",
-      "about-profile",
-      "about-identity",
-      "about-learning",
-      "about-journey",
-      "about-contact",
-    ],
+    children: [],
   },
   {
     id: "about-profile",
@@ -448,7 +576,7 @@ export const learnNodes: LearnNode[] = [
     tags: ["profile", "about", "roles"],
     relatedFileIds: ["about-identity", "about-journey"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "about",
     children: [],
   },
@@ -488,7 +616,7 @@ export const learnNodes: LearnNode[] = [
     tags: ["principles", "values", "identity"],
     relatedFileIds: ["about-profile", "about-learning"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "about",
     children: [],
   },
@@ -532,7 +660,7 @@ export const learnNodes: LearnNode[] = [
     tags: ["learning", "process", "methodology"],
     relatedFileIds: ["about-identity", "about-journey"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "about",
     children: [],
   },
@@ -587,7 +715,7 @@ export const learnNodes: LearnNode[] = [
       "dvld",
       "buildsense",
     ],
-    public: true,
+    public: false,
     parentId: "about",
     children: [],
   },
@@ -627,7 +755,7 @@ export const learnNodes: LearnNode[] = [
     tags: ["contact", "email", "linkedin", "github"],
     relatedFileIds: ["about-profile"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "about",
     children: [],
   },
@@ -649,12 +777,9 @@ export const learnNodes: LearnNode[] = [
     public: true,
     parentId: "this-pc",
     children: [
-      "ai-skills-overview",
-      "ai-agents-overview",
-      "workflow-course-to-obsidian",
-      "workflow-review-quality",
-      "workflow-requirements-to-code",
-      "workflow-validating-ai-code",
+      AI_SKILLS_FOLDER_ID,
+      AI_AGENTS_FOLDER_ID,
+      AI_WORKFLOWS_FOLDER_ID,
     ],
   },
   {
@@ -769,7 +894,7 @@ export const learnNodes: LearnNode[] = [
     tags: ["obsidian", "course material", "summarization", "ai-assisted"],
     relatedFileIds: ["knowledge-met", "workflow-review-quality"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "workflows",
     children: [],
   },
@@ -852,7 +977,7 @@ export const learnNodes: LearnNode[] = [
       "workflow-validating-ai-code",
     ],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "workflows",
     children: [],
   },
@@ -943,7 +1068,7 @@ export const learnNodes: LearnNode[] = [
       "workflow-validating-ai-code",
     ],
     relatedProjectSlugs: ["bookify", "buildsense"],
-    public: true,
+    public: false,
     parentId: "workflows",
     children: [],
   },
@@ -1031,31 +1156,151 @@ export const learnNodes: LearnNode[] = [
       "skill-engineering-practice",
     ],
     relatedProjectSlugs: ["buildsense"],
-    public: true,
+    public: false,
     parentId: "workflows",
     children: [],
   },
   {
     id: "skills",
     name: { en: "06 Technical Skills", ar: "06 المهارات التقنية" },
-    type: "folder",
-    kind: "folder",
+    type: "file",
+    kind: "skill",
     summary: {
-      en: "Project-backed capabilities with honest limitations and team attribution.",
-      ar: "قدرات مدعومة بالمشاريع مع قيود صريحة ونسب للفريق.",
+      en: "A visual, project-backed map of Nour's .NET center and cross-platform engineering range.",
+      ar: "خريطة بصرية مدعومة بالمشاريع لمركز خبرة نور في .NET ونطاقه الهندسي متعدد المنصات.",
     },
+    presentation: "skills",
+    downloadName: "nour-eldeen-technical-skills.md",
+    sections: [
+      {
+        heading: { en: ".NET & Backend", ar: ".NET والباك إند" },
+        content: {
+          en: "The professional center, evidenced across Bookify, CinemaVerse, Blood Bank, and DVLD.",
+          ar: "المركز المهني، ومدعوم بأدلة من Bookify وCinemaVerse وبنك الدم وDVLD.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "C#, ASP.NET Core MVC, Web API, Minimal APIs",
+            ar: "C# وASP.NET Core MVC وWeb API وMinimal APIs",
+          },
+          {
+            en: "EF Core, Repository, Unit of Work, migrations",
+            ar: "EF Core وRepository وUnit of Work والترحيلات",
+          },
+          {
+            en: "Identity, JWT, RBAC, Stripe, Hangfire",
+            ar: "Identity وJWT وRBAC وStripe وHangfire",
+          },
+          {
+            en: "REST, Swagger, validation, logging, health checks",
+            ar: "REST وSwagger والتحقق والتسجيل وفحوصات الصحة",
+          },
+        ],
+      },
+      {
+        heading: { en: "Frontend & Full Stack", ar: "الواجهات والفل ستاك" },
+        content: {
+          en: "End-to-end product work across Angular and ASP.NET MVC systems.",
+          ar: "عمل منتجات متكامل عبر أنظمة Angular وASP.NET MVC.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Angular, TypeScript, JavaScript, HTML, Tailwind CSS",
+            ar: "Angular وTypeScript وJavaScript وHTML وTailwind CSS",
+          },
+          {
+            en: "Node.js, Express, Nx monorepos",
+            ar: "Node.js وExpress وNx monorepos",
+          },
+          {
+            en: "Razor views and responsive interfaces",
+            ar: "واجهات Razor وتصميمات متجاوبة",
+          },
+        ],
+      },
+      {
+        heading: { en: "Data & Security", ar: "البيانات والأمان" },
+        content: {
+          en: "Relational and document data with practical application-security controls.",
+          ar: "بيانات علائقية ووثائقية مع ضوابط أمان تطبيقية عملية.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "SQL Server, T-SQL, ADO.NET, MongoDB",
+            ar: "SQL Server وT-SQL وADO.NET وMongoDB",
+          },
+          {
+            en: "CSRF protection, CORS, Helmet, input validation",
+            ar: "حماية CSRF وCORS وHelmet والتحقق من المدخلات",
+          },
+          {
+            en: "Authentication, authorization, audit logging",
+            ar: "المصادقة والصلاحيات وسجلات التدقيق",
+          },
+        ],
+      },
+      {
+        heading: {
+          en: "Desktop, Mobile & Games",
+          ar: "سطح المكتب والموبايل والألعاب",
+        },
+        content: {
+          en: "Breadth across product platforms and interactive systems.",
+          ar: "نطاق واسع عبر منصات المنتجات والأنظمة التفاعلية.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "WinForms, Flutter, Dart, three-tier architecture",
+            ar: "WinForms وFlutter وDart والبنية ثلاثية الطبقات",
+          },
+          {
+            en: "Unity 6, C# scripting, Cinemachine, NavMesh",
+            ar: "Unity 6 وبرمجة C# وCinemachine وNavMesh",
+          },
+          {
+            en: "Physics, object pooling, particles, ShaderLab/HLSL",
+            ar: "الفيزياء وتجميع الكائنات والجسيمات وShaderLab/HLSL",
+          },
+        ],
+      },
+      {
+        heading: { en: "Quality & Tooling", ar: "الجودة والأدوات" },
+        content: {
+          en: "Validation and delivery practices with varying depth by project.",
+          ar: "ممارسات التحقق والتسليم بعمق يختلف حسب المشروع.",
+        },
+        kind: "list",
+        items: [
+          {
+            en: "Vitest, Playwright, axe-core, integration testing",
+            ar: "Vitest وPlaywright وaxe-core واختبارات التكامل",
+          },
+          {
+            en: "Git, GitHub, CI pipelines, GitHub Pages",
+            ar: "Git وGitHub وخطوط CI وGitHub Pages",
+          },
+          {
+            en: "Architecture and API documentation",
+            ar: "توثيق الهندسة وواجهات API",
+          },
+        ],
+      },
+    ],
     tags: ["skills", "evidence"],
-    relatedFileIds: [],
-    relatedProjectSlugs: [],
-    public: true,
-    parentId: "this-pc",
-    children: [
+    relatedFileIds: [
       "skill-dotnet-backend",
       "skill-fullstack",
       "skill-crossplatform",
       "skill-engineering-practice",
-      "lab",
     ],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "this-pc",
+    children: [],
   },
   {
     id: "skill-dotnet-backend",
@@ -1293,7 +1538,7 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["testing", "ci", "documentation", "review", "engineering"],
-    relatedFileIds: ["workflow-validating-ai-code", "skill-dotnet-backend"],
+    relatedFileIds: ["resource-wf-software-delivery", "skill-dotnet-backend"],
     relatedProjectSlugs: ["buildsense", "bookify", "cinemaverse"],
     public: true,
     parentId: "skills",
@@ -1309,7 +1554,7 @@ export const learnNodes: LearnNode[] = [
       ar: "تجارب مواضيع التعلم الحالية والتأملات الهندسية.",
     },
     tags: ["lab", "learning", "experiments"],
-    relatedFileIds: ["about-learning"],
+    relatedFileIds: ["about"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "skills",
@@ -1357,7 +1602,7 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["currently learning", "active"],
-    relatedFileIds: ["about-learning", "lab-experiments"],
+    relatedFileIds: ["about", "lab-experiments"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "lab",
@@ -1971,7 +2216,7 @@ export const learnNodes: LearnNode[] = [
     ],
     relatedFileIds: ["ai-agents-overview", "workflow-validating-ai-code"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "workflows",
     children: [],
   },
@@ -2025,10 +2270,11 @@ export const learnNodes: LearnNode[] = [
     tags: ["ai", "agents", "delegation", "review", "workflow"],
     relatedFileIds: ["ai-skills-overview", "workflow-requirements-to-code"],
     relatedProjectSlugs: [],
-    public: true,
+    public: false,
     parentId: "workflows",
     children: [],
   },
+  ...aiResourceNodes,
   {
     id: "certifications",
     name: { en: "04 Certifications", ar: "04 الشهادات" },
@@ -2039,7 +2285,7 @@ export const learnNodes: LearnNode[] = [
       ar: "برامج ودورات مكتملة في .NET وقواعد البيانات والخوارزميات والواجهات وUnity والتطوير المهني.",
     },
     tags: ["certificates", "courses", "learning"],
-    relatedFileIds: ["about-learning", "skill-dotnet-backend"],
+    relatedFileIds: ["about", "skill-dotnet-backend"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "this-pc",
@@ -2181,11 +2427,11 @@ export const learnNodes: LearnNode[] = [
       ar: "كيف يجمع نور المعرفة التقنية وينظمها ويربطها ويسترجعها.",
     },
     tags: ["obsidian", "vault", "knowledge management", "linked thinking"],
-    relatedFileIds: ["app-obsidian", "workflow-course-to-obsidian"],
+    relatedFileIds: ["app-obsidian", "resource-wf-course-pipeline"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "this-pc",
-    children: ["obsidian-vault-overview"],
+    children: ["obsidian-vault-overview", "obsidian-vault-preview"],
   },
   {
     id: "obsidian-vault-overview",
@@ -2196,6 +2442,8 @@ export const learnNodes: LearnNode[] = [
       en: "A technical learning system built around an extended PARA structure and linked notes.",
       ar: "نظام تعلم تقني مبني على هيكل PARA موسع وملاحظات مترابطة.",
     },
+    presentation: "vault-structure",
+    downloadName: "obsidian-vault-structure.md",
     sections: [
       {
         heading: { en: "Structure", ar: "الهيكل" },
@@ -2223,6 +2471,14 @@ export const learnNodes: LearnNode[] = [
             ar: "الأرشيف والإضافات ومساحة عمل الوكلاء",
           },
         ],
+      },
+      {
+        heading: { en: "Privacy-safe structure", ar: "هيكل آمن للخصوصية" },
+        content: {
+          en: "vault/\n├── 00 Index/\n│   ├── Templates/\n│   └── Inbox/ [content excluded]\n├── 01 Projects/\n│   ├── Documentation & requirements/\n│   ├── Backend/\n│   ├── Frontend/\n│   └── UI/\n├── 02 Areas/\n│   ├── Main dashboards/\n│   ├── Learning & Programming/\n│   ├── Personal/ [content excluded]\n│   └── College/ [content excluded]\n├── 03 Resources/\n│   ├── Web Development/\n│   ├── CS Fundamentals/\n│   ├── System Design & Architecture/\n│   ├── AI & LLMs/\n│   ├── Cybersecurity/\n│   └── Productivity & Tools/\n├── 04 Archive/ [content excluded]\n├── 05 Extras/\n└── 06 Agent/ [private profiles and automation excluded]",
+          ar: "vault/\n├── 00 Index/\n│   ├── Templates/\n│   └── Inbox/ [المحتوى مستبعد]\n├── 01 Projects/\n│   ├── Documentation & requirements/\n│   ├── Backend/\n│   ├── Frontend/\n│   └── UI/\n├── 02 Areas/\n│   ├── Main dashboards/\n│   ├── Learning & Programming/\n│   ├── Personal/ [المحتوى مستبعد]\n│   └── College/ [المحتوى مستبعد]\n├── 03 Resources/\n│   ├── Web Development/\n│   ├── CS Fundamentals/\n│   ├── System Design & Architecture/\n│   ├── AI & LLMs/\n│   ├── Cybersecurity/\n│   └── Productivity & Tools/\n├── 04 Archive/ [المحتوى مستبعد]\n├── 05 Extras/\n└── 06 Agent/ [الملفات الشخصية والأتمتة مستبعدة]",
+        },
+        kind: "code",
       },
       {
         heading: { en: "Linked thinking", ar: "التفكير المترابط" },
@@ -2268,9 +2524,51 @@ export const learnNodes: LearnNode[] = [
     tags: ["obsidian", "para", "wikilinks", "dataview", "canvas", "pkm"],
     relatedFileIds: [
       "app-obsidian",
-      "workflow-course-to-obsidian",
+      "resource-wf-course-pipeline",
       "knowledge-met",
     ],
+    relatedProjectSlugs: [],
+    public: true,
+    parentId: "obsidian-vault",
+    children: [],
+  },
+  {
+    id: "obsidian-vault-preview",
+    name: { en: "Vault Visual Preview", ar: "معاينة شكل الخزانة" },
+    type: "file",
+    kind: "collection",
+    summary: {
+      en: "A privacy-safe reconstruction of the configured Obsidian dashboard, canvas, and linked-note experience.",
+      ar: "إعادة بناء آمنة للخصوصية لشكل لوحة Obsidian وCanvas وتجربة الملاحظات المترابطة المهيأة.",
+    },
+    presentation: "vault-preview",
+    downloadName: "obsidian-vault-visual-preview.md",
+    sections: [
+      {
+        heading: { en: "Visual language", ar: "اللغة البصرية" },
+        content: {
+          en: "The vault uses the GitHub theme at an 18px base size with custom dashboard and canvas snippets: rounded groups, soft shadows, colored borders, a gradient dashboard header, and RTL-aware task layouts.",
+          ar: "تستخدم الخزانة سمة GitHub بحجم أساسي 18px مع تنسيقات مخصصة للوحة وCanvas: مجموعات مستديرة وظلال ناعمة وحدود ملونة ورأس متدرج وتخطيطات مهام تدعم RTL.",
+        },
+      },
+      {
+        heading: { en: "Startup canvas", ar: "لوحة البداية" },
+        content: {
+          en: "Obsidian opens a task canvas organized into three working columns plus a separate leisure area. The preview uses generic labels because live tasks and recent-file history are private.",
+          ar: "يفتح Obsidian لوحة مهام منظمة في ثلاثة أعمدة عمل مع مساحة منفصلة للراحة. تستخدم المعاينة تسميات عامة لأن المهام الفعلية وسجل الملفات الحديثة خاصان.",
+        },
+        kind: "callout",
+      },
+      {
+        heading: { en: "Connected navigation", ar: "التنقل المترابط" },
+        content: {
+          en: "Index notes, Dataview dashboards, wikilinks, canvases, and project hubs provide multiple paths into the same knowledge without duplicating source notes.",
+          ar: "توفر ملاحظات الفهرسة ولوحات Dataview وروابط wikilink ولوحات Canvas ومحاور المشاريع مسارات متعددة لنفس المعرفة دون تكرار الملاحظات المصدرية.",
+        },
+      },
+    ],
+    tags: ["obsidian", "dashboard", "canvas", "preview", "privacy-safe"],
+    relatedFileIds: ["obsidian-vault-overview", "app-obsidian"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "obsidian-vault",
@@ -2295,7 +2593,7 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["ai", "google", "coding", "backup"],
-    relatedFileIds: ["ai-skills-overview"],
+    relatedFileIds: ["ai-skills-folder"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "apps",
@@ -2342,7 +2640,7 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["ai", "cli", "coding agent", "terminal", "git"],
-    relatedFileIds: ["ai-skills-overview", "ai-agents-overview"],
+    relatedFileIds: ["ai-skills-folder", "ai-agents-folder"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "apps",
@@ -2386,7 +2684,7 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["ai", "research", "citations", "learning"],
-    relatedFileIds: ["knowledge-met", "workflow-review-quality"],
+    relatedFileIds: ["knowledge-met", "resource-wf-course-pipeline"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "apps",
@@ -2433,7 +2731,7 @@ export const learnNodes: LearnNode[] = [
       },
     ],
     tags: ["ai", "agent", "memory", "automation", "skills"],
-    relatedFileIds: ["ai-agents-overview", "ai-skills-overview"],
+    relatedFileIds: ["ai-agents-folder", "ai-skills-folder"],
     relatedProjectSlugs: [],
     public: true,
     parentId: "apps",

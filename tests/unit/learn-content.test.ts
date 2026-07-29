@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   learnNodeMap,
   desktopFolders,
+  desktopItems,
   navItems,
   rootDesktopIds,
   getNodePath,
@@ -65,19 +66,20 @@ describe("learn content", () => {
     });
   });
 
-  describe("desktopFolders", () => {
+  describe("desktopItems", () => {
     it("returns exactly rootDesktopIds items", () => {
-      expect(desktopFolders).toHaveLength(rootDesktopIds.length);
+      expect(desktopItems).toHaveLength(rootDesktopIds.length);
     });
 
-    it("all folders have type 'folder'", () => {
-      for (const folder of desktopFolders) {
-        expect(folder.type).toBe("folder");
-      }
+    it("keeps About Me and Technical Skills as files", () => {
+      expect(learnNodeMap.get("about")?.type).toBe("file");
+      expect(learnNodeMap.get("skills")?.type).toBe("file");
+      expect(desktopFolders.map(({ id }) => id)).not.toContain("about");
+      expect(desktopFolders.map(({ id }) => id)).not.toContain("skills");
     });
 
     it("contains the seven requested workspace sections", () => {
-      const ids = desktopFolders.map((f) => f.id);
+      const ids = desktopItems.map((item) => item.id);
       expect(ids).toEqual([
         "apps",
         "workflows",
@@ -87,6 +89,14 @@ describe("learn content", () => {
         "skills",
         "obsidian-vault",
       ]);
+    });
+
+    it("uses the actual configured AI resource inventory", () => {
+      expect(learnNodeMap.get("ai-skills-folder")?.children).toHaveLength(51);
+      expect(learnNodeMap.get("ai-agents-folder")?.children).toHaveLength(7);
+      expect(learnNodeMap.get("ai-workflows-folder")?.children).toHaveLength(5);
+      expect(learnNodeMap.get("ai-skills-overview")?.public).toBe(false);
+      expect(learnNodeMap.get("ai-agents-overview")?.public).toBe(false);
     });
   });
 

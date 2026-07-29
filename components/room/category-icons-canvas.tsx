@@ -23,6 +23,9 @@ import {
 } from "./category-icons-policy";
 
 const MODEL_SCALE = 0.71;
+const CATEGORY_SCALE: Partial<Record<CategoryId, number>> = {
+  summaries: 1.22,
+};
 const BASE_Y_OFFSET = -7;
 const FOCUS_DURATION = 1.1;
 const FLOAT_AMPLITUDE = 7;
@@ -403,7 +406,8 @@ function IconMesh({
       heroAnchor.pb + (exploreAnchor.pb - heroAnchor.pb) * focus;
     const projectedHeight =
       heroAnchor.ph + (exploreAnchor.ph - heroAnchor.ph) * focus;
-    const displayHeight = projectedHeight * MODEL_SCALE;
+    const displayHeight =
+      projectedHeight * MODEL_SCALE * (CATEGORY_SCALE[categoryId] ?? 1);
     const x = heroAnchor.px + (exploreAnchor.px - heroAnchor.px) * focus;
     const pedestalY = screenYToWorldY(
       pedestalBottom + BASE_Y_OFFSET,

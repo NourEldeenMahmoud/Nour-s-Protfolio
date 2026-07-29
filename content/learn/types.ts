@@ -14,12 +14,28 @@ export interface LearnNode {
   summary: Record<Locale, string>;
   sections?: LearnSection[];
   media?: LearnMediaItem[];
+  presentation?:
+    | "profile"
+    | "skills"
+    | "resource"
+    | "summary"
+    | "vault-structure"
+    | "vault-preview";
+  links?: LearnLink[];
+  downloadName?: string;
+  downloadUrl?: string;
   tags: string[];
   relatedFileIds: string[];
   relatedProjectSlugs: ProjectSlug[];
   public: boolean;
   parentId: string | null;
   children: string[];
+}
+
+export interface LearnLink {
+  label: Record<Locale, string>;
+  href: string;
+  kind: "email" | "github" | "linkedin" | "website" | "repository";
 }
 
 export interface LearnMediaItem {

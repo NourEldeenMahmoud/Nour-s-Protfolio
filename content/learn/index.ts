@@ -9,6 +9,7 @@ export type {
   LearnNodeType,
   LearnSection,
   LearnMediaItem,
+  LearnLink,
   LearnApplication,
   Widget,
   WidgetBase,
@@ -45,7 +46,11 @@ export type DesktopFolderId = (typeof rootDesktopIds)[number];
 
 export const desktopFolders: LearnNode[] = rootDesktopIds
   .map((id) => learnNodeMap.get(id))
-  .filter((n): n is LearnNode => !!n);
+  .filter((n): n is LearnNode => !!n && n.type === "folder");
+
+export const desktopItems: LearnNode[] = rootDesktopIds
+  .map((id) => learnNodeMap.get(id))
+  .filter((node): node is LearnNode => !!node);
 
 export const navItems: Array<{ id: string; name: Record<Locale, string> }> = [
   { id: "__desktop__", name: { en: "Desktop", ar: "سطح المكتب" } },

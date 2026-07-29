@@ -414,6 +414,26 @@ vi.mock("@/content/learn", () => ({
         public: true,
       },
     ],
+    [
+      "resource-clean-code-guard",
+      {
+        id: "resource-clean-code-guard",
+        name: { en: "Clean Code Guard", ar: "حارس نظافة الكود" },
+        summary: { en: "Source-backed skill", ar: "مهارة مدعومة بالمصدر" },
+        sections: [],
+        tags: ["skill"],
+        relatedProjectSlugs: [],
+        relatedFileIds: [],
+        parentId: "ai-skills-folder",
+        children: [],
+        type: "file",
+        kind: "skill",
+        presentation: "resource",
+        downloadName: "clean-code-guard.zip",
+        downloadUrl: "/learn/downloads/ai/skills/clean-code-guard.zip",
+        public: true,
+      },
+    ],
   ]),
   getNodePath: () => [
     { id: "this-pc", name: { en: "This PC", ar: "هذا الكمبيوتر" } },
@@ -499,5 +519,38 @@ describe("DocumentViewer Copy Link feedback", () => {
       vi.advanceTimersByTime(2000);
     });
     expect(button).toHaveTextContent("Copy Link");
+  });
+
+  it("offers every document as a download", () => {
+    render(
+      <DocumentViewer
+        locale="en"
+        fileId="test-doc"
+        onOpenFile={vi.fn()}
+        copy={docCopy}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Download file" }),
+    ).toBeInTheDocument();
+  });
+
+  it("links configured AI resources to their source package", () => {
+    render(
+      <DocumentViewer
+        locale="en"
+        fileId="resource-clean-code-guard"
+        onOpenFile={vi.fn()}
+        copy={docCopy}
+      />,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Download source file" }),
+    ).toHaveAttribute(
+      "href",
+      "/learn/downloads/ai/skills/clean-code-guard.zip",
+    );
   });
 });

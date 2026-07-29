@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Image from "next/image";
 import type { HeroWidget } from "@/content/learn";
 import { WidgetCard } from "./widget-card";
 import styles from "./learn.module.css";
@@ -39,9 +40,21 @@ export function WidgetHero({ widget, onOpen }: WidgetHeroProps) {
       <div className={styles.widgetCardBody}>
         <div className={styles.widgetCardTop}>
           <div className={styles.widgetCardAvatar}>
-            <span className={styles.widgetCardAvatarText}>
-              {widget.avatarFallback}
-            </span>
+            {widget.avatarSrc ? (
+              <Image
+                className={styles.widgetCardAvatarImage}
+                src={widget.avatarSrc}
+                alt=""
+                width={160}
+                height={160}
+                sizes="80px"
+                draggable={false}
+              />
+            ) : (
+              <span className={styles.widgetCardAvatarText}>
+                {widget.avatarFallback}
+              </span>
+            )}
           </div>
           <div className={styles.widgetCardIdentity}>
             <h3 className={styles.widgetCardName}>{widget.title}</h3>
