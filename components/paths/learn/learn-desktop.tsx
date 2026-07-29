@@ -87,8 +87,8 @@ export function LearnDesktop({
   );
 
   const defaultPositions = useMemo(
-    () => computeDefaultPositions(allItemIds, maxCols),
-    [allItemIds, maxCols],
+    () => computeDefaultPositions(allItemIds, maxCols, maxRows),
+    [allItemIds, maxCols, maxRows],
   );
 
   const layout = useMemo(() => {

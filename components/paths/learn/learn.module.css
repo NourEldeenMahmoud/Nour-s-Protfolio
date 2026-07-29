@@ -3371,6 +3371,134 @@
   color: var(--workspace-amber-bright);
 }
 
+/* Keep the simulator useful on laptop-sized and short desktop viewports. */
+@media (min-width: 641px) and (max-width: 1500px),
+  (min-width: 641px) and (max-height: 900px) {
+  .learnWidgets {
+    width: clamp(20rem, 24vw, 24rem);
+    gap: 0.55rem;
+  }
+
+  .widgetCard[data-variant="hero"] {
+    border-radius: 22px;
+  }
+
+  .widgetCard[data-variant="featured"] {
+    border-radius: 18px;
+  }
+
+  .widgetCardBody {
+    gap: 0.65rem;
+    padding: 0.9rem 1.05rem 0.8rem;
+  }
+
+  .widgetCardTop {
+    gap: 0.7rem;
+  }
+
+  .widgetCardAvatar {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .widgetCardName {
+    font-size: 1.05rem;
+  }
+
+  .widgetCardSubtitle {
+    font-size: 0.74rem;
+  }
+
+  .widgetCardDescription {
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+
+  .widgetCardCapsules {
+    gap: 0.45rem;
+  }
+
+  .widgetCardCapsule {
+    gap: 0.12rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 10px;
+  }
+
+  .widgetCardCapsuleLabel {
+    font-size: 0.6rem;
+  }
+
+  .widgetCardCapsuleValue {
+    font-size: 0.78rem;
+  }
+
+  .widgetCardFeature {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 10px;
+  }
+
+  .widgetCardFeatureItem {
+    gap: 0.3rem;
+    padding: 0.12rem 0.2rem;
+    font-size: 0.7rem;
+  }
+
+  .widgetCardFeatureDot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .widgetCardCvDownload {
+    margin: 0 0 0.25rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.72rem;
+  }
+
+  .widgetCardFooter {
+    font-size: 0.68rem;
+  }
+
+  .widgetFeaturedHeader {
+    gap: 0.45rem;
+    padding: 0.65rem 0.85rem 0;
+  }
+
+  .widgetFeaturedIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .widgetFeaturedLabel {
+    font-size: 0.72rem;
+  }
+
+  .widgetFeaturedContent {
+    padding: 0.55rem 0.85rem 0.65rem;
+  }
+
+  .widgetFeaturedTitle {
+    margin-block-end: 0.3rem;
+    font-size: 0.92rem;
+  }
+
+  .widgetFeaturedDescription {
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+
+  .widgetFeaturedStepCount {
+    margin-top: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.68rem;
+  }
+
+  .widgetFeaturedNav {
+    padding: 0 0.85rem 0.65rem;
+  }
+}
+
 @media (max-width: 640px) {
   .taskbar {
     bottom: 0.45rem;

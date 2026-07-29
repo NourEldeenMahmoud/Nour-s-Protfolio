@@ -191,17 +191,11 @@ export function findNearestAvailableCell(
 export function computeDefaultPositions(
   itemIds: string[],
   maxCols: number,
+  maxRows: number,
 ): Map<string, DesktopIconGridPosition> {
-  const map = new Map<string, DesktopIconGridPosition>();
-  for (let i = 0; i < itemIds.length; i++) {
-    const id = itemIds[i];
-    if (!id) continue;
-    map.set(id, {
-      column: i % maxCols,
-      row: Math.floor(i / maxCols),
-    });
-  }
-  return map;
+  return new Map(
+    Object.entries(computeColumnFirstPositions(itemIds, maxCols, maxRows)),
+  );
 }
 
 /**

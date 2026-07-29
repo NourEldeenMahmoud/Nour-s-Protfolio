@@ -328,32 +328,32 @@ describe("grid utilities", () => {
   });
 
   describe("computeDefaultPositions", () => {
-    it("assigns sequential grid positions", () => {
-      const result = computeDefaultPositions(["a", "b", "c"], 4);
+    it("fills top-to-bottom before starting the next column", () => {
+      const result = computeDefaultPositions(["a", "b", "c"], 4, 2);
       expect(result.get("a")).toEqual({ column: 0, row: 0 });
-      expect(result.get("b")).toEqual({ column: 1, row: 0 });
-      expect(result.get("c")).toEqual({ column: 2, row: 0 });
+      expect(result.get("b")).toEqual({ column: 0, row: 1 });
+      expect(result.get("c")).toEqual({ column: 1, row: 0 });
     });
 
-    it("wraps to next row when columns exhausted", () => {
-      const result = computeDefaultPositions(["a", "b", "c", "d", "e"], 2);
+    it("wraps to the next column when rows are exhausted", () => {
+      const result = computeDefaultPositions(["a", "b", "c", "d", "e"], 3, 2);
       expect(result.get("a")).toEqual({ column: 0, row: 0 });
-      expect(result.get("b")).toEqual({ column: 1, row: 0 });
-      expect(result.get("c")).toEqual({ column: 0, row: 1 });
+      expect(result.get("b")).toEqual({ column: 0, row: 1 });
+      expect(result.get("c")).toEqual({ column: 1, row: 0 });
       expect(result.get("d")).toEqual({ column: 1, row: 1 });
-      expect(result.get("e")).toEqual({ column: 0, row: 2 });
+      expect(result.get("e")).toEqual({ column: 2, row: 0 });
     });
 
     it("handles empty list", () => {
-      const result = computeDefaultPositions([], 4);
+      const result = computeDefaultPositions([], 4, 3);
       expect(result.size).toBe(0);
     });
 
-    it("handles single column", () => {
-      const result = computeDefaultPositions(["a", "b", "c"], 1);
+    it("respects the available grid capacity", () => {
+      const result = computeDefaultPositions(["a", "b", "c"], 1, 2);
       expect(result.get("a")).toEqual({ column: 0, row: 0 });
       expect(result.get("b")).toEqual({ column: 0, row: 1 });
-      expect(result.get("c")).toEqual({ column: 0, row: 2 });
+      expect(result.get("c")).toBeUndefined();
     });
   });
 
