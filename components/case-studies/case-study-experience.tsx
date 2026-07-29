@@ -809,7 +809,10 @@ export function CaseStudyExperience({
           </Link>
         </nav>
         <div>
-          <Link href={`/${locale}?focus=projects`}>{labels.back}</Link>
+          <Link href={`/${locale}?focus=projects`}>
+            <span aria-hidden="true">{locale === "ar" ? "→" : "←"}</span>
+            {labels.back}
+          </Link>
         </div>
       </footer>
     </main>
