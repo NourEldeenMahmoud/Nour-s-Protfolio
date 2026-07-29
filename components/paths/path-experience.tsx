@@ -180,10 +180,12 @@ function PathHeader({
       <Link
         className={styles.brand}
         href={`/${locale}`}
-        aria-label={locale === "ar" ? "صفحة نور الرئيسية" : "Nour Eldeen home"}
+        aria-label={
+          locale === "ar" ? "صفحة نور الرئيسية" : "Nour Eldeen Dev home"
+        }
       >
         <span aria-hidden="true">NE</span>
-        <strong>Nour Eldeen</strong>
+        <strong>Nour Eldeen Dev</strong>
       </Link>
       <nav aria-label={c.nav}>
         {(Object.keys(c.paths) as PortfolioPath[]).map((path) => (

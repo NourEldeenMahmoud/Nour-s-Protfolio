@@ -1,6 +1,6 @@
 import type { Project } from "@/content/portfolio";
 import type { Locale } from "@/i18n/routing";
-import { getLocalizedUrl, getSiteUrl, siteName } from "@/lib/seo";
+import { getLocalizedUrl, getSiteUrl, personName, siteName } from "@/lib/seo";
 
 const personId = new URL("/#person", getSiteUrl()).toString();
 const websiteId = new URL("/#website", getSiteUrl()).toString();
@@ -12,8 +12,13 @@ export function createHomeStructuredData(locale: Locale) {
       {
         "@type": "Person",
         "@id": personId,
-        name: siteName,
-        alternateName: "نور الدين محمود",
+        name: personName,
+        alternateName: [
+          "نور الدين محمود",
+          "Nour Eldeen Dev",
+          "Noureldeen Dev",
+          "NourEldeenDev",
+        ],
         url: getLocalizedUrl(locale).toString(),
         image: new URL("/profile/nour-eldeen.webp", getSiteUrl()).toString(),
         jobTitle: locale === "ar" ? "مهندس برمجيات" : "Software Engineer",
@@ -25,7 +30,13 @@ export function createHomeStructuredData(locale: Locale) {
       {
         "@type": "WebSite",
         "@id": websiteId,
-        name: `${siteName} Portfolio`,
+        name: siteName,
+        alternateName: [
+          "Noureldeen Dev",
+          "NourEldeenDev",
+          "noureldeendev.me",
+          `${personName} Portfolio`,
+        ],
         url: getSiteUrl().toString(),
         inLanguage: ["en", "ar"],
         author: { "@id": personId },

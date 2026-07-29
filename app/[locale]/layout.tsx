@@ -12,7 +12,7 @@ import { MotionProvider } from "@/components/providers/motion-provider";
 import { LocalePreference } from "@/components/providers/locale-preference";
 import { RoomMusicProvider } from "@/components/providers/room-music-provider";
 import { JsonLd } from "@/components/seo/json-ld";
-import { getSiteUrl, siteName } from "@/lib/seo";
+import { getSiteUrl, personName, siteName } from "@/lib/seo";
 import { createHomeStructuredData } from "@/lib/structured-data";
 import "@/styles/globals.css";
 
@@ -43,9 +43,9 @@ export async function generateMetadata({
     metadataBase: getSiteUrl(),
     title: t("title"),
     description: t("description"),
-    applicationName: `${siteName} Portfolio`,
-    authors: [{ name: siteName, url: getSiteUrl() }],
-    creator: siteName,
+    applicationName: siteName,
+    authors: [{ name: personName, url: getSiteUrl() }],
+    creator: personName,
     publisher: siteName,
     formatDetection: { email: false, address: false, telephone: false },
   };

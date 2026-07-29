@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { isLocale } from "@/i18n/routing";
+import { siteName } from "@/lib/seo";
 
 const socialKinds = new Set([
   "portfolio",
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
   const locale = isLocale(requestedLocale) ? requestedLocale : "en";
   const requestedKind = url.searchParams.get("kind") ?? "portfolio";
   const kind = socialKinds.has(requestedKind) ? requestedKind : "portfolio";
-  const title = readParameter(url, "title", "Nour Eldeen Mahmoud", 110);
+  const title = readParameter(url, "title", siteName, 110);
   const description = readParameter(
     url,
     "description",

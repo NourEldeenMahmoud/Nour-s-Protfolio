@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
-import { createPageMetadata, getSiteUrl } from "@/lib/seo";
+import {
+  createPageMetadata,
+  getSiteUrl,
+  personName,
+  siteName,
+} from "@/lib/seo";
+import { createHomeStructuredData } from "@/lib/structured-data";
 
 describe("SEO configuration", () => {
   afterEach(() => {
@@ -37,6 +43,41 @@ describe("SEO configuration", () => {
       ar: "https://portfolio.example/ar/projects/buildsense",
       "x-default": "https://portfolio.example/en/projects/buildsense",
     });
+    expect(metadata.authors).toEqual([
+      { name: personName, url: new URL("https://portfolio.example/") },
+    ]);
+    expect(metadata.openGraph).toMatchObject({ siteName });
+    expect(metadata.publisher).toBe(siteName);
+  });
+
+  it("connects the website brand aliases to the person identity", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example");
+    const structuredData = createHomeStructuredData("en");
+
+    expect(structuredData["@graph"]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          "@type": "Person",
+          name: personName,
+          alternateName: expect.arrayContaining([
+            "نور الدين محمود",
+            "Nour Eldeen Dev",
+            "Noureldeen Dev",
+            "NourEldeenDev",
+          ]),
+        }),
+        expect.objectContaining({
+          "@type": "WebSite",
+          name: siteName,
+          alternateName: [
+            "Noureldeen Dev",
+            "NourEldeenDev",
+            "noureldeendev.me",
+            `${personName} Portfolio`,
+          ],
+        }),
+      ]),
+    );
   });
 
   it("lists every localized public route without query-state duplicates", () => {

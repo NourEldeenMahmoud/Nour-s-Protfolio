@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/i18n/routing";
 
-export const siteName = "Nour Eldeen Mahmoud";
+export const personName = "Nour Eldeen Mahmoud";
+export const siteName = "Nour Eldeen Dev";
 export const defaultSiteOrigin = "http://localhost:3000";
 
 export function getSiteUrl() {
@@ -52,8 +53,8 @@ export function createPageMetadata({
   return {
     title,
     description,
-    authors: [{ name: siteName, url: getSiteUrl() }],
-    creator: siteName,
+    authors: [{ name: personName, url: getSiteUrl() }],
+    creator: personName,
     publisher: siteName,
     alternates: {
       canonical: canonical.toString(),
