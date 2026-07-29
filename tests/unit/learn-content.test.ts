@@ -8,12 +8,9 @@ import {
   getNodePath,
   getChildNodes,
   searchNodes,
-  isDesktopFolderId,
-  getRootFolderId,
   applications,
   applicationMap,
   searchApplications,
-  widgets,
 } from "@/content/learn";
 
 describe("learn content", () => {
@@ -208,24 +205,6 @@ describe("learn content", () => {
     });
   });
 
-  describe("isDesktopFolderId", () => {
-    it("returns true for valid desktop folder ids", () => {
-      expect(isDesktopFolderId("apps")).toBe(true);
-      expect(isDesktopFolderId("knowledge")).toBe(true);
-    });
-
-    it("returns false for non-desktop ids", () => {
-      expect(isDesktopFolderId("nonexistent")).toBe(false);
-      expect(isDesktopFolderId("")).toBe(false);
-    });
-  });
-
-  describe("getRootFolderId", () => {
-    it("returns this-pc", () => {
-      expect(getRootFolderId()).toBe("this-pc");
-    });
-  });
-
   describe("applications", () => {
     it("has the five approved essential applications", () => {
       expect(applications.map((app) => app.id)).toEqual([
@@ -288,46 +267,6 @@ describe("learn content", () => {
     it("returns empty for no matches", () => {
       const results = searchApplications("zzzyyyxxxnotfound");
       expect(results).toHaveLength(0);
-    });
-  });
-
-  describe("widgets", () => {
-    it("has 4 widgets", () => {
-      expect(widgets).toHaveLength(4);
-    });
-
-    it("each widget has required fields", () => {
-      for (const widget of widgets) {
-        expect(widget.id).toBeTruthy();
-        expect(widget.title).toBeTruthy();
-        expect(widget.variant).toBeTruthy();
-        expect(widget.content).toBeTruthy();
-      }
-    });
-
-    it("has exactly one large, two small, and one wide layout", () => {
-      const large = widgets.filter((w) => w.layout === "large");
-      const small = widgets.filter((w) => w.layout === "small");
-      const wide = widgets.filter((w) => w.layout === "wide");
-      expect(large).toHaveLength(1);
-      expect(small).toHaveLength(2);
-      expect(wide).toHaveLength(1);
-    });
-
-    it("widgets with openFileId reference valid nodes", () => {
-      for (const widget of widgets) {
-        if (widget.openFileId) {
-          expect(learnNodeMap.has(widget.openFileId)).toBe(true);
-        }
-      }
-    });
-
-    it("widgets with openFolderId reference valid nodes", () => {
-      for (const widget of widgets) {
-        if (widget.openFolderId) {
-          expect(learnNodeMap.has(widget.openFolderId)).toBe(true);
-        }
-      }
     });
   });
 

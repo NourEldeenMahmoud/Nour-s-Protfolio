@@ -1,7 +1,25 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { RoomExperience } from "@/components/room/room-experience";
 import { isLocale } from "@/i18n/routing";
+import { createPageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const t = await getTranslations({ locale, namespace: "metadata" });
+  return createPageMetadata({
+    locale,
+    title: t("title"),
+    description: t("description"),
+    socialKind: "portfolio",
+  });
+}
 
 export default async function EntryPage({
   params,

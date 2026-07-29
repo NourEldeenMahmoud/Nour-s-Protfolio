@@ -3,47 +3,6 @@
     "title": "Nour Eldeen Mahmoud | Software Engineer",
     "description": ".NET-centered software engineer building dependable systems across backend, full-stack, cross-platform, and interactive work."
   },
-  "entry": {
-    "eyebrow": "ENGINEERING CORE / 001",
-    "name": "Nour Eldeen Mahmoud",
-    "role": ".NET-centered software engineer",
-    "statement": "I turn complex problems into systems that can be understood, built, and validated.",
-    "selectorTitle": "Choose your path",
-    "selectorHint": "One engineering core. Four ways to examine the work.",
-    "skip": "Skip intro",
-    "replay": "Replay intro",
-    "language": "العربية",
-    "languageLabel": "View in Arabic",
-    "statusPlaying": "Introduction playing. Use Skip intro to continue immediately.",
-    "statusReady": "The path selector is ready.",
-    "signals": [
-      "Booking",
-      "Payments",
-      "Hardware",
-      "Healthcare",
-      "Cross-platform",
-      "Interactive"
-    ],
-    "process": ["Understand", "Design", "Build", "Validate"],
-    "paths": {
-      "hire": {
-        "label": "Hire",
-        "description": "I am evaluating Nour for a role, internship, or engineering opportunity."
-      },
-      "watch": {
-        "label": "Watch",
-        "description": "I came to watch Nour's work, projects, interactions, and visual product stories."
-      },
-      "learn": {
-        "label": "Learn",
-        "description": "I want to understand Nour's architecture, decisions, experiments, knowledge, and working process."
-      },
-      "general": {
-        "label": "Continue to the general portfolio",
-        "description": "A balanced overview of work, process, knowledge, About, CV, and contact."
-      }
-    }
-  },
   "room": {
     "eyebrow": "NOUR / ENGINEERING ROOM",
     "name": "Nour Eldeen Mahmoud",

@@ -1,12 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createElement } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import {
@@ -20,11 +13,7 @@ describe("useReducedMotion hook", () => {
   it("returns the boolean provided by MotionContext", () => {
     const { result } = renderHook(() => useReducedMotion(), {
       wrapper: ({ children }) =>
-        createElement(
-          MotionContext.Provider,
-          { value: true },
-          children,
-        ),
+        createElement(MotionContext.Provider, { value: true }, children),
     });
     expect(result.current).toBe(true);
   });
@@ -32,11 +21,7 @@ describe("useReducedMotion hook", () => {
   it("returns false when context value is false", () => {
     const { result } = renderHook(() => useReducedMotion(), {
       wrapper: ({ children }) =>
-        createElement(
-          MotionContext.Provider,
-          { value: false },
-          children,
-        ),
+        createElement(MotionContext.Provider, { value: false }, children),
     });
     expect(result.current).toBe(false);
   });
@@ -46,16 +31,10 @@ describe("useReducedMotion hook", () => {
 
     renderHook(() => useReducedMotion(), {
       wrapper: ({ children }) =>
-        createElement(
-          MotionContext.Provider,
-          { value: false },
-          children,
-        ),
+        createElement(MotionContext.Provider, { value: false }, children),
     });
 
-    expect(getItemSpy).not.toHaveBeenCalledWith(
-      "portfolio-reduced-motion",
-    );
+    expect(getItemSpy).not.toHaveBeenCalledWith("portfolio-reduced-motion");
     getItemSpy.mockRestore();
   });
 });
@@ -66,8 +45,7 @@ describe("MotionProvider hydration safety", () => {
   const originalEnv = process.env.NODE_ENV;
 
   function setEnv(val: string) {
-    (process.env as Record<string, string>).NODE_ENV =
-      val;
+    (process.env as Record<string, string>).NODE_ENV = val;
   }
 
   beforeEach(() => {
@@ -89,23 +67,19 @@ describe("MotionProvider hydration safety", () => {
     vi.stubGlobal(
       "matchMedia",
       vi.fn().mockImplementation((query: string) => ({
-        matches:
-          query === "(prefers-reduced-motion: reduce)",
+        matches: query === "(prefers-reduced-motion: reduce)",
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
       })),
     );
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(true);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("reduced");
+    expect(document.documentElement.dataset.motion).toBe("reduced");
   });
 
   it("resolves to false in production when matchMedia does not prefer reduced", async () => {
@@ -120,30 +94,24 @@ describe("MotionProvider hydration safety", () => {
     );
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(false);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("full");
+    expect(document.documentElement.dataset.motion).toBe("full");
   });
 
   it("stays false in development without manual override", async () => {
     setEnv("development");
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(false);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("full");
+    expect(document.documentElement.dataset.motion).toBe("full");
   });
 
   it("ignores OS prefers-reduced-motion in development", async () => {
@@ -158,54 +126,38 @@ describe("MotionProvider hydration safety", () => {
     );
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(false);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("full");
+    expect(document.documentElement.dataset.motion).toBe("full");
   });
 
   it("activates reduced motion via URL override in development", async () => {
     setEnv("development");
-    window.history.replaceState(
-      {},
-      "",
-      "/?reducedMotion=1",
-    );
+    window.history.replaceState({}, "", "/?reducedMotion=1");
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(true);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("reduced");
+    expect(document.documentElement.dataset.motion).toBe("reduced");
   });
 
   it("activates reduced motion via localStorage override in development", async () => {
     setEnv("development");
-    window.localStorage.setItem(
-      "portfolio-reduced-motion",
-      "true",
-    );
+    window.localStorage.setItem("portfolio-reduced-motion", "true");
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(true);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("reduced");
+    expect(document.documentElement.dataset.motion).toBe("reduced");
   });
 
   it("activates reduced motion via URL override in production", async () => {
@@ -218,22 +170,15 @@ describe("MotionProvider hydration safety", () => {
         removeEventListener: vi.fn(),
       })),
     );
-    window.history.replaceState(
-      {},
-      "",
-      "/?reducedMotion=1",
-    );
+    window.history.replaceState({}, "", "/?reducedMotion=1");
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(true);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("reduced");
+    expect(document.documentElement.dataset.motion).toBe("reduced");
   });
 
   it("activates reduced motion via localStorage override in production", async () => {
@@ -246,21 +191,15 @@ describe("MotionProvider hydration safety", () => {
         removeEventListener: vi.fn(),
       })),
     );
-    window.localStorage.setItem(
-      "portfolio-reduced-motion",
-      "true",
-    );
+    window.localStorage.setItem("portfolio-reduced-motion", "true");
     document.documentElement.dataset.motion = "full";
 
-    const { result } = renderHook(
-      () => useReducedMotion(),
-      { wrapper: MotionProvider },
-    );
+    const { result } = renderHook(() => useReducedMotion(), {
+      wrapper: MotionProvider,
+    });
 
     expect(result.current).toBe(true);
-    expect(
-      document.documentElement.dataset.motion,
-    ).toBe("reduced");
+    expect(document.documentElement.dataset.motion).toBe("reduced");
   });
 
   it("subscribes to matchMedia changes in production", async () => {
@@ -271,11 +210,9 @@ describe("MotionProvider hydration safety", () => {
       "matchMedia",
       vi.fn().mockImplementation(() => ({
         matches: false,
-        addEventListener: vi
-          .fn()
-          .mockImplementation((_event, cb) => {
-            changeListeners.push(cb as () => void);
-          }),
+        addEventListener: vi.fn().mockImplementation((_event, cb) => {
+          changeListeners.push(cb as () => void);
+        }),
         removeEventListener: vi.fn(),
       })),
     );
@@ -296,11 +233,9 @@ describe("MotionProvider hydration safety", () => {
       "matchMedia",
       vi.fn().mockImplementation(() => ({
         matches: false,
-        addEventListener: vi
-          .fn()
-          .mockImplementation((event) => {
-            addEventCalls.push(event);
-          }),
+        addEventListener: vi.fn().mockImplementation((event) => {
+          addEventCalls.push(event);
+        }),
         removeEventListener: vi.fn(),
       })),
     );
@@ -325,20 +260,16 @@ describe("CSS audit", () => {
       "utf-8",
     );
 
-    expect(motionCss).toContain(
-      'html[data-motion="reduced"]',
-    );
+    expect(motionCss).toContain('html[data-motion="reduced"]');
     expect(motionCss).not.toContain("@media");
-    expect(motionCss).not.toContain(
-      "prefers-reduced-motion",
-    );
+    expect(motionCss).not.toContain("prefers-reduced-motion");
   });
 });
 
 /* ── Hydration safety (static analysis) ── */
 
 describe("Hydration safety", () => {
-  it("layout.tsx renders data-motion=\"full\" with suppressHydrationWarning", async () => {
+  it('layout.tsx renders data-motion="full" with suppressHydrationWarning', async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const layout = fs.readFileSync(
@@ -372,34 +303,26 @@ describe("Hydration safety", () => {
       "utf-8",
     );
 
-    expect(layout).toMatch(
-      /var root=document\.documentElement;try\{/,
-    );
+    expect(layout).toMatch(/var root=document\.documentElement;try\{/);
   });
 
   it("MotionProvider initializes with useState(false), not DOM read", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const provider = fs.readFileSync(
-      path.resolve(
-        "components/providers/motion-provider.tsx",
-      ),
+      path.resolve("components/providers/motion-provider.tsx"),
       "utf-8",
     );
 
     expect(provider).toContain("useState(false)");
-    expect(provider).not.toMatch(
-      /useState\(\(\)\s*=>\s*\{[^}]*document/,
-    );
+    expect(provider).not.toMatch(/useState\(\(\)\s*=>\s*\{[^}]*document/);
   });
 
   it("MotionProvider uses useLayoutEffect for post-hydration sync", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const provider = fs.readFileSync(
-      path.resolve(
-        "components/providers/motion-provider.tsx",
-      ),
+      path.resolve("components/providers/motion-provider.tsx"),
       "utf-8",
     );
 
@@ -419,7 +342,6 @@ describe("Component isolation", () => {
       "components/room/center-showcase.tsx",
       "components/room/project-media-player.tsx",
       "components/room/category-icons-layer.tsx",
-      "components/entry/entry-experience.tsx",
       "components/projects/project-experience.tsx",
       "components/case-studies/case-study-experience.tsx",
       "components/paths/learn/learn-widgets.tsx",
@@ -427,14 +349,9 @@ describe("Component isolation", () => {
     ];
 
     for (const file of componentFiles) {
-      const content = fs.readFileSync(
-        path.resolve(file),
-        "utf-8",
-      );
+      const content = fs.readFileSync(path.resolve(file), "utf-8");
       if (content.includes("useReducedMotion")) {
-        expect(content).not.toContain(
-          "matchMedia.*prefers-reduced-motion",
-        );
+        expect(content).not.toContain("matchMedia.*prefers-reduced-motion");
       }
     }
   });

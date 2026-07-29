@@ -5,6 +5,9 @@ import { CaseStudyExperience } from "@/components/case-studies/case-study-experi
 import { caseStudySlugs, getCaseStudy } from "@/content/case-studies";
 import { getProject } from "@/content/portfolio";
 import { isLocale } from "@/i18n/routing";
+import { JsonLd } from "@/components/seo/json-ld";
+import { createPageMetadata } from "@/lib/seo";
+import { createCaseStudyStructuredData } from "@/lib/structured-data";
 
 export function generateStaticParams() {
   return caseStudySlugs.map((slug) => ({ slug }));
@@ -18,10 +21,17 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const project = getProject(slug);
   if (!project || !isLocale(locale)) return {};
-  return {
-    title: `${project.title} Case Study | Nour Eldeen Mahmoud`,
+  return createPageMetadata({
+    locale,
+    path: `/case-studies/${project.slug}`,
+    title:
+      locale === "ar"
+        ? `دراسة حالة ${project.title} | نور الدين محمود`
+        : `${project.title} Case Study | Nour Eldeen Mahmoud`,
     description: project.context[locale],
-  };
+    socialKind: "case-study",
+    type: "article",
+  });
 }
 
 export default async function CaseStudyPage({
@@ -36,6 +46,9 @@ export default async function CaseStudyPage({
   if (!project || !study) notFound();
   setRequestLocale(locale);
   return (
-    <CaseStudyExperience locale={locale} project={project} study={study} />
+    <>
+      <JsonLd data={createCaseStudyStructuredData(project, locale)} />
+      <CaseStudyExperience locale={locale} project={project} study={study} />
+    </>
   );
 }

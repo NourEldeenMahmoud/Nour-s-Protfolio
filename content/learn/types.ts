@@ -121,23 +121,6 @@ export interface LearnApplication {
   tags: string[];
 }
 
-export interface Widget {
-  id: string;
-  title: string;
-  content: string;
-  items?: string[];
-  variant?: "identity" | "learning" | "note" | "workflow" | "focus";
-  layout?: "large" | "small" | "wide";
-  subtitle?: string;
-  tiles?: Array<{ label: string; value: string }>;
-  footer?: string;
-  actionLabel?: string;
-  openFolderId?: string;
-  openFileId?: string;
-  stepCount?: number;
-  focusItems?: string[];
-}
-
 export interface WidgetBase {
   id: string;
   title: string;

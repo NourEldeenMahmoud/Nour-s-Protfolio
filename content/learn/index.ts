@@ -11,7 +11,6 @@ export type {
   LearnMediaItem,
   LearnLink,
   LearnApplication,
-  Widget,
   WidgetBase,
   HeroWidget,
   FeaturedItem,
@@ -25,7 +24,6 @@ export {
   applicationMap,
   searchApplications,
 } from "./applications";
-export { widgets } from "./widgets";
 export { widgetsV2 } from "./widgets-v2";
 
 export const learnNodeMap = new Map<string, LearnNode>(
@@ -42,8 +40,6 @@ export const rootDesktopIds = [
   "obsidian-vault",
 ] as const;
 
-export type DesktopFolderId = (typeof rootDesktopIds)[number];
-
 export const desktopFolders: LearnNode[] = rootDesktopIds
   .map((id) => learnNodeMap.get(id))
   .filter((n): n is LearnNode => !!n && n.type === "folder");
@@ -58,11 +54,3 @@ export const navItems: Array<{ id: string; name: Record<Locale, string> }> = [
   { id: "__thispc__", name: { en: "This PC", ar: "هذا الكمبيوتر" } },
   { id: "__return__", name: { en: "Return to Room", ar: "العودة إلى الغرفة" } },
 ];
-
-export function getRootFolderId(): string {
-  return "this-pc";
-}
-
-export function isDesktopFolderId(id: string): boolean {
-  return rootDesktopIds.includes(id as DesktopFolderId);
-}

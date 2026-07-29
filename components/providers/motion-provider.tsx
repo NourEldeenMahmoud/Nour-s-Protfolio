@@ -2,16 +2,11 @@
 
 import {
   createContext,
-  useContext,
   useLayoutEffect,
   useState,
 } from "react";
 
 export const MotionContext = createContext(false);
-
-export function useMotionState() {
-  return useContext(MotionContext);
-}
 
 export function MotionProvider({
   children,

@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 import type { Locale } from "@/i18n/routing";
 import {
   learnNodeMap,
@@ -133,6 +134,7 @@ interface LearnExperienceProps {
 }
 
 export function LearnExperience({ locale, copy }: LearnExperienceProps) {
+  const router = useRouter();
   const {
     windows,
     activeWindowId,
@@ -227,8 +229,8 @@ export function LearnExperience({ locale, copy }: LearnExperienceProps) {
     try {
       sessionStorage.setItem("learn-returning", "true");
     } catch {}
-    window.location.href = `/${locale}`;
-  }, [locale]);
+    router.push(`/${locale}`);
+  }, [locale, router]);
 
   const handleRefresh = useCallback(() => {
     const allIds = [

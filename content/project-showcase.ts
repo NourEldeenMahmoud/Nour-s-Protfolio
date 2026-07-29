@@ -1,19 +1,7 @@
 import type { Locale } from "@/i18n/routing";
-import { getProjectPreviewMedia, type Project } from "@/content/portfolio";
 
 export type CategoryId =
-  | "web"
-  | "game-development"
-  | "desktop"
-  | "mobile-applications"
-  | "summaries";
-
-export type MediaItem = {
-  type: "image" | "video";
-  src: string;
-  alt: Record<Locale, string>;
-  poster?: string;
-};
+  "web" | "game-development" | "desktop" | "mobile-applications" | "summaries";
 
 export type ShowcaseCategory = {
   id: CategoryId;
@@ -62,15 +50,3 @@ export const categories: ShowcaseCategory[] = [
     projectSlugs: ["met-summaries"],
   },
 ];
-
-/**
- * Build preview media items for Center Showcase player.
- */
-export function buildMediaItems(project: Project): MediaItem[] {
-  return getProjectPreviewMedia(project).map(({ type, src, alt, poster }) => ({
-    type,
-    src,
-    alt,
-    poster,
-  }));
-}

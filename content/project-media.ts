@@ -798,11 +798,3 @@ export const projectMediaSets: Record<ProjectSlug, ProjectMediaSet> = {
     ],
   },
 };
-
-/** Keep backwards compatibility alias if needed */
-export const projectMediaPlaylists = Object.fromEntries(
-  Object.entries(projectMediaSets).map(([slug, set]) => [
-    slug,
-    [...(set.hero ? [set.hero] : []), ...set.preview, ...set.details],
-  ]),
-) as Record<ProjectSlug, ProjectMedia[]>;

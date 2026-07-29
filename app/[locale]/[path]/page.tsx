@@ -7,8 +7,36 @@ import {
 } from "@/components/paths/path-experience";
 import { LearnExperiencePage } from "@/components/paths/learn/learn-page";
 import { isLocale } from "@/i18n/routing";
+import { createPageMetadata } from "@/lib/seo";
 
 const paths = ["learn", "general"] as const;
+
+const pathMetadata = {
+  en: {
+    learn: {
+      title: "Engineering Knowledge & Workflow | Nour Eldeen Mahmoud",
+      description:
+        "Explore Nour Eldeen Mahmoud's verified engineering knowledge, tools, workflows, certificates, and learning system.",
+    },
+    general: {
+      title: "About Nour Eldeen Mahmoud | Software Engineer",
+      description:
+        "Meet Nour Eldeen Mahmoud, a .NET-centered software engineer working across backend, full-stack, cross-platform, and interactive systems.",
+    },
+  },
+  ar: {
+    learn: {
+      title: "المعرفة وسير العمل الهندسي | نور الدين محمود",
+      description:
+        "استكشف معرفة نور الدين محمود الهندسية المؤكدة وأدواته وسير العمل والشهادات ونظام التعلم.",
+    },
+    general: {
+      title: "عن نور الدين محمود | مهندس برمجيات",
+      description:
+        "تعرّف على نور الدين محمود، مهندس برمجيات يرتكز عمله على .NET عبر الباك إند والفل ستاك والأنظمة متعددة المنصات والتفاعلية.",
+    },
+  },
+} as const;
 
 function isPath(value: string): value is PortfolioPath {
   return paths.includes(value as (typeof paths)[number]);
@@ -16,6 +44,23 @@ function isPath(value: string): value is PortfolioPath {
 
 export function generateStaticParams() {
   return paths.map((path) => ({ path }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; path: string }>;
+}): Promise<Metadata> {
+  const { locale, path } = await params;
+  if (!isLocale(locale) || !isPath(path)) return {};
+  const copy = pathMetadata[locale][path];
+  return createPageMetadata({
+    locale,
+    path: `/${path}`,
+    title: copy.title,
+    description: copy.description,
+    socialKind: path === "learn" ? "knowledge" : "portfolio",
+  });
 }
 
 export default async function DestinationContractPage({
@@ -80,3 +125,4 @@ export default async function DestinationContractPage({
 
   return <PathExperience locale={locale} path={path} />;
 }
+import type { Metadata } from "next";

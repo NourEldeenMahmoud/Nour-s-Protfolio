@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import {
@@ -9,6 +9,11 @@ import {
 import { notFound } from "next/navigation";
 import { isLocale, locales } from "@/i18n/routing";
 import { MotionProvider } from "@/components/providers/motion-provider";
+import { LocalePreference } from "@/components/providers/locale-preference";
+import { RoomMusicProvider } from "@/components/providers/room-music-provider";
+import { JsonLd } from "@/components/seo/json-ld";
+import { getSiteUrl, siteName } from "@/lib/seo";
+import { createHomeStructuredData } from "@/lib/structured-data";
 import "@/styles/globals.css";
 
 type LocaleLayoutProps = {
@@ -20,6 +25,13 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "dark",
+  themeColor: "#0b1014",
+};
+
 export async function generateMetadata({
   params,
 }: LocaleLayoutProps): Promise<Metadata> {
@@ -28,11 +40,14 @@ export async function generateMetadata({
 
   const t = await getTranslations({ locale, namespace: "metadata" });
   return {
+    metadataBase: getSiteUrl(),
     title: t("title"),
     description: t("description"),
-    alternates: {
-      languages: { en: "/en", ar: "/ar" },
-    },
+    applicationName: `${siteName} Portfolio`,
+    authors: [{ name: siteName, url: getSiteUrl() }],
+    creator: siteName,
+    publisher: siteName,
+    formatDetection: { email: false, address: false, telephone: false },
   };
 }
 
@@ -66,9 +81,11 @@ export default async function LocaleLayout({
         )}
       </head>
       <body>
+        <JsonLd data={createHomeStructuredData(locale)} />
+        <LocalePreference locale={locale} />
         <MotionProvider>
           <NextIntlClientProvider messages={messages}>
-            {children}
+            <RoomMusicProvider>{children}</RoomMusicProvider>
           </NextIntlClientProvider>
         </MotionProvider>
       </body>
