@@ -960,6 +960,12 @@ export function ProjectExperience({
         </Link>
       </nav>
 
+      <div className={styles.bottomBack}>
+        <Link href={`/${locale}?focus=exploration`}>
+          <span aria-hidden="true">{locale === "ar" ? "→" : "←"}</span> {c.back}
+        </Link>
+      </div>
+
       <dialog
         ref={dialogRef}
         className={styles.viewer}

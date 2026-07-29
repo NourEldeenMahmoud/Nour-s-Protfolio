@@ -126,28 +126,50 @@
 
 .backLink {
   display: inline-flex;
-  min-height: 2.75rem;
+  min-height: 3rem;
   align-items: center;
-  gap: 0.65rem;
-  color: rgb(244 238 228 / 78%);
+  gap: 0.7rem;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid rgb(221 168 92 / 55%);
+  border-radius: 0.18rem;
+  background: rgb(12 18 24 / 72%);
+  color: #f6efe3;
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1.4cqi, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-decoration: none;
-  transition: color 180ms ease;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .backLink span {
   color: var(--amber);
+  font-size: 1.1em;
   transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .backLink:hover,
 .backLink:focus-visible {
+  border-color: var(--amber-bright);
+  background: rgb(221 168 92 / 14%);
   color: #fff;
+  transform: translateY(-2px);
 }
 .backLink:hover span {
   transform: translateX(-0.3rem);
 }
 [dir="rtl"] .backLink:hover span {
   transform: translateX(0.3rem);
+}
+.backLink:focus-visible {
+  outline: 2px solid #ffe2aa;
+  outline-offset: 3px;
 }
 
 .heroComposition {
@@ -1336,6 +1358,58 @@
   margin-inline-start: 0;
 }
 
+.bottomBack {
+  display: flex;
+  justify-content: center;
+  padding: 3rem clamp(1rem, 5vw, 6rem);
+  border-block-end: 1px solid var(--line);
+}
+.bottomBack a {
+  display: inline-flex;
+  min-height: 3.4rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.6rem;
+  border: 1px solid rgb(221 168 92 / 55%);
+  border-radius: 0.18rem;
+  background: rgb(12 18 24 / 72%);
+  color: #f6efe3;
+  font-family: var(--font-mono);
+  font-size: clamp(0.78rem, 1.6cqi, 0.92rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bottomBack a span {
+  color: var(--amber);
+  font-size: 1.15em;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bottomBack a:hover,
+.bottomBack a:focus-visible {
+  border-color: var(--amber-bright);
+  background: rgb(221 168 92 / 14%);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.bottomBack a:hover span {
+  transform: translateX(-0.3rem);
+}
+[dir="rtl"] .bottomBack a:hover span {
+  transform: translateX(0.3rem);
+}
+.bottomBack a:focus-visible {
+  outline: 2px solid #ffe2aa;
+  outline-offset: 3px;
+}
+
 .viewer {
   width: 100vw;
   max-width: none;
@@ -1434,6 +1508,7 @@
     .heroTopbar,
     .heroActions a,
     .endingActions a,
+    .bottomBack a,
     .zoneNav a,
     .heroFacts span,
     .explorerHeading > span,
