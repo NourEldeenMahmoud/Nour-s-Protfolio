@@ -61,9 +61,15 @@ describe("ProjectExperience", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "BuildSense" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText(buildsense.summary.en).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(buildsense.context.en).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(buildsense.contribution.en).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(buildsense.summary.en).length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getAllByText(buildsense.context.en).length).toBeGreaterThan(
+      0,
+    );
+    expect(
+      screen.getAllByText(buildsense.contribution.en).length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText("Not published")).not.toBeInTheDocument();
   });
 
@@ -83,7 +89,7 @@ describe("ProjectExperience", () => {
     expect(screen.getByText("End of game world")).toBeInTheDocument();
   });
 
-  it("uses the static poster for animated media when motion is reduced", () => {
+  it("always uses the GIF source for animated hero media regardless of motion preference", () => {
     render(
       <MotionContext.Provider value>
         <ProjectExperience locale="en" project={sharpShooter} />
@@ -96,13 +102,15 @@ describe("ProjectExperience", () => {
     expect(heroImages).toHaveLength(1);
     expect(heroImages[0]).toHaveAttribute(
       "src",
-      "/projects/sharp-shooter/preview/poster.webp",
+      "/projects/sharp-shooter/details/hero-gameplay.gif",
     );
   });
 
   it("adapts labels for collection kind", () => {
     render(<ProjectExperience locale="en" project={metSummaries} />);
-    expect(screen.getAllByText("Behind the collection").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Behind the collection").length).toBeGreaterThan(
+      0,
+    );
     expect(screen.getByText("Explore the collection")).toBeInTheDocument();
     expect(screen.getByText("Subjects and highlights")).toBeInTheDocument();
     expect(screen.getByText("End of collection")).toBeInTheDocument();
@@ -128,14 +136,18 @@ describe("ProjectExperience", () => {
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
 
-    const closeButton = screen.getByRole("button", { name: "Close media viewer" });
+    const closeButton = screen.getByRole("button", {
+      name: "Close media viewer",
+    });
     await user.click(closeButton);
     expect(dialog).not.toHaveAttribute("open");
   });
 
   it("renders Case Study link in both relevant action areas for projects with case study (BuildSense)", () => {
     render(<ProjectExperience locale="en" project={buildsense} />);
-    const links = screen.getAllByRole("link", { name: /View Technical Case Study/i });
+    const links = screen.getAllByRole("link", {
+      name: /View Technical Case Study/i,
+    });
     expect(links).toHaveLength(2);
     for (const link of links) {
       expect(link).toHaveAttribute("href", "/en/case-studies/buildsense");
@@ -144,11 +156,19 @@ describe("ProjectExperience", () => {
 
   it("does not render any Case Study link for projects without case study", () => {
     render(<ProjectExperience locale="en" project={httyai} />);
-    expect(screen.queryByRole("link", { name: /View Technical Case Study/i })).not.toBeInTheDocument();
-    expect(document.querySelector('a[href*="/case-studies/how-to-train-your-ai"]')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /View Technical Case Study/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      document.querySelector('a[href*="/case-studies/how-to-train-your-ai"]'),
+    ).not.toBeInTheDocument();
 
     render(<ProjectExperience locale="en" project={metSummaries} />);
-    expect(screen.queryByRole("link", { name: /View Technical Case Study/i })).not.toBeInTheDocument();
-    expect(document.querySelector('a[href*="/case-studies/met-summaries"]')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /View Technical Case Study/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      document.querySelector('a[href*="/case-studies/met-summaries"]'),
+    ).not.toBeInTheDocument();
   });
 });

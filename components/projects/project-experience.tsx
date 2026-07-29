@@ -276,35 +276,29 @@ function ProjectVisual({
     );
   }
 
-  const source = reducedMotion && media.poster ? media.poster : media.src;
   const animated = media.src.toLowerCase().endsWith(".gif");
+  const source = animated
+    ? media.src
+    : reducedMotion && media.poster
+      ? media.poster
+      : media.src;
 
   if (animated) {
-    const img = (
-      // eslint-disable-next-line @next/next/no-img-element -- native <img> required for animated GIFs; Next.js Image strips animation even with unoptimized
+    // native <img> required for animated GIFs; Next.js Image strips animation even with unoptimized
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={source}
         alt={media.alt[locale]}
         className={styles.visualAsset}
         style={{
+          position: "absolute",
+          inset: 0,
           objectPosition: media.focalPosition,
           width: "100%",
           height: "100%",
         }}
-        decoding="async"
       />
-    );
-
-    if (!media.poster) return img;
-
-    return (
-      <picture>
-        <source
-          media="(prefers-reduced-motion: reduce)"
-          srcSet={media.poster}
-        />
-        {img}
-      </picture>
     );
   }
 
