@@ -128,16 +128,31 @@ const categoryMap: Record<string, Record<Locale, string>> = {
   buildsense: { en: "Web product", ar: "منتج ويب" },
   bookify: { en: "Hotel reservation", ar: "حجز الفنادق" },
   cinemaverse: { en: "Cinema booking", ar: "حجز السينما" },
-  "frontend-mini-projects": { en: "Landing pages collection", ar: "مجموعة صفحات هبوط" },
-  "how-to-train-your-ai": { en: "Unity narrative game", ar: "لعبة Unity سردية" },
+  "frontend-mini-projects": {
+    en: "Landing pages collection",
+    ar: "مجموعة صفحات هبوط",
+  },
+  "how-to-train-your-ai": {
+    en: "Unity narrative game",
+    ar: "لعبة Unity سردية",
+  },
   "sharp-shooter": { en: "Unity FPS game", ar: "لعبة تصويب Unity" },
   "royal-run": { en: "Unity endless runner", ar: "لعبة ركض لانهائي Unity" },
-  "galaxy-strike": { en: "Unity space shooter", ar: "لعبة إطلاق نار فضائية Unity" },
-  "rocket-boost": { en: "Unity physics platformer", ar: "لعبة منصات فيزياء Unity" },
+  "galaxy-strike": {
+    en: "Unity space shooter",
+    ar: "لعبة إطلاق نار فضائية Unity",
+  },
+  "rocket-boost": {
+    en: "Unity physics platformer",
+    ar: "لعبة منصات فيزياء Unity",
+  },
   "blood-bank-desktop": { en: "Desktop operations", ar: "عمليات مكتبية" },
   dvld: { en: "Desktop system", ar: "نظام مكتبي" },
   "blood-bank-mobile": { en: "Mobile experience", ar: "تجربة موبايل" },
-  "met-summaries": { en: "Academic notes collection", ar: "مجموعة ملاحظات أكاديمية" },
+  "met-summaries": {
+    en: "Academic notes collection",
+    ar: "مجموعة ملاحظات أكاديمية",
+  },
 };
 
 function getKindCopy(kind: "product" | "game" | "collection", locale: Locale) {
@@ -204,7 +219,8 @@ function getKindCopy(kind: "product" | "game" | "collection", locale: Locale) {
       return {
         category: "Knowledge collection",
         storyEyebrow: "The collection, at a glance",
-        storyTitle: "A structured collection, presented as an interactive reference.",
+        storyTitle:
+          "A structured collection, presented as an interactive reference.",
         experienceEyebrow: "Explore the collection",
         featureEyebrow: "Subjects and highlights",
         behind: "Behind the collection",
@@ -263,6 +279,35 @@ function ProjectVisual({
   const source = reducedMotion && media.poster ? media.poster : media.src;
   const animated = media.src.toLowerCase().endsWith(".gif");
 
+  if (animated) {
+    const img = (
+      // eslint-disable-next-line @next/next/no-img-element -- native <img> required for animated GIFs; Next.js Image strips animation even with unoptimized
+      <img
+        src={source}
+        alt={media.alt[locale]}
+        className={styles.visualAsset}
+        style={{
+          objectPosition: media.focalPosition,
+          width: "100%",
+          height: "100%",
+        }}
+        decoding="async"
+      />
+    );
+
+    if (!media.poster) return img;
+
+    return (
+      <picture>
+        <source
+          media="(prefers-reduced-motion: reduce)"
+          srcSet={media.poster}
+        />
+        {img}
+      </picture>
+    );
+  }
+
   const image = (
     <Image
       src={source}
@@ -271,20 +316,12 @@ function ProjectVisual({
       priority={priority}
       loading={priority ? undefined : "lazy"}
       sizes={sizes}
-      unoptimized={animated}
       className={styles.visualAsset}
       style={style}
     />
   );
 
-  if (!animated || !media.poster) return image;
-
-  return (
-    <picture>
-      <source media="(prefers-reduced-motion: reduce)" srcSet={media.poster} />
-      {image}
-    </picture>
-  );
+  return image;
 }
 
 export function ProjectExperience({
