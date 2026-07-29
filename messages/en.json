@@ -119,6 +119,32 @@
       "label": "Cairo time",
       "timezone": "CAIRO / EGY"
     },
+    "certificate": {
+      "triggerEyebrow": "Recruiter credentials",
+      "triggerTitle": "Certificates",
+      "triggerAction": "Browse all 37",
+      "open": "Open my certificate library",
+      "eyebrow": "Credential file / Certificate library",
+      "close": "Close certificate library",
+      "title": "My certificate library",
+      "description": "Browse my completed programs and courses across .NET, databases, algorithms, frontend, Unity, and professional development.",
+      "selectedLabel": "Selected credential",
+      "galleryLabel": "All certificates",
+      "selectCertificate": "View certificate",
+      "certificateCount": "certificates"
+    },
+    "music": {
+      "label": "Room music controls",
+      "track": "Vastness",
+      "play": "Play room music",
+      "pause": "Pause room music",
+      "mute": "Mute room music",
+      "unmute": "Unmute room music",
+      "volume": "Room music volume",
+      "openControls": "Open room music controls",
+      "closeControls": "Close room music controls",
+      "error": "The room music could not be played."
+    },
     "areas": {
       "projects": {
         "label": "Are you here to hire me?",

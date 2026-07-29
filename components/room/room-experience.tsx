@@ -17,6 +17,10 @@ import type { CategoryId } from "@/content/project-showcase";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { CaseStudyModal } from "./case-study-modal";
 import { CaseStudyPaperMap } from "./case-study-paper-map";
+import {
+  CertificateSpotlight,
+  type CertificateSpotlightCopy,
+} from "./certificate-spotlight";
 import { CenterShowcase, type ShowcaseCopy } from "./center-showcase";
 import { CategoryIconsLayer } from "./category-icons-layer";
 import {
@@ -24,6 +28,7 @@ import {
   type EngineeringWallClockCopy,
 } from "./engineering-wall-clock";
 import { ProfileDossier, type ProfileDossierCopy } from "./profile-dossier";
+import { RoomMusicControl, type RoomMusicCopy } from "./room-music-control";
 import styles from "./room.module.css";
 
 const roomAreas = ["projects", "exploration", "lab"] as const;
@@ -56,7 +61,9 @@ type RoomCopy = {
     }
   >;
   profile: ProfileDossierCopy;
+  certificate: CertificateSpotlightCopy;
   clock: EngineeringWallClockCopy;
+  music: RoomMusicCopy;
   showcase: ShowcaseCopy;
 };
 
@@ -482,14 +489,17 @@ export function RoomExperience({
             </span>
           </button>
         </div>
-        <Link
-          href={`/${alternateLocale}`}
-          hrefLang={alternateLocale}
-          lang={alternateLocale}
-          aria-label={copy.languageLabel}
-        >
-          {copy.language}
-        </Link>
+        <div className={styles.topbarUtilities}>
+          <RoomMusicControl copy={copy.music} />
+          <Link
+            href={`/${alternateLocale}`}
+            hrefLang={alternateLocale}
+            lang={alternateLocale}
+            aria-label={copy.languageLabel}
+          >
+            {copy.language}
+          </Link>
+        </div>
       </header>
 
       <section
@@ -598,6 +608,12 @@ export function RoomExperience({
         active={isIdle && focusedArea === "projects"}
         locale={locale}
         onOpen={setSelectedProject}
+      />
+
+      <CertificateSpotlight
+        locale={locale}
+        copy={copy.certificate}
+        active={isIdle && focusedArea === "projects"}
       />
 
       {isIdle && focusedArea === "exploration" && (
