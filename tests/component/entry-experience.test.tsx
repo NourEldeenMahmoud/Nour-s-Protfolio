@@ -113,11 +113,11 @@ describe("EntryExperience", () => {
     expect(heading).toHaveFocus();
     expect(screen.getByRole("link", { name: /Hire/ })).toHaveAttribute(
       "href",
-      "/en/hire",
+      "/en?focus=projects",
     );
     expect(screen.getByRole("link", { name: /Watch/ })).toHaveAttribute(
       "href",
-      "/en/watch",
+      "/en?focus=exploration",
     );
     expect(screen.getByRole("link", { name: /Learn/ })).toHaveAttribute(
       "href",

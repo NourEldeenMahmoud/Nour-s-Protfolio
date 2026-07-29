@@ -8,7 +8,7 @@ import {
 import { LearnExperiencePage } from "@/components/paths/learn/learn-page";
 import { isLocale } from "@/i18n/routing";
 
-const paths = ["hire", "watch", "learn", "general"] as const;
+const paths = ["learn", "general"] as const;
 
 function isPath(value: string): value is PortfolioPath {
   return paths.includes(value as (typeof paths)[number]);

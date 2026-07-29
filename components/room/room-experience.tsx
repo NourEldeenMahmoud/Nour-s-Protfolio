@@ -19,6 +19,11 @@ import { CaseStudyModal } from "./case-study-modal";
 import { CaseStudyPaperMap } from "./case-study-paper-map";
 import { CenterShowcase, type ShowcaseCopy } from "./center-showcase";
 import { CategoryIconsLayer } from "./category-icons-layer";
+import {
+  EngineeringWallClock,
+  type EngineeringWallClockCopy,
+} from "./engineering-wall-clock";
+import { ProfileDossier, type ProfileDossierCopy } from "./profile-dossier";
 import styles from "./room.module.css";
 
 const roomAreas = ["projects", "exploration", "lab"] as const;
@@ -48,9 +53,10 @@ type RoomCopy = {
     {
       label: string;
       description: string;
-      path: "hire" | "watch" | "general" | "learn";
     }
   >;
+  profile: ProfileDossierCopy;
+  clock: EngineeringWallClockCopy;
   showcase: ShowcaseCopy;
 };
 
@@ -81,6 +87,7 @@ export function RoomExperience({
   const [focusedArea, setFocusedArea] = useState<RoomArea | null>(null);
   const [isScreenHovered, setIsScreenHovered] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
   const [status, setStatus] = useState(copy.loading);
   const [activeCategoryId, setActiveCategoryId] = useState<CategoryId>("web");
@@ -452,7 +459,29 @@ export function RoomExperience({
       <div ref={veilRef} className={styles.veil} aria-hidden="true" />
 
       <header ref={topbarRef} className={styles.topbar}>
-        <p>{copy.eyebrow}</p>
+        <div className={styles.profileEntry}>
+          <p>{copy.eyebrow}</p>
+          <button
+            className={styles.profileTrigger}
+            type="button"
+            aria-label={copy.profile.open}
+            aria-haspopup="dialog"
+            aria-expanded={isProfileOpen}
+            disabled={!isIdle}
+            onClick={() => setIsProfileOpen(true)}
+          >
+            <span className={styles.profileTriggerIcon} aria-hidden="true">
+              NE
+            </span>
+            <span className={styles.profileTriggerCopy}>
+              <span>{copy.profile.triggerEyebrow}</span>
+              <strong>{copy.profile.triggerLabel}</strong>
+            </span>
+            <span className={styles.profileTriggerArrow} aria-hidden="true">
+              {locale === "ar" ? "←" : "→"}
+            </span>
+          </button>
+        </div>
         <Link
           href={`/${alternateLocale}`}
           hrefLang={alternateLocale}
@@ -489,7 +518,7 @@ export function RoomExperience({
               return (
                 <Link
                   key={area}
-                  href={`/${locale}/${areaCopy.path}`}
+                  href={`/${locale}?focus=${area}`}
                   className={styles.hotspot}
                   data-area={area}
                   aria-label={`${areaCopy.label}. ${areaCopy.description}`}
@@ -596,11 +625,25 @@ export function RoomExperience({
         eventSourceRef={rootRef}
       />
 
+      <EngineeringWallClock
+        locale={locale}
+        copy={copy.clock}
+        active={isIdle && focusedArea === null}
+      />
+
       {selectedProject && (
         <CaseStudyModal
           locale={locale}
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
+        />
+      )}
+
+      {isProfileOpen && (
+        <ProfileDossier
+          locale={locale}
+          copy={copy.profile}
+          onClose={() => setIsProfileOpen(false)}
         />
       )}
 
@@ -616,7 +659,7 @@ export function RoomExperience({
       <noscript>
         <nav className={styles.noScriptNav} aria-label={copy.instruction}>
           {roomAreas.map((area) => (
-            <a key={area} href={`/${locale}/${copy.areas[area].path}`}>
+            <a key={area} href={`/${locale}?focus=${area}`}>
               {copy.areas[area].label}
             </a>
           ))}

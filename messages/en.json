@@ -58,21 +58,79 @@
     "language": "العربية",
     "languageLabel": "View in Arabic",
     "instruction": "Explore by room area. Use Tab to move between destinations.",
+    "profile": {
+      "triggerEyebrow": "Recruiter brief",
+      "triggerLabel": "Profile & CV",
+      "open": "Open my recruiter profile and CV",
+      "eyebrow": "Candidate dossier / Recruiter brief",
+      "close": "Close profile and CV",
+      "portraitAlt": "My portrait",
+      "fileNumber": "Candidate file / NE-001",
+      "title": "Nour Eldeen Mahmoud",
+      "role": "Junior .NET Backend / Full-Stack Developer",
+      "location": "Egypt",
+      "graduation": "Expected graduation / 2027",
+      "intro": "A concise, evidence-led profile for recruiters evaluating me for junior .NET backend, full-stack, internship, or engineering opportunities.",
+      "downloadCv": "Download CV",
+      "emailAction": "Email me",
+      "navigation": "Profile sections",
+      "aboutNav": "About me",
+      "cvNav": "CV snapshot",
+      "contactNav": "Contact",
+      "focusLabel": "Primary focus",
+      "focusValue": ".NET backend",
+      "educationLabel": "Education",
+      "educationValue": "BSc in progress",
+      "locationLabel": "Location",
+      "aboutTitle": "An engineer with a clear center and useful range.",
+      "aboutBody": "I am a software engineer focused on dependable backend and full-stack systems. My work spans product, data, security, desktop, mobile, and interactive projects while keeping .NET engineering, clear architecture, and careful validation at the center.",
+      "cvTitle": "The essentials, ready to scan.",
+      "cvIntro": "The full two-page CV is available as a PDF. This snapshot keeps the details most useful during an initial role-fit review visible here.",
+      "degreeLabel": "Education / In progress",
+      "degree": "Bachelor in Computer Science",
+      "academy": "MET Academy, Mansoura, Egypt",
+      "trainingLabel": "Professional training / 6 months",
+      "training": "Digital Egypt Pioneers Initiative (DEPI)",
+      "skillsTitle": "Core technical fit",
+      "skills": [
+        "ASP.NET Core",
+        "Web API",
+        "Entity Framework Core",
+        "SQL Server",
+        "Clean Architecture",
+        "REST",
+        "JWT",
+        "C#"
+      ],
+      "evidenceTitle": "Continue the evaluation",
+      "evidenceBody": "Review my role-focused evidence or inspect repository-backed project stories with contribution context and stated limitations.",
+      "hiringView": "Open project pinboard",
+      "caseStudies": "Explore selected work",
+      "contactEyebrow": "Contact / Next step",
+      "contactTitle": "Start a direct conversation.",
+      "contactBody": "For junior .NET backend, full-stack, internship, or engineering opportunities, contact me directly through email, WhatsApp, Telegram, or LinkedIn.",
+      "email": "noureldeendev@gmail.com",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "linkedin": "LinkedIn",
+      "github": "GitHub"
+    },
+    "clock": {
+      "label": "Cairo time",
+      "timezone": "CAIRO / EGY"
+    },
     "areas": {
       "projects": {
         "label": "Are you here to hire me?",
-        "description": "For HR teams, recruiters, and clients.",
-        "path": "hire"
+        "description": "For HR teams, recruiters, and clients."
       },
       "exploration": {
         "label": "Are you here to explore my work?",
-        "description": "For clients, developers, and product teams.",
-        "path": "watch"
+        "description": "For clients, developers, and product teams."
       },
       "lab": {
         "label": "Are you here to learn?",
-        "description": "For developers, peers, and fellow builders.",
-        "path": "learn"
+        "description": "For developers, peers, and fellow builders."
       }
     },
     "showcase": {

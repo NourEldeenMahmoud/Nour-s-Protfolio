@@ -15,10 +15,8 @@ for (const locale of ["en", "ar"] as const) {
 }
 
 for (const route of [
-  "/en/watch",
   "/en/learn",
   "/en/general",
-  "/en/hire",
   "/en/projects/buildsense",
 ] as const) {
   test(`${route} has no detectable accessibility violations`, async ({

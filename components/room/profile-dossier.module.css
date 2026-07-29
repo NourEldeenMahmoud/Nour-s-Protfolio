@@ -1,0 +1,710 @@
+.dialog {
+  width: min(36rem, 44vw);
+  max-width: none;
+  height: 100svh;
+  max-height: none;
+  margin-block: 0;
+  margin-inline: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-inline-end: 1px solid rgb(216 167 92 / 48%);
+  background: #091017;
+  color: #f6f0e5;
+  box-shadow: 28px 0 90px rgb(0 0 0 / 70%);
+  animation: dossier-enter 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dialog::backdrop {
+  background: rgb(2 5 8 / 72%);
+  backdrop-filter: blur(9px) saturate(0.72);
+  animation: backdrop-enter 280ms ease both;
+}
+
+@keyframes dossier-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@keyframes dossier-enter-rtl {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes backdrop-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+.dossier {
+  --dossier-amber: #d8a75c;
+  --dossier-cyan: #8bc4d8;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgb(139 196 216 / 5%) 1px, transparent 1px),
+    linear-gradient(rgb(139 196 216 / 4%) 1px, transparent 1px),
+    radial-gradient(circle at 8% 9%, rgb(216 167 92 / 12%), transparent 28rem),
+    #091017;
+  background-size:
+    32px 32px,
+    32px 32px,
+    auto,
+    auto;
+}
+
+.dossier::after {
+  position: absolute;
+  z-index: 4;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--dossier-amber) 18%,
+    var(--dossier-cyan) 82%,
+    transparent
+  );
+  content: "";
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  min-height: 5.25rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem clamp(1.25rem, 3vw, 2rem);
+  border-block-end: 1px solid rgb(139 196 216 / 18%);
+  background: rgb(6 11 16 / 82%);
+  backdrop-filter: blur(16px);
+}
+
+.header div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.header p,
+.header div > span,
+.status,
+.identityMeta,
+.sectionNav,
+.quickFacts dt,
+.sectionNumber,
+.timeline article > span,
+.timeline small,
+.skills h4,
+.evidence > p,
+.contactSection > p {
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.header p {
+  color: var(--dossier-amber);
+  font-size: 0.67rem;
+}
+
+.header div > span {
+  color: rgb(246 240 229 / 46%);
+  font-size: 0.58rem;
+}
+
+.header button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgb(216 167 92 / 55%);
+  border-radius: 50%;
+  background: rgb(216 167 92 / 7%);
+  color: #f1d19a;
+  font-size: 1.45rem;
+  cursor: pointer;
+  place-items: center;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.header button:hover,
+.header button:focus-visible {
+  border-color: var(--dossier-amber);
+  background: rgb(216 167 92 / 16%);
+  outline: 2px solid var(--dossier-cyan);
+  outline-offset: 3px;
+  transform: rotate(5deg);
+}
+
+.scrollArea {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #8d6841 #101a22;
+}
+
+.identity {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 1.15rem 1.35rem;
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+}
+
+.portraitFrame {
+  position: relative;
+  width: 7rem;
+  height: 8.5rem;
+  padding: 0.35rem;
+  border: 1px solid rgb(216 167 92 / 40%);
+  background: #111b22;
+  box-shadow: 0 14px 32px rgb(0 0 0 / 38%);
+  transform: rotate(-1deg);
+}
+
+.portraitFrame::before {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: -0.55rem;
+  left: 50%;
+  width: 3.8rem;
+  height: 1.2rem;
+  background: rgb(205 184 130 / 65%);
+  content: "";
+  transform: translateX(-50%) rotate(2deg);
+}
+
+.portraitFrame img {
+  position: relative !important;
+  height: calc(100% - 1.25rem) !important;
+  object-fit: cover;
+  object-position: center top;
+  filter: saturate(0.72) contrast(1.05);
+}
+
+.portraitFrame > span {
+  position: absolute;
+  inset-block-end: 0.25rem;
+  inset-inline: 0.35rem;
+  color: rgb(246 240 229 / 48%);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+}
+
+.identityCopy {
+  align-self: center;
+  min-width: 0;
+}
+
+.status {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--dossier-cyan);
+  font-size: 0.61rem;
+  line-height: 1.5;
+}
+
+.status > span {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--dossier-cyan);
+  box-shadow: 0 0 12px rgb(139 196 216 / 75%);
+}
+
+.identity h2 {
+  margin-block-start: 0.65rem;
+  color: #f4dfb8;
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.identityMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.8rem;
+  margin-block-start: 0.85rem;
+  color: rgb(246 240 229 / 55%);
+  font-size: 0.55rem;
+  line-height: 1.5;
+}
+
+.identityMeta span + span::before {
+  margin-inline-end: 0.8rem;
+  color: var(--dossier-amber);
+  content: "/";
+}
+
+.intro {
+  grid-column: 1 / -1;
+  max-width: 42rem;
+  color: rgb(246 240 229 / 72%);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.primaryActions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 0.7rem;
+}
+
+.downloadAction,
+.emailAction {
+  display: flex;
+  min-height: 3.2rem;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.8rem, 1vw, 0.92rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.downloadAction {
+  border: 1px solid var(--dossier-amber);
+  background: var(--dossier-amber);
+  color: #0a1117;
+  box-shadow: 0 10px 28px rgb(216 167 92 / 16%);
+}
+
+.emailAction {
+  border: 1px solid rgb(139 196 216 / 38%);
+  background: rgb(139 196 216 / 6%);
+  color: #c9e5ed;
+}
+
+.downloadAction:hover,
+.downloadAction:focus-visible,
+.emailAction:hover,
+.emailAction:focus-visible {
+  transform: translateY(-2px);
+}
+
+.downloadAction:focus-visible,
+.emailAction:focus-visible {
+  outline: 2px solid var(--dossier-cyan);
+  outline-offset: 3px;
+}
+
+.downloadAction:hover {
+  background: #edc57e;
+}
+
+.emailAction:hover {
+  border-color: var(--dossier-cyan);
+  background: rgb(139 196 216 / 13%);
+}
+
+.sectionNav {
+  position: sticky;
+  z-index: 3;
+  inset-block-start: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-block: 1px solid rgb(139 196 216 / 16%);
+  background: rgb(7 13 19 / 94%);
+  backdrop-filter: blur(14px);
+}
+
+.sectionNav a {
+  display: flex;
+  min-height: 3.1rem;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: center;
+  color: rgb(246 240 229 / 64%);
+  font-size: 0.59rem;
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.sectionNav a + a {
+  border-inline-start: 1px solid rgb(139 196 216 / 13%);
+}
+
+.sectionNav a span {
+  color: var(--dossier-amber);
+}
+
+.sectionNav a:hover,
+.sectionNav a:focus-visible {
+  background: rgb(139 196 216 / 8%);
+  color: #fff;
+  outline: 0;
+}
+
+.quickFacts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: clamp(1.5rem, 4vw, 2.4rem);
+  border: 1px solid rgb(216 167 92 / 22%);
+  background: rgb(216 167 92 / 4%);
+}
+
+.quickFacts div {
+  min-width: 0;
+  padding: 1rem;
+}
+
+.quickFacts div + div {
+  border-inline-start: 1px solid rgb(216 167 92 / 17%);
+}
+
+.quickFacts dt {
+  color: var(--dossier-amber);
+  font-size: 0.52rem;
+}
+
+.quickFacts dd {
+  margin-block-start: 0.45rem;
+  color: rgb(246 240 229 / 82%);
+  font-size: clamp(0.92rem, 1.2vw, 1.05rem);
+  line-height: 1.4;
+}
+
+.contentSection,
+.contactSection {
+  scroll-margin-top: 3.2rem;
+  padding: clamp(1.8rem, 5vw, 2.8rem) clamp(1.5rem, 4vw, 2.4rem);
+  border-block-start: 1px solid rgb(139 196 216 / 14%);
+}
+
+.sectionNumber,
+.contactSection > p {
+  color: var(--dossier-amber);
+  font-size: 0.7rem;
+}
+
+.contentSection h3,
+.contactSection h3 {
+  margin-block-start: 0.6rem;
+  color: #f4dfb8;
+  font-family: var(--font-sans);
+  font-size: clamp(1.7rem, 4vw, 2.35rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.contentSection > p:last-child,
+.cvSection > p,
+.contactSection > span {
+  display: block;
+  margin-block-start: 1rem;
+  color: rgb(246 240 229 / 68%);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin-block-start: 1.5rem;
+  padding-inline-start: 1.35rem;
+  border-inline-start: 1px solid rgb(139 196 216 / 28%);
+}
+
+.timeline article {
+  position: relative;
+  padding: 0.3rem 0 1.5rem;
+}
+
+.timeline article::before {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: -1.63rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 1px solid var(--dossier-amber);
+  border-radius: 50%;
+  background: #091017;
+  content: "";
+}
+
+.timeline article > span,
+.timeline small {
+  color: var(--dossier-cyan);
+  font-size: 0.68rem;
+}
+
+.timeline h4 {
+  margin-block-start: 0.45rem;
+  color: #f6f0e5;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.timeline p {
+  margin-block: 0.35rem;
+  color: rgb(246 240 229 / 60%);
+  font-size: 0.95rem;
+}
+
+.skills {
+  margin-block-start: 0.5rem;
+  padding: 1.2rem;
+  border: 1px solid rgb(139 196 216 / 18%);
+  background: rgb(139 196 216 / 4%);
+}
+
+.skills h4 {
+  color: var(--dossier-cyan);
+  font-size: 0.7rem;
+}
+
+.skills ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-block-start: 0.85rem;
+  padding: 0;
+  list-style: none;
+}
+
+.skills li {
+  padding: 0.42rem 0.58rem;
+  border: 1px solid rgb(216 167 92 / 22%);
+  color: rgb(246 240 229 / 74%);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+
+.evidence {
+  margin-block-start: 1rem;
+  padding: 1.2rem;
+  border-inline-start: 3px solid var(--dossier-amber);
+  background: linear-gradient(90deg, rgb(216 167 92 / 10%), transparent);
+}
+
+.evidence > p {
+  color: var(--dossier-amber);
+  font-size: 0.68rem;
+}
+
+.evidence > span {
+  display: block;
+  margin-block-start: 0.55rem;
+  color: rgb(246 240 229 / 66%);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.evidence div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.2rem;
+  margin-block-start: 0.9rem;
+}
+
+.evidence a {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: #f1d19a;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.evidence a:hover,
+.evidence a:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.contactSection {
+  padding-block-end: max(3rem, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(
+      circle at 12% 20%,
+      rgb(216 167 92 / 14%),
+      transparent 18rem
+    ),
+    #0c151c;
+}
+
+.contactLinks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-block-start: 1.4rem;
+}
+
+.contactLinks a {
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgb(139 196 216 / 22%);
+  color: #d4e8ee;
+  font-family: var(--font-mono);
+  font-size: clamp(0.76rem, 0.9vw, 0.86rem);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contactLinks a:first-child {
+  grid-column: 1 / -1;
+  border-color: rgb(216 167 92 / 36%);
+  color: #f1d19a;
+}
+
+.contactLinks a:hover,
+.contactLinks a:focus-visible {
+  border-color: var(--dossier-cyan);
+  background: rgb(139 196 216 / 8%);
+  outline: 0;
+  transform: translateY(-2px);
+}
+
+[dir="rtl"] .dialog {
+  animation-name: dossier-enter-rtl;
+}
+
+[dir="rtl"] .header p,
+[dir="rtl"] .header div > span,
+[dir="rtl"] .status,
+[dir="rtl"] .identityMeta,
+[dir="rtl"] .sectionNav,
+[dir="rtl"] .quickFacts dt,
+[dir="rtl"] .sectionNumber,
+[dir="rtl"] .timeline article > span,
+[dir="rtl"] .timeline small,
+[dir="rtl"] .skills h4,
+[dir="rtl"] .evidence > p,
+[dir="rtl"] .contactSection > p,
+[dir="rtl"] .downloadAction,
+[dir="rtl"] .emailAction,
+[dir="rtl"] .contactLinks a,
+[dir="rtl"] .evidence a {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .identity h2,
+[dir="rtl"] .contentSection h3,
+[dir="rtl"] .contactSection h3 {
+  font-family: var(--font-arabic);
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 780px) {
+  .dialog {
+    width: min(100vw, 40rem);
+  }
+
+  .identity {
+    padding-inline: 1.25rem;
+  }
+
+  .quickFacts {
+    margin-inline: 1.25rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .header {
+    min-height: 4.5rem;
+  }
+
+  .identity {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .portraitFrame {
+    width: 5.5rem;
+    height: 7rem;
+  }
+
+  .identity h2 {
+    font-size: clamp(1.75rem, 9vw, 2.35rem);
+  }
+
+  .identityMeta {
+    display: grid;
+  }
+
+  .identityMeta span + span::before {
+    display: none;
+  }
+
+  .primaryActions,
+  .quickFacts {
+    grid-template-columns: 1fr;
+  }
+
+  .quickFacts div + div {
+    border-block-start: 1px solid rgb(216 167 92 / 17%);
+    border-inline-start: 0;
+  }
+
+  .sectionNav a {
+    min-height: 3.25rem;
+  }
+
+  .sectionNav a span {
+    display: none;
+  }
+}
+
+:global(html[data-motion="reduced"]) .dialog,
+:global(html[data-motion="reduced"]) .dialog::backdrop {
+  animation: none;
+}
+
+:global(html[data-motion="reduced"]) .header button,
+:global(html[data-motion="reduced"]) .downloadAction,
+:global(html[data-motion="reduced"]) .emailAction,
+:global(html[data-motion="reduced"]) .sectionNav a,
+:global(html[data-motion="reduced"]) .contactLinks a {
+  transition: none;
+}
+
+:global(html[data-motion="reduced"]) .header button:hover,
+:global(html[data-motion="reduced"]) .downloadAction:hover,
+:global(html[data-motion="reduced"]) .emailAction:hover,
+:global(html[data-motion="reduced"]) .contactLinks a:hover {
+  transform: none;
+}

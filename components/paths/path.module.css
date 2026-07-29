@@ -154,78 +154,6 @@
   line-height: 1.65;
 }
 
-.projectGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  background: rgb(236 232 222 / 12%);
-}
-
-.projectCard {
-  display: grid;
-  grid-template-rows: minmax(18rem, 46vh) auto;
-  min-width: 0;
-  background: #0a1017;
-}
-
-.projectCard[data-featured="true"] {
-  grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1.45fr) minmax(20rem, 0.55fr);
-  grid-template-rows: minmax(31rem, 74vh);
-}
-
-.projectImage {
-  position: relative;
-  display: block;
-  min-height: 100%;
-  overflow: hidden;
-  background: #101820;
-}
-
-.projectImage::after {
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgb(255 255 255 / 8%);
-  content: "";
-  pointer-events: none;
-}
-
-.projectImage img {
-  object-fit: cover;
-  filter: saturate(0.82);
-  transition:
-    transform 650ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 450ms ease;
-}
-
-.projectImage:hover img,
-.projectImage:focus-visible img {
-  transform: scale(1.025);
-  filter: saturate(1);
-}
-
-.projectBody {
-  padding: clamp(1.5rem, 4vw, 3.5rem);
-}
-
-.projectNumber {
-  color: var(--path-accent);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-}
-
-.projectBody h2 {
-  margin-block: 0.8rem;
-  font-size: clamp(1.7rem, 3vw, 3.4rem);
-  letter-spacing: -0.045em;
-}
-
-.projectBody > p:not(.projectNumber) {
-  max-width: 38rem;
-  color: rgb(236 232 222 / 66%);
-  line-height: 1.6;
-}
-
 .stack {
   display: flex;
   flex-wrap: wrap;
@@ -243,7 +171,6 @@
   text-transform: uppercase;
 }
 
-.projectActions,
 .heroLinks {
   display: flex;
   flex-wrap: wrap;
@@ -251,7 +178,6 @@
   margin-block-start: 2rem;
 }
 
-.projectActions a,
 .heroLinks a {
   border-block-end: 1px solid var(--path-accent);
   padding-block-end: 0.25rem;
@@ -271,7 +197,6 @@
 }
 
 .labZone > span,
-.evidence article > span,
 .principles article > span {
   color: var(--path-accent);
   font-family: var(--font-mono);
@@ -282,8 +207,7 @@
 .knowledge h2,
 .range h2,
 .contact h2,
-.principles > h2,
-.evidence > h2 {
+.principles > h2 {
   margin-block: 1.2rem;
   font-size: clamp(2rem, 4vw, 4.2rem);
   letter-spacing: -0.05em;
@@ -293,9 +217,7 @@
 .knowledge p,
 .range > p:not(.eyebrow),
 .contact p,
-.principles p,
-.evidence p,
-.honestBoundary p {
+.principles p {
   color: rgb(236 232 222 / 66%);
   line-height: 1.7;
 }
@@ -340,18 +262,15 @@
   text-transform: uppercase;
 }
 
-.generalHero,
-.hireHero {
+.generalHero {
   min-height: min(86svh, 62rem);
 }
 
-.principles,
-.evidence {
+.principles {
   padding: clamp(4rem, 10vw, 9rem) clamp(1.25rem, 8vw, 8rem);
 }
 
-.principles > div,
-.evidence > div {
+.principles > div {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
@@ -359,25 +278,18 @@
   background: rgb(236 232 222 / 12%);
 }
 
-.principles article,
-.evidence article {
+.principles article {
   min-height: 18rem;
   padding: clamp(1.5rem, 3vw, 2.5rem);
   background: #0a1017;
 }
 
-.principles h3,
-.evidence h3 {
+.principles h3 {
   margin-block: 2.5rem 0.8rem;
   font-size: clamp(1.2rem, 2.2vw, 2rem);
 }
 
-.evidence > div {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.range,
-.honestBoundary {
+.range {
   max-width: 72rem;
   margin-inline: auto;
   padding: clamp(4rem, 10vw, 9rem) clamp(1.25rem, 5vw, 5rem);
@@ -420,16 +332,6 @@
   color: var(--path-accent);
 }
 
-.honestBoundary {
-  border: 1px solid rgb(236 232 222 / 16%);
-  text-align: start;
-}
-
-.honestBoundary h2 {
-  margin-block-end: 1rem;
-  font-size: clamp(1.7rem, 3vw, 3rem);
-}
-
 .footer {
   display: flex;
   justify-content: space-between;
@@ -458,23 +360,11 @@
     grid-row: 1;
   }
 
-  .projectGrid,
-  .projectCard,
-  .projectCard[data-featured="true"],
   .labGrid,
   .knowledge,
   .contact,
-  .principles > div,
-  .evidence > div {
+  .principles > div {
     grid-template-columns: 1fr;
-  }
-
-  .projectCard[data-featured="true"] {
-    grid-template-rows: minmax(21rem, 52vh) auto;
-  }
-
-  .projectCard {
-    grid-template-rows: minmax(18rem, 45vh) auto;
   }
 
   .labZone {
@@ -506,8 +396,7 @@
   }
 }
 
-:global(html[data-motion="reduced"]) .path,
-:global(html[data-motion="reduced"]) .projectImage img {
+:global(html[data-motion="reduced"]) .path {
   animation: none;
   transition: none;
 }

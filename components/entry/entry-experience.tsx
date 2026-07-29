@@ -16,6 +16,12 @@ import styles from "./entry.module.css";
 
 const pathOrder = ["hire", "watch", "learn"] as const;
 
+function pathDestination(locale: Locale, path: (typeof pathOrder)[number]) {
+  if (path === "hire") return `/${locale}?focus=projects`;
+  if (path === "watch") return `/${locale}?focus=exploration`;
+  return `/${locale}/learn`;
+}
+
 type PathKey = (typeof pathOrder)[number] | "general";
 type EntryCopy = {
   eyebrow: string;
@@ -319,7 +325,7 @@ export function EntryExperience({
             <Link
               key={path}
               className={styles.pathCard}
-              href={`/${locale}/${path}`}
+              href={pathDestination(locale, path)}
               data-intent-track
               data-path={path}
             >

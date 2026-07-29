@@ -1,0 +1,157 @@
+.clock {
+  position: absolute;
+  z-index: 4;
+  top: calc(var(--clock-y) - var(--clock-size) * 1.17);
+  left: var(--clock-x);
+  width: var(--clock-size);
+  min-width: 6rem;
+  max-width: 9.5rem;
+  color: #f4dfb8;
+  opacity: 0;
+  filter: drop-shadow(0 1.2rem 1.4rem rgb(0 0 0 / 55%));
+  pointer-events: none;
+  transform: translateX(calc(-50% + 3px)) translateY(calc(0.6rem - 6px))
+    scale(0.96);
+  transform-origin: 50% 24%;
+  transition:
+    opacity 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.clock[data-active] {
+  opacity: 1;
+  transform: translateX(calc(-50% + 3px)) translateY(-6px) scale(1);
+}
+
+.clock time,
+.clock svg {
+  display: block;
+  width: 100%;
+}
+
+.wallMount {
+  fill: #111b23;
+  stroke: #8c673b;
+  stroke-width: 2;
+}
+
+.outerRim {
+  fill: #101921;
+  stroke: url("#clock-brass");
+  stroke-width: 6;
+}
+
+.innerRim {
+  fill: #091119;
+  stroke: rgb(139 196 216 / 54%);
+  stroke-width: 1.5;
+}
+
+.face {
+  fill: url("#clock-face");
+  stroke: rgb(246 240 229 / 12%);
+  stroke-width: 1;
+}
+
+.ticks line {
+  stroke: #e8c17c;
+  stroke-linecap: round;
+  stroke-width: 2.2;
+}
+
+.brand,
+.zone {
+  fill: #8bc4d8;
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1.8px;
+  text-anchor: middle;
+}
+
+.zone {
+  fill: rgb(246 240 229 / 50%);
+  font-size: 6px;
+  letter-spacing: 1.3px;
+}
+
+.hourHand line,
+.minuteHand line {
+  stroke: #e9e3d6;
+  stroke-linecap: round;
+}
+
+.hourHand line {
+  stroke-width: 7;
+}
+
+.minuteHand line {
+  stroke: #a9ccdf;
+  stroke-width: 4;
+}
+
+.secondHand line {
+  stroke: #e3a94e;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.secondHand {
+  filter: drop-shadow(0 0 3px rgb(227 169 78 / 85%));
+}
+
+.pin,
+.gearPin {
+  fill: #f0c77f;
+  stroke: #6e4820;
+  stroke-width: 2;
+}
+
+.mechanismBridge {
+  fill: rgb(8 15 21 / 92%);
+  stroke: rgb(139 196 216 / 42%);
+  stroke-width: 1.5;
+}
+
+.gear {
+  fill: none;
+  stroke: url("#clock-brass");
+  stroke-linecap: round;
+  stroke-width: 2.4;
+  transform-origin: 110px 220px;
+  animation: gear-turn 18s linear infinite;
+}
+
+.gear circle:first-child {
+  stroke-dasharray: 3 4;
+  stroke-width: 5;
+}
+
+@keyframes gear-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+[dir="rtl"] .brand,
+[dir="rtl"] .zone {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+
+@media (max-width: 780px) {
+  .clock {
+    display: none;
+  }
+}
+
+:global(html[data-motion="reduced"]) .clock {
+  transition: none;
+}
+
+:global(html[data-motion="reduced"]) .secondHand {
+  display: none;
+}
+
+:global(html[data-motion="reduced"]) .gear {
+  animation: none;
+}

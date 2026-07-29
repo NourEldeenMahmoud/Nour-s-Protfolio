@@ -26,13 +26,13 @@ test("intro can skip and moves focus", async ({ page }) => {
   ).toBeFocused();
   await expect(
     page.getByRole("link", { name: /Are you here to hire me/ }),
-  ).toHaveAttribute("href", "/en/hire");
+  ).toHaveAttribute("href", "/en?focus=projects");
   await expect(
     page.getByRole("link", { name: /Are you here to learn/ }),
   ).toHaveAttribute("href", "/en/learn");
   await expect(
     page.getByRole("link", { name: /Are you here to explore my work/ }),
-  ).toHaveAttribute("href", "/en/watch");
+  ).toHaveAttribute("href", "/en?focus=exploration");
   await page.reload();
   await expect(page.getByRole("button", { name: "Skip intro" })).toBeVisible();
 });
@@ -92,29 +92,29 @@ test("Arabic entry has RTL direction and equivalent route links", async ({
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(
     page.getByRole("link", { name: /هل أنت هنا لتوظيفي/ }),
-  ).toHaveAttribute("href", "/ar/hire");
+  ).toHaveAttribute("href", "/ar?focus=projects");
   await expect(
     page.getByRole("link", { name: /هل أنت هنا للتعلّم/ }),
   ).toHaveAttribute("href", "/ar/learn");
   await expect(
     page.getByRole("link", { name: /هل أنت هنا لاستكشاف أعمالي/ }),
-  ).toHaveAttribute("href", "/ar/watch");
+  ).toHaveAttribute("href", "/ar?focus=exploration");
 });
 
-test("light-only intro remains available with reduced motion", async ({ page }) => {
+test("light-only intro remains available with reduced motion", async ({
+  page,
+}) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/en");
   await expect(page.getByRole("button", { name: "Skip intro" })).toBeVisible();
 });
 
 const routeHeadings = {
-  hire: /Evidence for a junior/i,
-  watch: /Software built around real constraints/i,
   learn: /How the work is understood/i,
   general: /Broad range/i,
 } as const;
 
-for (const path of ["hire", "watch", "learn", "general"] as const) {
+for (const path of ["learn", "general"] as const) {
   test(`direct ${path} route bypasses the entry`, async ({ page }) => {
     await page.goto(`/en/${path}`);
 
@@ -133,21 +133,21 @@ test("project routes are directly addressable and return to the project index", 
   await page.goto("/en/projects/buildsense");
   await expect(page.getByRole("heading", { name: "BuildSense" })).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /All case studies/ }),
-  ).toHaveAttribute("href", "/en/watch");
+    page.getByRole("link", { name: /Back to Explore/ }).first(),
+  ).toHaveAttribute("href", "/en?focus=exploration");
 });
 
-test("browser back returns from a case study to the projects path", async ({
+test("browser back returns from a case study to the room showcase", async ({
   page,
 }) => {
-  await page.goto("/en/watch");
-  await page.getByRole("link", { name: /Read case study: BuildSense/ }).click();
-  await expect(page).toHaveURL(/projects\/buildsense/);
+  await page.goto("/en/projects/buildsense");
+  await page
+    .getByRole("link", { name: /Back to Explore/ })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/en\?focus=exploration$/);
   await page.goBack();
-  await expect(page).toHaveURL(/\/en\/watch$/);
-  await expect(
-    page.getByRole("heading", { name: /Software built/ }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/projects\/buildsense/);
 });
 
 test("room selection focuses a section without leaving the hub", async ({
