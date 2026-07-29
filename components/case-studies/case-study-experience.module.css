@@ -174,9 +174,10 @@
   gap: 0.65rem;
   min-height: 3rem;
   padding: 0.6rem 1rem;
-  border: 1px solid rgb(44 40 34 / 22%);
+  border: 1px solid rgb(44 40 34 / 35%);
   border-radius: 0.18rem;
-  color: var(--ink);
+  background: rgb(44 40 34 / 85%);
+  color: #f5ead5;
   font-family: var(--font-mono);
   font-size: clamp(0.72rem, 1.3cqi, 0.82rem);
   font-weight: 650;
@@ -191,16 +192,16 @@
 }
 
 .coverTopbar a span {
-  color: var(--amber);
+  color: var(--amber-bright);
   font-size: 1.1em;
   transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .coverTopbar a:hover,
 .coverTopbar a:focus-visible {
-  background: rgb(255 255 255 / 42%);
-  box-shadow: 0 0.7rem 1.4rem rgb(61 46 27 / 12%);
-  outline: 2px solid #4f8f91;
+  background: rgb(44 40 34 / 95%);
+  box-shadow: 0 0.7rem 1.4rem rgb(61 46 27 / 18%);
+  outline: 2px solid var(--amber);
   outline-offset: 3px;
   transform: translateY(-2px);
 }
@@ -1219,9 +1220,10 @@
   gap: 0.65rem;
   min-height: 3.4rem;
   padding: 0.7rem 1.5rem;
-  border: 1px solid rgb(44 40 34 / 22%);
+  border: 1px solid rgb(44 40 34 / 35%);
   border-radius: 0.18rem;
-  color: var(--ink);
+  background: rgb(44 40 34 / 85%);
+  color: #f5ead5;
   font-family: var(--font-mono);
   font-size: clamp(0.78rem, 1.5cqi, 0.92rem);
   font-weight: 650;
@@ -1236,15 +1238,15 @@
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .caseFooter > div a span {
-  color: var(--amber);
+  color: var(--amber-bright);
   font-size: 1.15em;
   transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .caseFooter > div a:hover,
 .caseFooter > div a:focus-visible {
-  background: rgb(255 255 255 / 42%);
-  box-shadow: 0 0.7rem 1.4rem rgb(61 46 27 / 12%);
-  outline: 2px solid #4f8f91;
+  background: rgb(44 40 34 / 95%);
+  box-shadow: 0 0.7rem 1.4rem rgb(61 46 27 / 18%);
+  outline: 2px solid var(--amber);
   outline-offset: 3px;
   transform: translateY(-2px);
 }
