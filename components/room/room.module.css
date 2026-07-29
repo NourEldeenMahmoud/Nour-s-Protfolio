@@ -793,6 +793,96 @@
   border: 1px solid #725d40;
 }
 
+@media (min-width: 781px) and (max-width: 1120px),
+  (min-width: 781px) and (max-height: 700px) {
+  .topbar {
+    inset-block-start: 1rem;
+    inset-inline: 2rem;
+  }
+
+  .profileEntry > p,
+  .profileTriggerCopy > span {
+    display: none;
+  }
+
+  .profileTrigger {
+    grid-template-columns: 2.1rem minmax(0, auto) auto;
+    min-height: 2.65rem;
+    gap: 0.55rem;
+    padding: 0.25rem 0.6rem 0.25rem 0.25rem;
+  }
+
+  .profileTriggerIcon {
+    width: 2.1rem;
+    height: 2rem;
+    font-size: 0.55rem;
+  }
+
+  .profileTriggerCopy strong {
+    font-size: 0.76rem;
+  }
+
+  .topbar a {
+    padding: 0.55rem 1rem;
+    font-size: 0.75rem;
+  }
+
+  .identity {
+    inset-block-start: 1rem;
+    width: min(34rem, 52vw);
+  }
+
+  .identity::before {
+    margin-block-end: 0.35rem;
+  }
+
+  .identity h1 {
+    font-size: clamp(2rem, 3.8vw, 2.65rem);
+    line-height: 0.96;
+  }
+
+  .identity p {
+    max-width: 28rem;
+    margin-block-start: 0.45rem;
+    font-size: 0.6rem;
+    line-height: 1.35;
+  }
+
+  [dir="rtl"] .identity p {
+    font-size: 0.75rem;
+  }
+
+  .hotspotMarker {
+    inset-block-end: 7%;
+  }
+
+  .hotspotCopy {
+    gap: 0.25rem;
+  }
+
+  .hotspotCopy strong {
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  }
+
+  .hotspotCopy > span {
+    font-size: clamp(0.64rem, 0.9vw, 0.75rem);
+  }
+
+  [dir="rtl"] .hotspotCopy strong {
+    font-size: clamp(1.3rem, 2vw, 1.65rem);
+  }
+
+  [dir="rtl"] .hotspotCopy > span {
+    font-size: clamp(0.72rem, 1vw, 0.86rem);
+  }
+
+  .replay,
+  .skip {
+    padding: 0.55rem 1rem;
+    font-size: 0.68rem;
+  }
+}
+
 @media (max-width: 780px) {
   .roomImage {
     object-position: 50% 44%;
@@ -807,18 +897,19 @@
   }
 
   .identity {
-    inset-block-start: 4.5rem;
+    inset-block-start: 4.75rem;
     width: calc(100% - 2.5rem);
   }
 
   .identity h1 {
-    font-size: clamp(2rem, 9vw, 3rem);
+    font-size: clamp(1.8rem, 7vw, 2.65rem);
   }
 
   .identity p {
     max-width: 36rem;
     margin-inline: auto;
-    font-size: 0.62rem;
+    font-size: clamp(0.54rem, 1.7vw, 0.64rem);
+    line-height: 1.4;
   }
 
   .hotspots {
@@ -867,18 +958,37 @@
 
   .hotspotCopy > span {
     max-width: 16rem;
-    font-size: 0.68rem;
+    font-size: clamp(0.58rem, 1.8vw, 0.68rem);
+  }
+
+  .hotspotCopy strong {
+    font-size: clamp(1.05rem, 4.2vw, 1.45rem);
+  }
+
+  [dir="rtl"] .hotspotCopy strong {
+    font-size: clamp(1.2rem, 4.8vw, 1.6rem);
+  }
+
+  [dir="rtl"] .hotspotCopy > span {
+    font-size: clamp(0.68rem, 2.2vw, 0.82rem);
   }
 
   .replay,
   .skip {
     inset-block: 3.5rem auto;
     inset-inline: auto 1rem;
+    padding: 0.55rem 0.9rem;
+    font-size: clamp(0.62rem, 1.9vw, 0.72rem);
   }
 
   .topbar {
     inset-inline-end: 1.25rem;
     align-items: flex-start;
+  }
+
+  .topbar a {
+    padding: 0.55rem 0.85rem;
+    font-size: clamp(0.7rem, 2.3vw, 0.82rem);
   }
 
   .topbarUtilities {
@@ -887,18 +997,30 @@
   }
 
   .profileEntry > p {
-    font-size: 0.7rem;
+    display: none;
   }
 
   .profileTrigger {
-    grid-template-columns: 2.4rem minmax(0, auto) auto;
-    min-height: 3rem;
-    gap: 0.6rem;
+    grid-template-columns: 2.2rem;
+    width: 2.75rem;
+    min-height: 2.75rem;
+    gap: 0;
+    padding: 0.25rem;
+    place-items: center;
   }
 
   .profileTriggerIcon {
-    width: 2.4rem;
-    height: 2.2rem;
+    width: 2.2rem;
+    height: 2.05rem;
+  }
+
+  .profileTriggerCopy,
+  .profileTriggerArrow {
+    display: none;
+  }
+
+  [dir="rtl"] .profileTrigger {
+    padding: 0.25rem;
   }
 
   /* Return button: visible above dark mobile theater sheet for exploration only */
@@ -927,6 +1049,11 @@
     pointer-events: auto;
   }
 
+  .returnToRoom,
+  .openComputer {
+    font-size: clamp(0.64rem, 2vw, 0.76rem);
+  }
+
   .room[data-focused-area="exploration"] .returnToRoom:hover,
   .room[data-focused-area="exploration"] .returnToRoom:focus-visible {
     border-color: #d8a75c;
@@ -937,6 +1064,31 @@
 }
 
 @media (max-width: 520px) {
+  .identity {
+    inset-block-start: 4.5rem;
+  }
+
+  .identity h1 {
+    font-size: clamp(1.65rem, 7.5vw, 2.15rem);
+  }
+
+  .identity p {
+    max-width: 22rem;
+    font-size: clamp(0.5rem, 2.35vw, 0.6rem);
+  }
+
+  [dir="rtl"] .identity p {
+    font-size: clamp(0.66rem, 3vw, 0.78rem);
+  }
+
+  .hotspotCopy strong {
+    font-size: clamp(0.98rem, 4.8vw, 1.25rem);
+  }
+
+  [dir="rtl"] .hotspotCopy strong {
+    font-size: clamp(1.08rem, 5.4vw, 1.4rem);
+  }
+
   .hotspotCopy > span {
     display: none;
   }
