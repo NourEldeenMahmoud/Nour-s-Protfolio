@@ -155,6 +155,8 @@ export interface HeroWidget extends WidgetBase {
   capsules: Array<{ label: string; value: string }>;
   featureItems: Array<{ label: string; icon?: string }>;
   footer: string;
+  downloadCvUrl?: string;
+  downloadCvLabel?: string;
 }
 
 export interface FeaturedItem {

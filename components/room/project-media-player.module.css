@@ -463,7 +463,7 @@
   );
   color: #ffe2ae;
   font-family: var(--font-sans);
-  font-size: clamp(0.48rem, 1.15cqi, 0.7rem);
+  font-size: clamp(0.6rem, 1.4cqi, 0.9rem);
   font-weight: 650;
   box-shadow:
     inset 0 1px rgb(255 255 255 / 8%),

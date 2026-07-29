@@ -79,6 +79,7 @@ export function RoomExperience({
   const [run, setRun] = useState(0);
   const [hoveredArea, setHoveredArea] = useState<RoomArea | null>(null);
   const [focusedArea, setFocusedArea] = useState<RoomArea | null>(null);
+  const [isScreenHovered, setIsScreenHovered] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isIdle, setIsIdle] = useState(false);
   const [status, setStatus] = useState(copy.loading);
@@ -166,9 +167,7 @@ export function RoomExperience({
       new URLSearchParams(window.location.search).get("focus") ?? "";
     if (focusParam && roomAreas.includes(focusParam as RoomArea)) {
       if (process.env.NODE_ENV === "development") {
-        console.log(
-          `[RoomIntro] skipped because: focus param "${focusParam}"`,
-        );
+        console.log(`[RoomIntro] skipped because: focus param "${focusParam}"`);
       }
       const targetArea = focusParam as RoomArea;
       window.history.replaceState(null, "", window.location.pathname);
@@ -339,7 +338,14 @@ export function RoomExperience({
       cancelled = true;
       clearAnimation();
     };
-  }, [copy.introStatus, copy.readyStatus, imageReady, reducedMotion, run, transitionToArea]);
+  }, [
+    copy.introStatus,
+    copy.readyStatus,
+    imageReady,
+    reducedMotion,
+    run,
+    transitionToArea,
+  ]);
 
   function replayIntro() {
     clearAnimation();
@@ -527,12 +533,25 @@ export function RoomExperience({
           )}
 
           {focusedArea === "lab" && (
-            <Link
-              href={`/${locale}/learn?from=room`}
-              className={styles.openComputer}
+            <div
+              className={styles.screenHover}
+              onMouseEnter={() => setIsScreenHovered(true)}
+              onMouseLeave={() => setIsScreenHovered(false)}
             >
-              {copy.openComputer}
-            </Link>
+              <Link
+                href={`/${locale}/learn?from=room`}
+                className={`${styles.openComputer} ${isScreenHovered ? styles.openComputerVisible : ""}`}
+                tabIndex={isScreenHovered ? 0 : -1}
+                onFocus={() => setIsScreenHovered(true)}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setIsScreenHovered(false);
+                  }
+                }}
+              >
+                {copy.openComputer}
+              </Link>
+            </div>
           )}
 
           <button

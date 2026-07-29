@@ -134,6 +134,20 @@
   will-change: opacity, mask-position;
 }
 
+.screenHover {
+  position: absolute;
+  z-index: 10;
+  inset-inline-start: 38%;
+  inset-block-start: 22%;
+  width: 28%;
+  height: 32%;
+  cursor: pointer;
+}
+
+.room[data-focused-area="lab"] .screenHover {
+  pointer-events: auto;
+}
+
 .room[data-active-area] .focusedRoomImage {
   opacity: 0.22;
 }
@@ -339,6 +353,10 @@
   letter-spacing: 0;
 }
 
+[dir="rtl"] .openComputer {
+  text-align: right;
+}
+
 [dir="rtl"] .topbar a {
   font-family: var(--font-arabic);
   font-size: 1.05rem;
@@ -519,34 +537,45 @@
 
 .openComputer {
   position: absolute;
-  z-index: 10;
-  inset-block-end: clamp(4rem, 9vh, 6.5rem);
-  left: 50%;
+  z-index: 1;
+  inset: 0;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
   padding: 0.6rem 1.4rem;
-  border: 1px solid rgb(102 167 170 / 50%);
-  background: rgb(6 11 16 / 45%);
-  color: rgb(166 220 226 / 82%);
+  border: 1px solid rgb(166 220 226 / 50%);
+  background: rgb(6 11 16 / 80%);
+  color: #fff;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
+  font-size: clamp(0.75rem, 1vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-shadow: 0 2px 16px #000;
   text-transform: uppercase;
   cursor: pointer;
   text-decoration: none;
-  transform: translateX(-50%);
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
   transition:
+    opacity 220ms ease,
     color 180ms ease,
     border-color 180ms ease,
-    background 180ms ease,
-    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    background 180ms ease;
+}
+
+.openComputerVisible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .openComputer:hover,
 .openComputer:focus-visible {
-  border-color: #66a7aa;
-  background: rgb(6 11 16 / 65%);
+  border-color: #8bd4d8;
+  background: rgb(102 167 170 / 25%);
   color: #fff;
-  transform: translate(-50%, -0.25rem);
+  transform: translateY(-2px);
 }
 
 .replay,
@@ -648,6 +677,10 @@
   }
 
   .focusedRoomImage {
+    display: none;
+  }
+
+  .screenHover {
     display: none;
   }
 

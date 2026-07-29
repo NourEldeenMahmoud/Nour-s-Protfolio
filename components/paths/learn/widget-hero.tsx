@@ -82,6 +82,16 @@ export function WidgetHero({ widget, onOpen }: WidgetHeroProps) {
           ))}
         </div>
 
+        {widget.downloadCvUrl && (
+          <a
+            className={styles.widgetCardCvDownload}
+            href={widget.downloadCvUrl}
+            download
+          >
+            <span aria-hidden="true">↓</span>
+            {widget.downloadCvLabel ?? "Download CV"}
+          </a>
+        )}
         <div className={styles.widgetCardFooter}>
           <span>{widget.footer}</span>
         </div>

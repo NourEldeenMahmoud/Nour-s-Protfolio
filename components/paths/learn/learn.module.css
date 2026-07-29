@@ -1168,6 +1168,37 @@
   background: #3aa0f0;
 }
 
+.widgetCardCvDownload {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.1rem;
+  margin: 0.2rem 0 0.7rem;
+  border: 1px solid rgb(226 185 116 / 34%);
+  border-radius: 10px;
+  background: rgb(226 185 116 / 9%);
+  color: var(--workspace-amber-bright);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.widgetCardCvDownload:hover {
+  border-color: rgb(243 209 149 / 65%);
+  background: rgb(226 185 116 / 15%);
+  transform: translateY(-1px);
+}
+
+.widgetCardCvDownload:focus-visible {
+  outline: 2px solid var(--workspace-cyan);
+  outline-offset: 2px;
+}
+
 .widgetCardFooter {
   font-size: 0.78rem;
   color: rgba(160, 180, 200, 0.5);

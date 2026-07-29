@@ -22,6 +22,8 @@ export const widgetsV2: WidgetV2[] = [
     ],
     footer: "Learn \u00B7 Build \u00B7 Validate",
     openFileId: "about",
+    downloadCvUrl: "/learn/downloads/NourEldeen_CV.pdf",
+    downloadCvLabel: "Download CV",
   },
   {
     id: "featured",
