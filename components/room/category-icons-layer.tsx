@@ -101,6 +101,7 @@ export function CategoryIconsLayer({
   const reducedMotion = useReducedMotion();
   const [capability, setCapability] = useState<CapabilityState>("pending");
   const [viewportSize, setViewportSize] = useState({ w: 0, h: 0 });
+  const [compactIconScale, setCompactIconScale] = useState(1);
   const [motionPolicy, setMotionPolicy] = useState(() =>
     resolveCategoryIconsMotionPolicy(reducedMotion),
   );
@@ -109,6 +110,13 @@ export function CategoryIconsLayer({
   useEffect(() => {
     function measure() {
       setViewportSize({ w: window.innerWidth, h: window.innerHeight });
+      const isPortraitPhone = window.matchMedia(
+        "(hover: none) and (pointer: coarse) and (max-width: 600px) and (orientation: portrait)",
+      ).matches;
+      const isLandscapePhone = window.matchMedia(
+        "(hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 600px)",
+      ).matches;
+      setCompactIconScale(isPortraitPhone ? 0.62 : isLandscapePhone ? 0.72 : 1);
     }
     measure();
     window.addEventListener("resize", measure);
@@ -147,27 +155,29 @@ export function CategoryIconsLayer({
     if (!viewportSize.w || !viewportSize.h) return null;
     const result = {} as Record<CategoryId, ViewportAnchor>;
     for (const id of CATEGORY_IDS) {
-      result[id] = sourceToViewport(
+      const anchor = sourceToViewport(
         HERO_ANCHORS[id],
         viewportSize.w,
         viewportSize.h,
       );
+      result[id] = { ...anchor, ph: anchor.ph * compactIconScale };
     }
     return result;
-  }, [viewportSize]);
+  }, [compactIconScale, viewportSize]);
 
   const exploreAnchors = useMemo(() => {
     if (!viewportSize.w || !viewportSize.h) return null;
     const result = {} as Record<CategoryId, ViewportAnchor>;
     for (const id of CATEGORY_IDS) {
-      result[id] = sourceToViewport(
+      const anchor = sourceToViewport(
         EXPLORE_ANCHORS[id],
         viewportSize.w,
         viewportSize.h,
       );
+      result[id] = { ...anchor, ph: anchor.ph * compactIconScale };
     }
     return result;
-  }, [viewportSize]);
+  }, [compactIconScale, viewportSize]);
 
   /* ── Visibility ── */
   const isIconView = focusedArea === null || focusedArea === "exploration";
@@ -255,6 +265,8 @@ export function CategoryIconsLayer({
         <div className={styles.hitTargets}>
           {CATEGORY_IDS.map((id) => {
             const anchor = heroAnchors[id];
+            const hitWidth = Math.max(44, anchor.ph * 1.35);
+            const hitHeight = Math.max(44, anchor.ph * 1.25);
             return (
               <button
                 key={id}
@@ -265,10 +277,10 @@ export function CategoryIconsLayer({
                   categories.find((cat) => cat.id === id)!.label[locale]
                 }
                 style={{
-                  left: `${anchor.px - anchor.ph * 0.675}px`,
-                  top: `${anchor.pb - anchor.ph * 1.1}px`,
-                  width: `${anchor.ph * 1.35}px`,
-                  height: `${anchor.ph * 1.25}px`,
+                  left: `${anchor.px - hitWidth / 2}px`,
+                  top: `${anchor.pb - hitHeight}px`,
+                  width: `${hitWidth}px`,
+                  height: `${hitHeight}px`,
                 }}
                 onClick={() => onCategoryClick?.(id)}
                 onMouseEnter={() => onCategoryHover?.(id)}

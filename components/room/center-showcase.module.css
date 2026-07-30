@@ -324,6 +324,38 @@
   }
 }
 
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .projectStrip {
+    top: 0.2rem;
+    max-width: calc(100% - 0.5rem);
+  }
+
+  .projectStrip > div {
+    padding: 0.12rem;
+  }
+
+  .projectStrip button {
+    min-height: 2.75rem;
+    padding: 0.2rem 0.4rem;
+    font-size: clamp(0.32rem, 0.8cqi, 0.46rem);
+  }
+
+  .tab {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.2rem 0.3rem;
+    border-color: transparent;
+    background: rgb(7 11 16 / 54%);
+    font-size: clamp(0.46rem, 2vh, 0.56rem);
+  }
+
+  .tabActive {
+    border-color: rgb(116 212 223 / 46%);
+    background: rgb(7 11 16 / 74%);
+    box-shadow: inset 0 -2px rgb(116 212 223 / 65%);
+  }
+}
+
 :global(html[data-motion="reduced"]) .tab,
 :global(html[data-motion="reduced"]) .projectStrip,
 :global(html[data-motion="reduced"]) .projectStrip button {

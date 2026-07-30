@@ -73,6 +73,31 @@ export type CategoryIconsCanvasProps = {
   reducedMotion?: boolean;
 };
 
+function SyncOrthographicCamera({
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+}) {
+  const camera = useThree((state) => state.camera);
+  const invalidate = useThree((state) => state.invalidate);
+
+  useEffect(() => {
+    if (!(camera instanceof THREE.OrthographicCamera)) return;
+    /* eslint-disable react-hooks/immutability -- Three.js camera projection updates are imperative. */
+    camera.left = 0;
+    camera.right = width;
+    camera.top = height;
+    camera.bottom = 0;
+    camera.updateProjectionMatrix();
+    /* eslint-enable react-hooks/immutability */
+    invalidate();
+  }, [camera, height, invalidate, width]);
+
+  return null;
+}
+
 type IconAnimState = {
   floatY: number;
   floatRotY: number;
@@ -812,6 +837,7 @@ export default function CategoryIconsCanvas({
         }
       }}
     >
+      <SyncOrthographicCamera width={viewportWidth} height={viewportHeight} />
       <Scene
         {...sceneProps}
         viewportWidth={viewportWidth}

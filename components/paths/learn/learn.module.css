@@ -3539,6 +3539,249 @@
   }
 }
 
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .monitorStage {
+    padding: 0.3rem;
+  }
+
+  .monitorFrame {
+    width: calc(100vw - 0.6rem);
+    height: calc(100svh - 0.6rem);
+    padding: 0.35rem;
+    padding-block-end: 0.45rem;
+    border-radius: 0.75rem;
+    transform: none;
+  }
+
+  .monitorCamera {
+    top: 0.08rem;
+    width: 2.6rem;
+    height: 0.45rem;
+  }
+
+  .desktop {
+    --desktop-cell-w: 4.75rem;
+    --desktop-cell-h: 5.1rem;
+    --desktop-gap-x: 0.35rem;
+    --desktop-gap-y: 0.35rem;
+    --desktop-pad-x: 0.5rem;
+    --desktop-pad-top: 0.45rem;
+  }
+
+  .desktopIcon {
+    gap: 0.18rem;
+    width: var(--desktop-cell-w);
+    height: var(--desktop-cell-h);
+    padding: 0.3rem 0.2rem;
+    border-radius: 11px;
+  }
+
+  .desktopIconImage,
+  .desktopSectionIcon {
+    width: 2.7rem;
+    height: 2.7rem;
+  }
+
+  .desktopSectionIcon svg {
+    width: 1.45rem;
+    height: 1.45rem;
+  }
+
+  .desktopIconLabel {
+    max-width: calc(var(--desktop-cell-w) - 0.35rem);
+    min-height: 2.2em;
+    font-size: clamp(0.52rem, 2.2vh, 0.62rem);
+    line-height: 1.12;
+  }
+
+  .learnWidgets {
+    top: 0.4rem;
+    right: 0.4rem;
+    width: clamp(12.5rem, 25vw, 14.5rem);
+    max-height: calc(100% - 4.2rem);
+    gap: 0.35rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .learnWidgetsDragHandle {
+    display: none;
+  }
+
+  .learnWidgetsRow {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .widgetCard[data-variant="hero"],
+  .widgetCard[data-variant="featured"] {
+    border-radius: 12px;
+  }
+
+  .widgetCardBody {
+    gap: 0.35rem;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .widgetCardTop {
+    gap: 0.45rem;
+  }
+
+  .widgetCardAvatar {
+    width: 2.7rem;
+    height: 2.7rem;
+  }
+
+  .widgetCardName {
+    font-size: clamp(0.75rem, 3vh, 0.88rem);
+  }
+
+  .widgetCardSubtitle {
+    font-size: clamp(0.52rem, 2.1vh, 0.62rem);
+  }
+
+  .widgetCardDescription {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: clamp(0.54rem, 2.2vh, 0.64rem);
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .widgetCardCapsules,
+  .widgetCardFeature,
+  .widgetCardFooter {
+    display: none;
+  }
+
+  .widgetFeaturedHeader {
+    gap: 0.3rem;
+    padding: 0.45rem 0.55rem 0;
+  }
+
+  .widgetFeaturedIcon {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .widgetFeaturedLabel {
+    font-size: 0.55rem;
+  }
+
+  .widgetFeaturedContent {
+    padding: 0.4rem 0.55rem 0.45rem;
+  }
+
+  .widgetFeaturedTitle {
+    margin-block-end: 0.15rem;
+    font-size: 0.7rem;
+  }
+
+  .widgetFeaturedDescription {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.56rem;
+    line-height: 1.25;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .widgetFeaturedStepCount {
+    margin-top: 0.2rem;
+    padding: 0.12rem 0.35rem;
+    font-size: 0.52rem;
+  }
+
+  .widgetFeaturedNav {
+    padding: 0 0.55rem 0.4rem;
+  }
+
+  .taskbar {
+    bottom: 0.35rem;
+    width: calc(100% - 0.7rem);
+    height: 3rem;
+    gap: 0.1rem;
+    padding: 0.15rem 0.25rem;
+    border-radius: 16px;
+  }
+
+  .taskbarStart,
+  .taskbarSearch,
+  .taskbarApp,
+  .taskbarReturn {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+
+  .taskbarApps {
+    gap: 0.1rem;
+    padding-inline: 0.2rem;
+  }
+
+  .taskbarRight {
+    gap: 0.2rem;
+    padding-inline: 0.25rem;
+    font-size: 0.58rem;
+  }
+
+  .taskbarLang {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.58rem;
+  }
+
+  .taskbarDate {
+    display: none;
+  }
+
+  .taskbarTime span:last-child {
+    display: none;
+  }
+
+  .window {
+    min-width: min(22rem, calc(100% - 0.5rem));
+    min-height: min(14rem, calc(100% - 0.5rem));
+    border-radius: 12px;
+  }
+
+  .windowHeader {
+    height: 2.75rem;
+    padding-inline: 0.7rem 0.45rem;
+  }
+
+  .windowControlBtn {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .startMenu {
+    bottom: 3.75rem;
+    left: 0.5rem;
+    width: min(21rem, calc(100% - 1rem));
+    max-height: calc(100% - 4.5rem);
+    overflow-y: auto;
+    padding: 0.55rem;
+    border-radius: 16px;
+  }
+
+  .searchOverlay {
+    padding-top: 0.5rem;
+  }
+
+  .searchPanel {
+    width: min(36rem, calc(100% - 1rem));
+    max-height: calc(100% - 1rem);
+    border-radius: 16px;
+  }
+
+  .globalToast {
+    bottom: 3.75rem;
+    font-size: 0.64rem;
+  }
+}
+
 :global([dir="rtl"]) .explorerNavItem[aria-current="page"] {
   box-shadow: inset -2px 0 0 var(--workspace-amber);
 }

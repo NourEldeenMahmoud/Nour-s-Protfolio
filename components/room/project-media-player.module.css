@@ -640,6 +640,100 @@
   }
 }
 
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .projectMeta {
+    top: 58%;
+    width: min(8rem, 25cqi);
+    padding: 0.35rem 0.45rem;
+  }
+
+  .projectMeta p,
+  .projectMeta ul,
+  .scene,
+  .mediaCount {
+    display: none;
+  }
+
+  .projectMeta h3 {
+    font-size: clamp(0.5rem, 2.4cqi, 0.68rem);
+  }
+
+  .projectNav {
+    position: absolute;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .projectNav::before,
+  .iconButton::before {
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid rgb(239 197 126 / 40%);
+    border-radius: 50%;
+    background: rgb(5 10 16 / 76%);
+    content: "";
+  }
+
+  .projectNav svg,
+  .iconButton svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  .transportOverlay {
+    right: clamp(4.2rem, 15cqi, 6rem);
+    bottom: 0.25rem;
+    left: clamp(4.2rem, 15cqi, 6rem);
+    padding: 0.2rem 0.35rem;
+  }
+
+  .transportRow {
+    gap: 0.25rem;
+    margin-block-end: 0.1rem;
+  }
+
+  .iconButton {
+    position: relative;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .timeReadout {
+    margin-inline-start: auto;
+    font-size: 0.42rem;
+  }
+
+  .timeline {
+    height: 0.8rem;
+  }
+
+  .primaryAction {
+    top: 58%;
+    min-width: 2.75rem;
+    width: 2.75rem;
+    min-height: 2.75rem;
+    padding-inline: 0;
+    font-size: 0.52rem;
+  }
+
+  .primaryAction span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
 :global(html[data-motion="reduced"]) .imageFrame {
   animation: reducedReveal 180ms ease-out both;
 }

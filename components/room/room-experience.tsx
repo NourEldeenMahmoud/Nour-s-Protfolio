@@ -32,6 +32,7 @@ import { RoomMusicControl, type RoomMusicCopy } from "./room-music-control";
 import styles from "./room.module.css";
 
 const roomAreas = ["projects", "exploration", "lab"] as const;
+const mobilePromptDismissedKey = "mobile-experience-prompt-dismissed";
 const focusStills = {
   projects: "/engineering-room-hire-straight.webp",
   exploration: "/engineering-room-explore-focus-final.webp",
@@ -120,6 +121,13 @@ export function RoomExperience({
     contextRef.current = null;
   }
 
+  function dismissMobileExperiencePrompt() {
+    try {
+      sessionStorage.setItem(mobilePromptDismissedKey, "true");
+    } catch {}
+    setShowMobileExperiencePrompt(false);
+  }
+
   function completeIntro({ focus = true }: { focus?: boolean } = {}) {
     clearAnimation();
     if (rootRef.current) rootRef.current.dataset.roomState = "idle";
@@ -129,6 +137,15 @@ export function RoomExperience({
   }
 
   const completeIntroAfterEffect = useEffectEvent(completeIntro);
+
+  useLayoutEffect(() => {
+    try {
+      if (sessionStorage.getItem(mobilePromptDismissedKey) === "true") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate session preference before paint
+        setShowMobileExperiencePrompt(false);
+      }
+    } catch {}
+  }, []);
 
   const transitionToArea = useCallback(
     (nextArea: RoomArea | null) => {
@@ -522,10 +539,7 @@ export function RoomExperience({
             </strong>
             <p>{copy.mobileExperience.description}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowMobileExperiencePrompt(false)}
-          >
+          <button type="button" onClick={dismissMobileExperiencePrompt}>
             {copy.mobileExperience.dismiss}
           </button>
         </aside>
@@ -625,10 +639,19 @@ export function RoomExperience({
           <button
             className={styles.replay}
             type="button"
+            aria-label={copy.replay}
             onClick={replayIntro}
             disabled={!isIdle}
           >
-            {copy.replay}
+            <span className={styles.replayLabel}>{copy.replay}</span>
+            <svg
+              className={styles.replayIcon}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M4 4v5h5" />
+              <path d="M5.5 8.5A8 8 0 1 1 4 13" />
+            </svg>
           </button>
         </div>
       </section>

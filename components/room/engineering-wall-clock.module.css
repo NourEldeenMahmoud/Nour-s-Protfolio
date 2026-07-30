@@ -144,6 +144,12 @@
   }
 }
 
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .clock {
+    display: none;
+  }
+}
+
 :global(html[data-motion="reduced"]) .clock {
   transition: none;
 }
