@@ -88,7 +88,6 @@
       "openControls": "فتح إعدادات التجربة",
       "closeControls": "إغلاق إعدادات التجربة",
       "motionLabel": "حركة الموقع",
-      "motionDescription": "اختر ما إذا كان المعرض يتبع إعداد جهازك أو يستخدم إعداد حركة خاصاً بالموقع.",
       "motionSystem": "النظام",
       "motionFull": "كاملة",
       "motionReduced": "محدودة"

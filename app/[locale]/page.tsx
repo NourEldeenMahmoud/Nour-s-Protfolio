@@ -125,7 +125,6 @@ export default async function EntryPage({
           openControls: t("settings.openControls"),
           closeControls: t("settings.closeControls"),
           motionLabel: t("settings.motionLabel"),
-          motionDescription: t("settings.motionDescription"),
           motionSystem: t("settings.motionSystem"),
           motionFull: t("settings.motionFull"),
           motionReduced: t("settings.motionReduced"),

@@ -29,7 +29,6 @@ const settingsCopy: RoomSettingsCopy = {
   openControls: "Open experience settings",
   closeControls: "Close experience settings",
   motionLabel: "Site motion",
-  motionDescription: "Choose a site motion preference.",
   motionSystem: "System",
   motionFull: "Full",
   motionReduced: "Reduced",

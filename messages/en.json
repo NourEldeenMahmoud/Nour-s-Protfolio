@@ -88,7 +88,6 @@
       "openControls": "Open experience settings",
       "closeControls": "Close experience settings",
       "motionLabel": "Site motion",
-      "motionDescription": "Choose whether this portfolio follows your device or uses a site-specific motion preference.",
       "motionSystem": "System",
       "motionFull": "Full",
       "motionReduced": "Reduced"

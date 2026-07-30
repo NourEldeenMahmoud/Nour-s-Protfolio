@@ -27,7 +27,6 @@ export type RoomSettingsCopy = {
   openControls: string;
   closeControls: string;
   motionLabel: string;
-  motionDescription: string;
   motionSystem: string;
   motionFull: string;
   motionReduced: string;
@@ -141,7 +140,6 @@ export function RoomSettingsControl({
       >
         <fieldset className={styles.motionFieldset}>
           <legend>{settingsCopy.motionLabel}</legend>
-          <p>{settingsCopy.motionDescription}</p>
           <div className={styles.motionOptions}>
             {motionOptions.map((option) => (
               <label key={option.value}>
