@@ -602,6 +602,11 @@
     min-height: inherit;
   }
 
+  .mediaImage,
+  .mediaVideo {
+    object-position: center 18%;
+  }
+
   .projectMeta h3 {
     font-size: clamp(0.68rem, 2.8vw, 0.9rem);
   }

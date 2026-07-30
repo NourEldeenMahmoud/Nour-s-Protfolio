@@ -627,6 +627,7 @@
 /* Hide exploration hotspot labels and heading when showcase is open */
 .room[data-focused-area="exploration"] .hotspots,
 .room[data-focused-area="exploration"] .roomHeading {
+  visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }

@@ -296,7 +296,7 @@
     left: auto;
     flex: 1 0 auto;
     width: calc(100% - 1.5rem);
-    min-height: min(72vh, 46rem);
+    min-height: min(64svh, 36rem);
     margin: 0.4rem auto 0;
     border-radius: 4px;
   }
