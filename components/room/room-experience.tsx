@@ -53,6 +53,11 @@ type RoomCopy = {
   language: string;
   languageLabel: string;
   instruction: string;
+  mobileExperience: {
+    title: string;
+    description: string;
+    dismiss: string;
+  };
   areas: Record<
     RoomArea,
     {
@@ -95,6 +100,8 @@ export function RoomExperience({
   const [isScreenHovered, setIsScreenHovered] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [showMobileExperiencePrompt, setShowMobileExperiencePrompt] =
+    useState(true);
   const [isIdle, setIsIdle] = useState(false);
   const [status, setStatus] = useState(copy.loading);
   const [activeCategoryId, setActiveCategoryId] = useState<CategoryId>("web");
@@ -501,6 +508,28 @@ export function RoomExperience({
           </Link>
         </div>
       </header>
+
+      {showMobileExperiencePrompt && (
+        <aside
+          className={styles.mobileExperiencePrompt}
+          aria-labelledby="mobile-experience-title"
+          aria-live="polite"
+        >
+          <span className={styles.rotatePhoneIcon} aria-hidden="true" />
+          <div>
+            <strong id="mobile-experience-title">
+              {copy.mobileExperience.title}
+            </strong>
+            <p>{copy.mobileExperience.description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowMobileExperiencePrompt(false)}
+          >
+            {copy.mobileExperience.dismiss}
+          </button>
+        </aside>
+      )}
 
       <section
         ref={controlsRef}

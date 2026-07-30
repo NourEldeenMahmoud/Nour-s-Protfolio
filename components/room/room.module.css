@@ -233,6 +233,7 @@
 .profileEntry {
   display: grid;
   gap: 0.65rem;
+  justify-items: start;
 }
 
 .profileTrigger {
@@ -354,6 +355,10 @@
   background: rgb(6 11 16 / 75%);
   color: #fff;
   transform: translateY(-2px);
+}
+
+.mobileExperiencePrompt {
+  display: none;
 }
 
 .controls {
@@ -793,6 +798,38 @@
   border: 1px solid #725d40;
 }
 
+@media (min-width: 1121px) and (max-width: 1440px),
+  (min-width: 1121px) and (max-height: 800px) {
+  .identity h1 {
+    font-size: clamp(2.1rem, 3.1vw, 2.8rem);
+  }
+
+  .identity p {
+    max-width: 36rem;
+    font-size: clamp(0.62rem, 0.8vw, 0.76rem);
+  }
+
+  .hotspotCopy strong {
+    font-size: clamp(1.2rem, 1.65vw, 1.6rem);
+  }
+
+  .hotspotCopy > span {
+    font-size: clamp(0.68rem, 0.85vw, 0.8rem);
+  }
+
+  [dir="rtl"] .identity p {
+    font-size: clamp(0.78rem, 1vw, 0.92rem);
+  }
+
+  [dir="rtl"] .hotspotCopy strong {
+    font-size: clamp(1.35rem, 1.8vw, 1.75rem);
+  }
+
+  [dir="rtl"] .hotspotCopy > span {
+    font-size: clamp(0.78rem, 1vw, 0.92rem);
+  }
+}
+
 @media (min-width: 781px) and (max-width: 1120px),
   (min-width: 781px) and (max-height: 700px) {
   .topbar {
@@ -1094,6 +1131,107 @@
   }
 }
 
+@media (max-width: 780px) and (orientation: portrait) {
+  .mobileExperiencePrompt {
+    position: fixed;
+    z-index: 30;
+    inset-block-start: 50%;
+    left: 50%;
+    display: grid;
+    width: min(22rem, calc(100vw - 2rem));
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0.8rem 0.9rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid rgb(216 167 92 / 72%);
+    border-radius: 0.35rem;
+    background:
+      linear-gradient(120deg, rgb(216 167 92 / 14%), transparent 55%),
+      rgb(6 11 16 / 96%);
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 64%);
+    color: #f6f0e5;
+    translate: -50% -50%;
+    backdrop-filter: blur(18px);
+    animation: mobile-prompt-enter 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .mobileExperiencePrompt strong {
+    display: block;
+    color: #f1d19a;
+    font-size: clamp(1rem, 4.8vw, 1.2rem);
+    line-height: 1.15;
+  }
+
+  .mobileExperiencePrompt p {
+    margin-block-start: 0.35rem;
+    color: rgb(246 240 229 / 72%);
+    font-size: clamp(0.72rem, 3.2vw, 0.84rem);
+    line-height: 1.5;
+  }
+
+  .mobileExperiencePrompt button {
+    grid-column: 1 / -1;
+    min-height: 2.75rem;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid rgb(139 196 216 / 55%);
+    border-radius: 0.2rem;
+    background: rgb(139 196 216 / 9%);
+    color: #dcecf1;
+    font-family: var(--font-mono);
+    font-size: clamp(0.66rem, 2.8vw, 0.76rem);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .mobileExperiencePrompt button:hover,
+  .mobileExperiencePrompt button:focus-visible {
+    border-color: #8bc4d8;
+    background: rgb(139 196 216 / 16%);
+    outline: 2px solid #d8a75c;
+    outline-offset: 3px;
+  }
+
+  .rotatePhoneIcon {
+    position: relative;
+    display: block;
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .rotatePhoneIcon::before,
+  .rotatePhoneIcon::after {
+    position: absolute;
+    border: 1px solid #8bc4d8;
+    border-radius: 0.22rem;
+    background: rgb(139 196 216 / 7%);
+    content: "";
+  }
+
+  .rotatePhoneIcon::before {
+    inset: 0.15rem 0.85rem 0.15rem 0.55rem;
+  }
+
+  .rotatePhoneIcon::after {
+    inset: 0.85rem 0.1rem 0.55rem 0.75rem;
+    border-color: #d8a75c;
+  }
+
+  [dir="rtl"] .mobileExperiencePrompt strong,
+  [dir="rtl"] .mobileExperiencePrompt p,
+  [dir="rtl"] .mobileExperiencePrompt button {
+    font-family: var(--font-arabic);
+    letter-spacing: 0;
+  }
+}
+
+@keyframes mobile-prompt-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.97);
+  }
+}
+
 :global(html[data-motion="reduced"]) .sceneCamera {
   transition-duration: 1150ms !important;
 }
@@ -1109,8 +1247,10 @@
 }
 
 :global(html[data-motion="reduced"]) .profileTrigger,
-:global(html[data-motion="reduced"]) .profileTriggerArrow {
+:global(html[data-motion="reduced"]) .profileTriggerArrow,
+:global(html[data-motion="reduced"]) .mobileExperiencePrompt {
   transition: none;
+  animation: none;
 }
 
 :global(html[data-motion="reduced"]) .profileTrigger:hover,

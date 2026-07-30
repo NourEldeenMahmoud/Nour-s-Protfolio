@@ -342,6 +342,20 @@
   font-size: 0.65rem;
 }
 
+@media (max-width: 1440px), (max-height: 900px) {
+  .pathHero h1 {
+    font-size: clamp(2.6rem, 5vw, 4.25rem);
+  }
+
+  .labZone h2,
+  .knowledge h2,
+  .range h2,
+  .contact h2,
+  .principles > h2 {
+    font-size: clamp(1.8rem, 3vw, 3rem);
+  }
+}
+
 @media (max-width: 900px) {
   .header {
     grid-template-columns: 1fr auto;
@@ -358,6 +372,18 @@
   .roomReturn {
     grid-column: 2;
     grid-row: 1;
+  }
+
+  .pathHero h1 {
+    font-size: clamp(2.3rem, 7vw, 3.5rem);
+  }
+
+  .labZone h2,
+  .knowledge h2,
+  .range h2,
+  .contact h2,
+  .principles > h2 {
+    font-size: clamp(1.65rem, 5vw, 2.4rem);
   }
 
   .labGrid,
@@ -385,6 +411,25 @@
 
   .pathHero {
     min-height: 72svh;
+    padding-inline: 1.25rem;
+  }
+
+  .pathHero h1 {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+    line-height: 0.96;
+  }
+
+  .pathHero > p:not(.eyebrow) {
+    margin-block-start: 1.4rem;
+    font-size: clamp(0.92rem, 3.8vw, 1rem);
+  }
+
+  .labZone h2,
+  .knowledge h2,
+  .range h2,
+  .contact h2,
+  .principles > h2 {
+    font-size: clamp(1.5rem, 6.5vw, 2rem);
   }
 
   .pathHero::before {

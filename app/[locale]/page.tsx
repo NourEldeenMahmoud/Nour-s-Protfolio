@@ -49,6 +49,11 @@ export default async function EntryPage({
         language: t("language"),
         languageLabel: t("languageLabel"),
         instruction: t("instruction"),
+        mobileExperience: {
+          title: t("mobileExperience.title"),
+          description: t("mobileExperience.description"),
+          dismiss: t("mobileExperience.dismiss"),
+        },
         profile: {
           triggerEyebrow: t("profile.triggerEyebrow"),
           triggerLabel: t("profile.triggerLabel"),

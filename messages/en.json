@@ -17,6 +17,11 @@
     "language": "العربية",
     "languageLabel": "View in Arabic",
     "instruction": "Explore by room area. Use Tab to move between destinations.",
+    "mobileExperience": {
+      "title": "See the room in full",
+      "description": "Rotate your phone to landscape or open the portfolio on a desktop for the full experience. Portrait mode still works.",
+      "dismiss": "Continue in portrait"
+    },
     "profile": {
       "triggerEyebrow": "Recruiter brief",
       "triggerLabel": "Profile & CV",
