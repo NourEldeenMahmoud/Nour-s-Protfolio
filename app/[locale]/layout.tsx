@@ -75,7 +75,7 @@ export default async function LocaleLayout({
         {isProduction && (
           <script
             dangerouslySetInnerHTML={{
-              __html: `(function(){var root=document.documentElement;try{var params=new URLSearchParams(location.search);var manual=params.get("reducedMotion")==="1"||localStorage.getItem("portfolio-reduced-motion")==="true";var systemReduced=matchMedia("(prefers-reduced-motion:reduce)").matches;root.dataset.motion=manual||systemReduced?"reduced":"full";}catch(e){root.dataset.motion="full";}})()`,
+              __html: `(function(){var root=document.documentElement;var params=new URLSearchParams(location.search);var forced=params.get("reducedMotion")==="1";var systemReduced=matchMedia("(prefers-reduced-motion:reduce)").matches;var preference="system";try{var saved=localStorage.getItem("portfolio-motion-preference");var legacy=localStorage.getItem("portfolio-reduced-motion")==="true";preference=saved==="full"||saved==="reduced"?saved:legacy?"reduced":"system";}catch(e){preference="system";}root.dataset.motion=forced||preference==="reduced"||preference==="system"&&systemReduced?"reduced":"full";})()`,
             }}
           />
         )}

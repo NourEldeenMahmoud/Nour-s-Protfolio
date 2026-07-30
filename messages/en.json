@@ -83,6 +83,16 @@
       "label": "Cairo time",
       "timezone": "CAIRO / EGY"
     },
+    "settings": {
+      "label": "Experience settings",
+      "openControls": "Open experience settings",
+      "closeControls": "Close experience settings",
+      "motionLabel": "Site motion",
+      "motionDescription": "Choose whether this portfolio follows your device or uses a site-specific motion preference.",
+      "motionSystem": "System",
+      "motionFull": "Full",
+      "motionReduced": "Reduced"
+    },
     "certificate": {
       "triggerEyebrow": "Recruiter credentials",
       "triggerTitle": "Certificates",
@@ -105,8 +115,6 @@
       "mute": "Mute room music",
       "unmute": "Unmute room music",
       "volume": "Room music volume",
-      "openControls": "Open room music controls",
-      "closeControls": "Close room music controls",
       "error": "The room music could not be played."
     },
     "areas": {

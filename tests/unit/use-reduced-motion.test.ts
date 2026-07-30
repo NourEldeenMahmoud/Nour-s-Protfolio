@@ -1,7 +1,8 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createElement } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useMotionPreference } from "@/hooks/use-motion-preference";
 import {
   MotionContext,
   MotionProvider,
@@ -202,6 +203,70 @@ describe("MotionProvider hydration safety", () => {
     expect(document.documentElement.dataset.motion).toBe("reduced");
   });
 
+  it("lets a saved full preference override reduced motion from the OS", async () => {
+    setEnv("production");
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation(() => ({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    window.localStorage.setItem("portfolio-motion-preference", "full");
+    document.documentElement.dataset.motion = "reduced";
+
+    const { result } = renderHook(
+      () => ({
+        reducedMotion: useReducedMotion(),
+        motion: useMotionPreference(),
+      }),
+      { wrapper: MotionProvider },
+    );
+
+    expect(result.current.motion.preference).toBe("full");
+    expect(result.current.reducedMotion).toBe(false);
+    expect(document.documentElement.dataset.motion).toBe("full");
+  });
+
+  it("switches live between system and full motion and persists the choice", async () => {
+    setEnv("production");
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation(() => ({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    document.documentElement.dataset.motion = "full";
+
+    const { result } = renderHook(
+      () => ({
+        reducedMotion: useReducedMotion(),
+        motion: useMotionPreference(),
+      }),
+      { wrapper: MotionProvider },
+    );
+
+    expect(result.current.reducedMotion).toBe(true);
+    expect(result.current.motion.preference).toBe("system");
+
+    act(() => result.current.motion.setPreference("full"));
+    expect(result.current.reducedMotion).toBe(false);
+    expect(document.documentElement.dataset.motion).toBe("full");
+    expect(window.localStorage.getItem("portfolio-motion-preference")).toBe(
+      "full",
+    );
+
+    act(() => result.current.motion.setPreference("system"));
+    expect(result.current.reducedMotion).toBe(true);
+    expect(document.documentElement.dataset.motion).toBe("reduced");
+    expect(
+      window.localStorage.getItem("portfolio-motion-preference"),
+    ).toBeNull();
+  });
+
   it("subscribes to matchMedia changes in production", async () => {
     setEnv("production");
     document.documentElement.dataset.motion = "full";
@@ -303,7 +368,9 @@ describe("Hydration safety", () => {
       "utf-8",
     );
 
-    expect(layout).toMatch(/var root=document\.documentElement;try\{/);
+    expect(layout).toContain("__html: `(function(){");
+    expect(layout).toContain("var root=document.documentElement;");
+    expect(layout).toContain('saved==="full"||saved==="reduced"');
   });
 
   it("MotionProvider initializes with useState(false), not DOM read", async () => {

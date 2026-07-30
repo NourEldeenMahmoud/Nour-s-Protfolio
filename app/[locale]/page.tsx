@@ -120,6 +120,16 @@ export default async function EntryPage({
           label: t("clock.label"),
           timezone: t("clock.timezone"),
         },
+        settings: {
+          label: t("settings.label"),
+          openControls: t("settings.openControls"),
+          closeControls: t("settings.closeControls"),
+          motionLabel: t("settings.motionLabel"),
+          motionDescription: t("settings.motionDescription"),
+          motionSystem: t("settings.motionSystem"),
+          motionFull: t("settings.motionFull"),
+          motionReduced: t("settings.motionReduced"),
+        },
         music: {
           label: t("music.label"),
           track: t("music.track"),
@@ -128,8 +138,6 @@ export default async function EntryPage({
           mute: t("music.mute"),
           unmute: t("music.unmute"),
           volume: t("music.volume"),
-          openControls: t("music.openControls"),
-          closeControls: t("music.closeControls"),
           error: t("music.error"),
         },
         areas: {

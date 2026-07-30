@@ -28,7 +28,11 @@ import {
   type EngineeringWallClockCopy,
 } from "./engineering-wall-clock";
 import { ProfileDossier, type ProfileDossierCopy } from "./profile-dossier";
-import { RoomMusicControl, type RoomMusicCopy } from "./room-music-control";
+import {
+  RoomSettingsControl,
+  type RoomMusicCopy,
+  type RoomSettingsCopy,
+} from "./room-settings-control";
 import styles from "./room.module.css";
 
 const roomAreas = ["projects", "exploration", "lab"] as const;
@@ -69,6 +73,7 @@ type RoomCopy = {
   profile: ProfileDossierCopy;
   certificate: CertificateSpotlightCopy;
   clock: EngineeringWallClockCopy;
+  settings: RoomSettingsCopy;
   music: RoomMusicCopy;
   showcase: ShowcaseCopy;
 };
@@ -514,7 +519,10 @@ export function RoomExperience({
           </button>
         </div>
         <div className={styles.topbarUtilities}>
-          <RoomMusicControl copy={copy.music} />
+          <RoomSettingsControl
+            settingsCopy={copy.settings}
+            musicCopy={copy.music}
+          />
           <Link
             href={`/${alternateLocale}`}
             hrefLang={alternateLocale}
