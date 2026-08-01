@@ -21,6 +21,14 @@ export function PortfolioAnalytics() {
       if (!link) return;
 
       const url = new URL(link.href, window.location.href);
+      if (link.hasAttribute("download")) {
+        const isCv = url.pathname.toLowerCase().includes("cv");
+        void track(isCv ? "cv_downloaded" : "file_downloaded", {
+          file_type: url.pathname.split(".").at(-1) ?? "unknown",
+        });
+        return;
+      }
+
       if (url.origin !== window.location.origin) {
         void track("external_link_clicked", {
           destination: classifyExternalLink(url.href),
