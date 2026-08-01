@@ -7,7 +7,6 @@ import { getLocalizedUrl } from "@/lib/seo";
 const publicPaths = [
   "",
   "/learn",
-  "/general",
   ...projectSlugs.map((slug) => `/projects/${slug}`),
   ...caseStudySlugs.map((slug) => `/case-studies/${slug}`),
 ];

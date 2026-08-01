@@ -84,8 +84,8 @@ describe("SEO configuration", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example");
     const entries = sitemap();
 
-    expect(entries).toHaveLength(44);
-    expect(new Set(entries.map(({ url }) => url)).size).toBe(44);
+    expect(entries).toHaveLength(42);
+    expect(new Set(entries.map(({ url }) => url)).size).toBe(42);
     expect(entries.every(({ url }) => !url.includes("?"))).toBe(true);
     expect(entries.map(({ url }) => url)).toContain(
       "https://portfolio.example/ar/case-studies/buildsense",

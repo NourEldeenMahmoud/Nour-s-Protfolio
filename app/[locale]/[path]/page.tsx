@@ -1,5 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   PathExperience,
@@ -70,6 +70,8 @@ export default async function DestinationContractPage({
 }) {
   const { locale, path } = await params;
   if (!isLocale(locale) || !isPath(path)) notFound();
+
+  if (path === "general") permanentRedirect(`/${locale}`);
 
   setRequestLocale(locale);
 
