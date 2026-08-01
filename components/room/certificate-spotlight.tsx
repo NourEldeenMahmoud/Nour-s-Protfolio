@@ -148,6 +148,7 @@ export function CertificateSpotlight({
         className={styles.trigger}
         type="button"
         data-active={active || undefined}
+        data-analytics-event="certificate_opened"
         aria-label={copy.open}
         aria-haspopup="dialog"
         aria-expanded={isOpen}

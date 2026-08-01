@@ -180,6 +180,8 @@ export function CenterShowcase({
               key={category.id}
               role="tab"
               data-category-icon-control="true"
+              data-analytics-event="category_selected"
+              data-category={category.id}
               id={`tab-${category.id}`}
               aria-selected={isActive}
               aria-controls={PANEL_ID}
@@ -222,6 +224,8 @@ export function CenterShowcase({
                     key={project.slug}
                     type="button"
                     className={isActive ? styles.projectStripActive : undefined}
+                    data-analytics-event="project_selected"
+                    data-project={project.slug}
                     aria-current={isActive ? "true" : undefined}
                     onClick={() => selectProject(index)}
                   >
