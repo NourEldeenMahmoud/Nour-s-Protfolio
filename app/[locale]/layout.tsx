@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { NextIntlClientProvider } from "next-intl";
 import {
   getMessages,
@@ -11,6 +12,7 @@ import { isLocale, locales } from "@/i18n/routing";
 import { MotionProvider } from "@/components/providers/motion-provider";
 import { LocalePreference } from "@/components/providers/locale-preference";
 import { RoomMusicProvider } from "@/components/providers/room-music-provider";
+import { PortfolioAnalytics } from "@/components/analytics/portfolio-analytics";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getSiteUrl, personName, siteName } from "@/lib/seo";
 import { createHomeStructuredData } from "@/lib/structured-data";
@@ -81,6 +83,8 @@ export default async function LocaleLayout({
         )}
       </head>
       <body>
+        <Analytics />
+        <PortfolioAnalytics />
         <JsonLd data={createHomeStructuredData(locale)} />
         <LocalePreference locale={locale} />
         <MotionProvider>
